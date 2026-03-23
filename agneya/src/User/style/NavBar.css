@@ -1,25 +1,25 @@
 @import url('../../index.css');
 
-
-nav {
+.user-navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
   transition: all 0.4s ease;
+  background: transparent;
 }
 
-nav.scrolled {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+.user-navbar.scrolled {
+  background: rgba(15, 12, 41, 0.85); /* Deep grape/purple shade */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
 /* Main container */
-.nav-container {
+.user-nav-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 1.2rem 2.5rem;
@@ -29,27 +29,28 @@ nav.scrolled {
 }
 
 /* Logo */
-.nav-logo {
-  font-family: var(--font-heading);
+.user-logo {
+  font-family: var(--font-heading, "Poppins", sans-serif);
   font-size: 2rem;
   font-weight: 800;
   letter-spacing: -1px;
-  background: linear-gradient(90deg, var(--primary-light), var(--secondary));
+  background: linear-gradient(90deg, #ff7e5f, #feb47b); /* Orange/Red */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  text-decoration: none;
 }
 
-.nav-logo span {
-  color: var(--accent);
-  font-weight: 700;
+.user-logo .accent-dot {
+  color: #ff7e5f;
+  font-weight: 900;
 }
 
 /* Navigation Links */
-.nav-menu {
+.user-nav-links {
   display: flex;
   align-items: center;
   gap: 2.5rem;
@@ -58,42 +59,44 @@ nav.scrolled {
   padding: 0;
 }
 
-.nav-item {
+.user-nav-item {
   position: relative;
 }
 
-.nav-link {
-  color: var(--light);
+.user-nav-link {
+  color: #e2e8f0; /* Soft light gray */
   font-weight: 500;
   font-size: 1.05rem;
   text-decoration: none;
-  transition: var(--transition);
+  transition: all 0.3s ease;
   padding: 0.5rem 0;
+  font-family: var(--font-body, 'Inter', sans-serif);
 }
 
-.nav-link:hover,
-.nav-link.active {
-  color: var(--primary-light);
+.user-nav-link:hover,
+.user-nav-link.active {
+  color: #ff7e5f;
 }
 
-.nav-link::after {
+.user-nav-link::after {
   content: '';
   position: absolute;
   width: 0;
   height: 2px;
-  bottom: -4px;
+  bottom: -2px;
   left: 0;
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  background: linear-gradient(90deg, #ff7e5f, #feb47b);
   transition: width 0.3s ease;
+  border-radius: 2px;
 }
 
-.nav-link:hover::after,
-.nav-link.active::after {
+.user-nav-link:hover::after,
+.user-nav-link.active::after {
   width: 100%;
 }
 
 /* Auth / User Actions (Desktop) */
-.nav-actions {
+.user-nav-actions {
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -103,41 +106,52 @@ nav.scrolled {
   display: flex;
   align-items: center;
   gap: 1rem;
-  color: var(--light);
+  color: #e2e8f0;
   font-weight: 500;
 }
 
 .user-name-text {
-  color: var(--primary-light);
+  color: #ff7e5f; /* Orange accent */
+  font-weight: 600;
 }
 
 .logout-icon-btn {
-  background: none;
-  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #fca5a5;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.3s ease;
 }
 
 .logout-icon-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
-  transform: scale(1.15);
+  transform: scale(1.05);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .login-link-desktop {
-  color: var(--light);
+  color: #ffffff;
   font-weight: 600;
   padding: 0.7rem 1.8rem;
-  border: 2px solid var(--primary);
+  background: linear-gradient(90deg, #ff512f, #dd2476);
   border-radius: 50px;
-  transition: var(--transition);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(221, 36, 118, 0.3);
 }
 
 .login-link-desktop:hover {
-  background: var(--primary);
-  color: white;
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(221, 36, 118, 0.5);
+  opacity: 0.95;
 }
 
 /* Hamburger Menu */
@@ -149,18 +163,19 @@ nav.scrolled {
   border: none;
   cursor: pointer;
   padding: 0.5rem;
+  z-index: 1001; /* Above mobile menu */
 }
 
 .hamburger span {
   width: 28px;
   height: 3px;
-  background: var(--light);
+  background: #ffffff;
   border-radius: 3px;
   transition: all 0.4s ease;
 }
 
 .hamburger.active span:nth-child(1) {
-  transform: rotate(45deg) translate(8px, 8px);
+  transform: rotate(45deg) translate(6px, 6px);
 }
 
 .hamburger.active span:nth-child(2) {
@@ -168,38 +183,7 @@ nav.scrolled {
 }
 
 .hamburger.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -7px);
-}
-
-/* Mobile Menu */
-.mobile-menu {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--dark);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 3rem;
-  z-index: 999;
-  transform: translateY(-100%);
-  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.mobile-menu.open {
-  transform: translateY(0);
-}
-
-.mobile-menu .nav-item {
-  font-size: 1.8rem;
-  font-weight: 600;
-}
-
-.mobile-menu .nav-link {
-  font-size: 2rem;
+  transform: rotate(-45deg) translate(6px, -7px);
 }
 
 /* Mobile-only elements */
@@ -209,52 +193,86 @@ nav.scrolled {
 
 /* Responsive Design */
 @media (max-width: 992px) {
-  .nav-container {
+  .user-nav-container {
     padding: 1.2rem 2rem;
   }
 
-  .nav-menu {
-    display: none;
-  }
-
-  .nav-actions .desktop-only {
-    display: none;
-  }
-
+  /* Hamburger logic maps perfectly now */
   .hamburger {
     display: flex;
   }
 
+  .user-nav-actions .desktop-only {
+    display: none;
+  }
+
+  .user-nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100vh;
+    background: rgba(15, 12, 41, 0.98); /* Matching background shade */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 1000;
+  }
+
+  .user-nav-links.active {
+    right: 0;
+  }
+
+  .user-nav-item {
+    font-size: 1.5rem;
+  }
+
+  .user-nav-link {
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
+
   .mobile-only {
     display: block;
+    margin-top: 1rem;
   }
 
   .logout-btn-mob,
   .login-btn-mob {
-    padding: 1rem 2.5rem;
+    display: inline-block;
+    padding: 1rem 3rem;
     font-size: 1.3rem;
     border-radius: 50px;
     font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
   }
 
   .logout-btn-mob {
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.1);
     color: #fca5a5;
-    border: 1px solid rgba(239, 68, 68, 0.4);
+    border: 1px solid rgba(239, 68, 68, 0.3);
   }
 
   .login-btn-mob {
-    background: var(--primary);
+    background: linear-gradient(90deg, #ff512f, #dd2476);
     color: white;
+    box-shadow: 0 4px 15px rgba(221, 36, 118, 0.3);
   }
 }
 
 @media (max-width: 576px) {
-  .nav-logo {
+  .user-logo {
     font-size: 1.7rem;
   }
 
-  .nav-container {
+  .user-nav-container {
     padding: 1rem 1.5rem;
   }
 }

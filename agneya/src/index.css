@@ -7,12 +7,12 @@
 
 :root {
   /* Core Brand Colors */
-  --primary: #7c3aed;           /* vibrant purple */
-  --primary-dark: #5b21b6;
-  --primary-light: #a78bfa;
+  --primary: #5b0475;           /* vibrant purple */
+  --primary-dark: #4707ae;
+  --primary-light: #9f0ca1;
   
-  --secondary: #22d3ee;         /* cyan/turquoise */
-  --secondary-dark: #0891b2;
+  --secondary: #4b0566;         /* cyan/turquoise */
+  --secondary-dark: #3a0341;
   
   --accent: #facc15;            /* gold/yellow */
   --accent-dark: #eab308;
