@@ -9,7 +9,7 @@ import {
   PerspectiveCamera,
 } from "@react-three/drei";
 import * as THREE from "three";
-import "./TShirt3D.css";
+import "../style/TShirt3D.css";
 
 const MODEL_PATH = "/models/tshirt.glb"; // ← Make sure this file exists in public/models/
 
