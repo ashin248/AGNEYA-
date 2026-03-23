@@ -63,15 +63,8 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
 
-          {/* Protected User Routes */}
-          <Route
-            path="/customize"
-            element={
-              <ProtectedRoute>
-                <ProductCustomize />
-              </ProtectedRoute>
-            }
-          />
+          {/* Customize - no login required here, auth checked at purchase */}
+          <Route path="/customize" element={<ProductCustomize />} />
           <Route
             path="/profile"
             element={

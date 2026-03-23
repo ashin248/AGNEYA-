@@ -19,8 +19,11 @@ export default function AdminLogin() {
       const res = await API.post("/api/admin/login", { password });
 
       if (res.data.success) {
-        // Optional: store session ID or flag (skip if unnecessary)
-        localStorage.setItem("isAdmin", "true"); // for quick check
+        // Save JWT token returned by backend (used by product upload routes)
+        if (res.data.token) {
+          localStorage.setItem("adminToken", res.data.token);
+        }
+        localStorage.setItem("isAdmin", "true"); // for quick UI check
 
         // ✅ redirect here
         navigate("/admin", { replace: true });

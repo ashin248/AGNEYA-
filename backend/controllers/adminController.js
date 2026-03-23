@@ -1,4 +1,6 @@
 // controllers/adminController.js
+const jwt = require('jsonwebtoken');
+
 const adminLogin = (req, res) => {
   const { password } = req.body;
 
@@ -12,12 +14,22 @@ const adminLogin = (req, res) => {
   const correctPassword = process.env.ADMIN_PASSWORD || 'supersecret123';
 
   if (password === correctPassword) {
+    // Set session (for session-based routes)
     req.session.isAdmin = true;
     req.session.adminLoggedInAt = new Date();
+
+    // Also generate a JWT token (for JWT-based routes like product upload)
+    const secret = process.env.JWT_SECRET || process.env.SESSION_SECRET || 'fallback_secret';
+    const token = jwt.sign(
+      { isAdmin: true, role: 'admin', id: 'admin' },
+      secret,
+      { expiresIn: '7d' }
+    );
 
     return res.status(200).json({
       success: true,
       message: 'Admin login successful',
+      token, // Return token to frontend
     });
   } else {
     return res.status(401).json({
