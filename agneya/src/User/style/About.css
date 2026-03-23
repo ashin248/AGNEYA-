@@ -1,52 +1,60 @@
 /* src/style/About.css */
 
 .about-section {
-  padding: 6rem 1rem;
-  background-color: #050505; /* Consistent deep dark background */
+  position: relative;
+  padding: 8rem 1rem;
+  background-color: #050505;
   color: #ffffff;
   overflow: hidden;
+  /* പശ്ചാത്തലത്തിൽ വളരെ നേർത്ത ഒരു കളർ മിക്സിങ് (Melted feel) */
+  background-image: radial-gradient(circle at 10% 20%, rgba(106, 27, 154, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 90% 80%, rgba(179, 136, 255, 0.05) 0%, transparent 50%);
 }
 
 .about-container {
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
-/* Heading Styles */
+/* Heading Styles - Smooth fading text */
 .about-heading {
   text-align: center;
-  margin-bottom: 4rem;
+  margin-bottom: 5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .about-heading h2 {
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 700;
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 800;
   margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+  /* ബോക്സ് ഇല്ലാതെ ടെക്സ്റ്റ് ബാക്ക്ഗ്രൗണ്ടിലേക്ക് അലിഞ്ഞു ചേരാൻ */
+  background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.3) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .about-underline {
-  height: 4px;
-  width: 80px;
-  background: linear-gradient(90deg, transparent, #b388ff, transparent);
-  border-radius: 2px;
-  box-shadow: 0 0 10px #b388ff;
+  height: 2px;
+  width: 100px;
+  background: linear-gradient(90deg, transparent, rgba(179, 136, 255, 0.8), transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(179, 136, 255, 0.6);
+  filter: blur(1px); /* ലേശം ബ്ലർ ചെയ്ത് സ്മൂത്താക്കുന്നു */
 }
 
 /* Main Content Layout */
 .about-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  gap: 5rem;
   align-items: center;
 }
 
-/* Text Content */
+/* Text Content - No boxes, pure flowing text */
 .about-text {
   display: flex;
   flex-direction: column;
@@ -54,140 +62,120 @@
 }
 
 .about-text h3 {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 600;
   color: #b388ff;
   margin-bottom: 0.5rem;
+  text-shadow: 0 0 30px rgba(179, 136, 255, 0.3);
 }
 
 .about-text p {
-  font-size: 1.1rem;
-  line-height: 1.7;
-  color: #a0a0a0;
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.7); /* നേർത്ത സുതാര്യത (opacity) അലിഞ്ഞ ഫീൽ നൽകും */
   margin: 0;
 }
 
 /* Stats Section */
 .about-stats {
   display: flex;
-  gap: 3rem;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 4rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  /* വരകൾ ഒഴിവാക്കി പകരം ഒരു നേർത്ത ഗ്രേഡിയന്റ് */
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
 }
 
 .stat-item {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
 }
 
 .stat-item h4 {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 3rem;
+  font-weight: 800;
   background: linear-gradient(135deg, #b388ff 0%, #ff4081 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1;
   margin: 0;
+  filter: drop-shadow(0 10px 20px rgba(106, 27, 154, 0.2));
 }
 
 .stat-item p {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 500;
-  color: #cccccc;
-  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 2px;
   text-transform: uppercase;
 }
 
-/* Image Frame & Decoration */
+/* Image Frame - MELTED EFFECT (അലിഞ്ഞ ചേർന്ന ഫീൽ) */
 .about-image {
   position: relative;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .image-frame {
   position: relative;
   width: 100%;
-  max-width: 500px;
-  z-index: 1;
+  max-width: 450px;
+}
+
+/* ചിത്രത്തിന് പിന്നിലെ പ്രകാശം (Glow Instead of Border) */
+.image-frame::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110%;
+  height: 110%;
+  background: radial-gradient(circle, rgba(106, 27, 154, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+  filter: blur(40px); /* ഈ ബ്ലർ ആണ് അലിഞ്ഞു ചേർന്ന ഫീൽ നൽകുന്നത് */
+  z-index: 0;
+  border-radius: 50%;
+  transition: all 0.8s ease;
 }
 
 .image-frame img {
   width: 100%;
   height: auto;
-  border-radius: 16px;
+  border-radius: 24px; /* Soft rounded corners */
   display: block;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   position: relative;
-  z-index: 2;
-  transition: transform 0.4s ease;
-}
-
-/* Creative offset border sitting behind the image */
-.image-border-decoration {
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  width: 100%;
-  height: 100%;
-  border: 2px solid #6a1b9a;
-  border-radius: 16px;
   z-index: 1;
-  transition: all 0.4s ease;
+  /* ഹാർഷ് ആയ ഷാഡോ ഒഴിവാക്കി സ്മൂത്ത് ഷാഡോ നൽകുന്നു */
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Hover effect on the image frame */
+/* Hover ചെയ്യുമ്പോൾ ആ പ്രകാശം കുറച്ചുകൂടി വലുതാകുന്നു */
+.image-frame:hover::before {
+  width: 130%;
+  height: 130%;
+  background: radial-gradient(circle, rgba(179, 136, 255, 0.5) 0%, rgba(0, 0, 0, 0) 70%);
+}
+
 .image-frame:hover img {
-  transform: translate(-8px, -8px);
-}
-
-.image-frame:hover .image-border-decoration {
-  top: 32px;
-  left: 32px;
-  border-color: #b388ff;
-  box-shadow: 0 0 20px rgba(106, 27, 154, 0.4);
+  transform: translateY(-10px) scale(1.02);
 }
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
   .about-content {
     grid-template-columns: 1fr;
-    gap: 3rem;
+    gap: 4rem;
   }
-
-  .about-text {
+  .about-text, .about-heading {
     text-align: center;
     align-items: center;
   }
-
   .about-stats {
     justify-content: center;
     width: 100%;
-  }
-
-  .image-frame {
-    margin: 0 auto;
-    max-width: 80%;
-  }
-}
-
-@media (max-width: 576px) {
-  .about-stats {
-    gap: 2rem;
-  }
-
-  .stat-item h4 {
-    font-size: 2rem;
-  }
-
-  .image-frame {
-    max-width: 100%;
-  }
-  
-  .image-border-decoration {
-    top: 16px;
-    left: 16px;
   }
 }
