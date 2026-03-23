@@ -1,135 +1,58 @@
-/* ProductCustomize.css - Premium Customisation Canvas 2026 */
+/* src/User/style/ProductCustomize.css */
+
+@import url('../../index.css');
 
 .customize-page {
-  padding: var(--space-lg) var(--space-md);
-  max-width: 1600px;
-  margin: 0 auto;
+  background: var(--bg);
+  padding: var(--space-xl);
 }
 
-.customize-layout {
-  display: grid;
-  grid-template-columns: 320px 1fr 320px;
-  gap: 2rem;
-}
-
-@media (max-width: 1200px) {
-  .customize-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Tools Panel (left) */
-.tools-panel, .layers-panel {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 1.8rem;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
-  height: fit-content;
-}
-
-.tools-panel h3, .layers-panel h3 {
-  color: var(--color-highlight);
-  margin-bottom: 1.5rem;
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  background: var(--bg-card);
+  border: var(--stroke-thick);
+  box-shadow: 10px 10px 0 #000;
+  padding: var(--space-lg);
 }
 
 .tool-group {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-bottom: 1.8rem;
-}
-
-.tool-btn {
-  padding: 0.9rem 1.4rem;
-  background: rgba(30, 10, 50, 0.5);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-}
-
-.tool-btn:hover, .tool-btn.active {
-  background: var(--color-primary);
-  color: white;
-  transform: translateY(-2px);
-}
-
-/* Canvas Area */
-.canvas-wrapper {
-  background: #111;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: 0 12px 45px rgba(0, 0, 0, 0.6);
-  position: relative;
-}
-
-/* Right Panel - Preview / Actions */
-.actions-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-.preview-btn, .add-to-cart-btn, .checkout-now {
-  padding: 1.2rem;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-}
-
-.preview-btn {
-  background: var(--color-primary);
-  color: white;
-}
-
-.add-to-cart-btn {
-  background: rgba(132, 189, 0, 0.8);
-  color: white;
-}
-
-.checkout-now {
-  background: linear-gradient(135deg, var(--color-accent), #a0d600);
-  color: black;
-}
-
-.preview-btn:hover, .add-to-cart-btn:hover, .checkout-now:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 35px rgba(156, 81, 182, 0.45);
-}
-
-/* Preview Modal */
-.preview-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  display: flex;
+  gap: var(--space-sm);
   align-items: center;
+}
+
+.canvas-wrapper {
+  border: var(--stroke-thick);
+  box-shadow: 14px 14px 0 #000;
+  overflow: hidden;
+  background: #000;
+  margin-bottom: var(--space-2xl);
+}
+
+#fabric-canvas {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  display: block;
+}
+
+.preview-3d-toggle {
+  @extend .btn;
+  background: var(--accent);
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--space-lg);
   justify-content: center;
-  z-index: 2000;
 }
 
-.modal-content {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 2rem;
-  max-width: 90%;
-  text-align: center;
-}
-
-.download-btn {
-  margin-top: 1.5rem;
-  padding: 1rem 2rem;
-  background: var(--color-accent);
-  color: black;
-  border-radius: var(--radius-md);
-  text-decoration: none;
-  font-weight: 700;
+.buy-btn {
+  @extend .btn;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  font-size: 1.4rem;
+  padding: 1.2rem 3rem;
 }

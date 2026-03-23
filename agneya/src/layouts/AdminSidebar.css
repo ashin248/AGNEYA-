@@ -1,55 +1,87 @@
-/* AdminSidebar.css */
+
+
+@import url('../index.css');
 
 .admin-layout-wrapper {
   display: flex;
   min-height: 100vh;
-  background-color: var(--bg-primary);
-  transition: all var(--transition-normal);
-}
-
-/* മെയിൻ കണ്ടന്റ് ഏരിയ */
-.admin-main-content {
-  flex: 1;
-  transition: all var(--transition-normal);
-  padding: var(--space-md);
+  background: var(--bg);
+  position: relative;
   overflow-x: hidden;
 }
 
-.admin-content-inner {
-  max-width: 1400px;
-  margin: 0 auto;
-  background: var(--bg-card);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl);
-  min-height: 85vh;
-  margin-top: 15px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+/* Main content area */
+.admin-main-content {
+  flex: 1;
+  transition: margin-left var(--tr-bounce), opacity var(--tr-micro);
+  padding: var(--space-lg);
+  background: var(--bg);
 }
 
-/* Sidebar തുറന്നിരിക്കുമ്പോൾ കണ്ടന്റ് അഡ്ജസ്റ്റ് ചെയ്യാൻ */
+/* Content inner wrapper – brutal card */
+.admin-content-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: var(--stroke-thick);
+  box-shadow: 12px 12px 0 #000000;
+  padding: var(--space-xl);
+  min-height: 85vh;
+}
+
+/* Sidebar states */
 .sidebar-open .admin-main-content {
-  margin-left: 260px;
+  margin-left: 280px;       
 }
 
 .sidebar-closed .admin-main-content {
-  margin-left: 84px;
+  margin-left: 90px;      
 }
 
-/* Mobile Responsive */
+/* Mobile behavior – brutal overlay */
 @media (max-width: 768px) {
   .sidebar-open .admin-main-content {
     margin-left: 0;
-    opacity: 0.3; /* സൈഡ് ബാർ തുറക്കുമ്പോൾ കണ്ടന്റ് മങ്ങാൻ */
+    opacity: 0.4;           
+    filter: blur(2px);     
+    transition: all var(--tr-bounce);
   }
-  
+
   .sidebar-closed .admin-main-content {
     margin-left: 0;
+    opacity: 1;
+    filter: none;
   }
 
   .admin-content-inner {
-    padding: var(--space-sm);
-    margin-top: 10px;
+    padding: var(--space-lg);
+    box-shadow: 8px 8px 0 #000000;
   }
+
+
+  .sidebar-open::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 5;
+    pointer-events: none;
+  }
+}
+
+
+.admin-layout-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 260px;            
+  bottom: 0;
+  width: var(--stroke);     
+  background: #000000;
+  z-index: 10;
+  transition: left var(--tr-bounce);
+}
+
+.sidebar-closed::before {
+  left: 70px;               
 }

@@ -1,23 +1,46 @@
-/* UserLayout.css */
+/* UserLayout.css - Neo-Minimal Brutalism version */
+
+@import url('../index.css');
+
 .user-layout-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: var(--bg-primary); /* Midnight Purple */
+  background: var(--bg); /* pure black */
 }
 
+/* Navbar ഇപ്പോഴും floating ആണെങ്കിലും brutal look കൊടുക്കാം (NavBar.css-ൽ adjust ചെയ്യണം) */
 .user-main-content {
   flex: 1;
   width: 100%;
-  margin-top: 110px; /* Increased to account for floating navbar (15px top + 84px height + gap) */
-  padding: var(--space-md);
+  margin-top: 90px;          /* navbar height അനുസരിച്ച് adjust ചെയ്യുക */
+  padding: var(--space-lg);
+  border-top: var(--stroke-thick); /* top thick black line – brutal separator */
   position: relative;
   z-index: 1;
 }
 
-/* പേജ് ട്രാൻസിഷൻ സ്മൂത്ത് ആക്കാൻ */
+/* Outlet content wrapper – centered + brutal card feel */
 .user-main-content > div {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
+  padding: var(--space-xl) var(--space-lg);
+  background: var(--bg-card);
+  border: var(--stroke-thick);
+  box-shadow: 10px 10px 0 #000000;
+  min-height: calc(100vh - 140px);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .user-main-content {
+    margin-top: 80px;
+    padding: var(--space-md);
+  }
+  
+  .user-main-content > div {
+    padding: var(--space-lg);
+    box-shadow: 6px 6px 0 #000000;
+  }
 }

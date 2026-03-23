@@ -1,0 +1,10 @@
+@import url('../../index.css');
+
+.brutal-3d-canvas {
+  width: 100%;
+  height: 500px;
+  border: var(--stroke-thick);
+  box-shadow: 12px 12px 0 #000;
+  background: #000;
+  overflow: hidden;
+}

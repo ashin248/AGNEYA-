@@ -7,10 +7,9 @@ import "../style/Service.css";
 const services = [
   { name: "Digital Printing", icon: "bi-printer" },
   { name: "Offset Printing", icon: "bi-layers" },
-  { name: "Brochure & Catalog Printing", icon: "bi-book" },
+  { name: "Brochures & Catalog Printing", icon: "bi-book" },
   { name: "Business Cards & Letterheads", icon: "bi-person-vcard" },
   { name: "Label Printing", icon: "bi-tags" },
-  // { name: "Acrylic Keychains & Photo Printing", icon: "bi-image" },
   { name: "Custom T-Shirt Printing", icon: "bi-palette" },
 ];
 

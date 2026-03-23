@@ -1,164 +1,48 @@
-/* ReadyProductUpload.css - Premium Glassmorphism Upload 2026 */
+/* src/Admin/style/ReadyProductUpload.css */
 
-.upload-container {
-  max-width: 720px;
-  margin: 2.5rem auto;
-  padding: 2.2rem 2rem;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-  animation: fadeIn 0.6s var(--transition-normal);
+@import url('../../index.css');
+
+.ready-product-upload {
+  background: var(--bg);
+  padding: var(--space-2xl);
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.upload-container h2 {
-  text-align: center;
-  color: var(--color-highlight);
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  font-weight: 700;
-}
-
-/* Toggle Buttons - Single / Bulk */
-.upload-mode-toggle {
+.upload-type-toggle {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
 }
 
-.upload-mode-toggle button {
-  padding: var(--space-sm) var(--space-xl);
-  background: rgba(30, 10, 50, 0.4);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  font-weight: 600;
+.toggle-btn {
+  flex: 1;
+  padding: var(--space-lg);
+  background: var(--bg-card);
+  border: var(--stroke-thick);
+  font-weight: 900;
   cursor: pointer;
-  transition: var(--transition-normal);
+  box-shadow: 6px 6px 0 #000;
 }
 
-.upload-mode-toggle button.active,
-.upload-mode-toggle button:hover {
-  background: linear-gradient(135deg, var(--color-primary), rgba(132, 189, 0, 0.3));
+.toggle-btn.active {
+  background: var(--accent);
   color: white;
-  border-color: var(--color-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(156, 81, 182, 0.3);
-}
-
-/* Messages */
-.message.success {
-  background: rgba(132, 189, 0, 0.2);
-  border: 1px solid var(--color-accent);
-  color: #d4ffaa;
-}
-
-.message.error {
-  background: rgba(220, 53, 69, 0.2);
-  border: 1px solid #dc3545;
-  color: #ff9999;
-}
-
-.message {
-  padding: 1rem;
-  margin-bottom: 1.8rem;
-  border-radius: var(--radius-md);
-  text-align: center;
-  font-weight: 500;
-}
-
-/* Form Groups */
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.6rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.95rem;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: 0.95rem 1.2rem;
-  background: rgba(30, 10, 50, 0.55);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 1rem;
-  transition: var(--transition-normal);
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px rgba(156, 81, 182, 0.2);
-  background: rgba(30, 10, 50, 0.7);
-}
-
-.form-group input[type="file"] {
-  padding: 0.6rem;
-  background: transparent;
-  border: 1px dashed var(--border-hover);
-  cursor: pointer;
-}
-
-/* Upload Button */
-.upload-btn {
-  width: 100%;
-  padding: 1.15rem;
-  margin-top: 1.8rem;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  box-shadow: 0 6px 22px rgba(156, 81, 182, 0.4);
-}
-
-.upload-btn:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 12px 35px rgba(156, 81, 182, 0.55);
-}
-
-.upload-btn:disabled {
-  background: #4a2a5e;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* Bulk Info */
-.bulk-info {
-  background: rgba(156, 81, 182, 0.1);
-  padding: 1.2rem;
-  border-radius: var(--radius-md);
-  margin-bottom: 2rem;
-  color: var(--text-secondary);
-  font-size: 0.95rem;
+  transform: translate(-3px, -3px);
+  box-shadow: 10px 10px 0 #000;
 }
 
 .bulk-info pre {
-  background: rgba(0,0,0,0.3);
-  padding: 0.8rem;
-  border-radius: var(--radius-sm);
+  background: #000;
+  padding: var(--space-lg);
+  border: var(--stroke);
+  color: var(--accent);
+  font-weight: 700;
   overflow-x: auto;
-  margin: 0.8rem 0 0;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .upload-container {
-    margin: 1.5rem 1rem;
-    padding: 1.8rem 1.4rem;
-  }
+.upload-btn {
+  @extend .btn;
+  width: 100%;
+  margin-top: var(--space-xl);
 }
