@@ -1,6 +1,6 @@
 // src/components/TShirt3D.jsx
-import React, { useRef, useMemo, useEffect } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import React, { useRef, useMemo, useEffect, useState } from "react";
+import { Canvas } from "@react-three/fiber";
 import {
   OrbitControls,
   ContactShadows,
@@ -9,22 +9,20 @@ import {
   PerspectiveCamera,
 } from "@react-three/drei";
 import * as THREE from "three";
-import '../style/TShirt3D.css'
+import "./TShirt3D.css";
 
-const MODEL_PATH = "/models/tshirt.glb"; // ← Change this to your actual GLTF/GLB path
-// Example free models: https://sketchfab.com (search "t-shirt low poly glb")
-// Or create in Blender and export with UVs ready for texture
+const MODEL_PATH = "/models/tshirt.glb"; // ← Make sure this file exists in public/models/
 
-const TShirtModel = ({ fabricCanvas }) => {
+function TShirtModel({ fabricCanvas }) {
   const { scene, nodes, materials } = useGLTF(MODEL_PATH);
   const modelRef = useRef();
 
-  // Create canvas texture from Fabric.js canvas
+  // Create texture from Fabric.js canvas (for custom design)
   const canvasTexture = useMemo(() => {
     if (!fabricCanvas) return null;
 
     const texture = new THREE.CanvasTexture(fabricCanvas.getElement());
-    texture.flipY = false;           // Important: Fabric.js canvas is flipped by default
+    texture.flipY = false; // Important: Fabric.js canvas is upside-down by default
     texture.wrapS = THREE.ClampToEdgeWrapping;
     texture.wrapT = THREE.ClampToEdgeWrapping;
     texture.minFilter = THREE.LinearFilter;
@@ -34,116 +32,260 @@ const TShirtModel = ({ fabricCanvas }) => {
     return texture;
   }, [fabricCanvas]);
 
-  // Apply texture to the t-shirt material(s) – adjust material name(s) based on your model
+  // Apply texture to the shirt material (adjust material name to match your model)
   useEffect(() => {
-    if (!canvasTexture || !scene) return;
+    if (!canvasTexture || !nodes || !materials) return;
 
-    scene.traverse((child) => {
-      if (child.isMesh && child.material) {
-        // Replace or add map – you might have multiple materials (front, back, sleeves)
-        // Example: if your model has material named 'TShirt_Front' or 'Fabric'
-        if (
-          child.material.name.includes("TShirt") ||
-          child.material.name.includes("Fabric") ||
-          child.material.name.includes("Shirt")
-        ) {
-          child.material.map = canvasTexture;
-          child.material.needsUpdate = true;
-        }
-      }
-    });
-  }, [canvasTexture, scene]);
+    // IMPORTANT: Change "TShirt_001" / "Material" to the actual material name in your .glb model
+    // You can find the correct name by logging scene or nodes
+    const shirtMaterial = materials.TShirt_001 || materials.Material || materials.shirt;
 
-  // Optional: subtle floating/breathing animation
-  useFrame((state) => {
-    if (!modelRef.current) return;
-    const t = state.clock.getElapsedTime();
-    modelRef.current.rotation.y = Math.sin(t * 0.3) * 0.15;
-    modelRef.current.position.y = Math.sin(t * 1.2) * 0.08;
+    if (shirtMaterial) {
+      shirtMaterial.map = canvasTexture;
+      shirtMaterial.needsUpdate = true;
+    }
+  }, [canvasTexture, nodes, materials]);
+
+  // Optional: slight rotation animation (can be removed)
+  useFrame(() => {
+    if (modelRef.current) {
+      modelRef.current.rotation.y += 0.001; // very slow auto-rotate
+    }
   });
 
   return (
-    <group ref={modelRef} dispose={null} scale={1.2} position={[0, -0.6, 0]}>
+    <group ref={modelRef} dispose={null}>
       <primitive object={scene} />
     </group>
   );
-};
+}
 
-// Fallback simple plane version (when no GLTF model is available yet)
-const SimplePlaneFallback = ({ texture }) => {
-  return (
-    <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[3.5, 4.5]} />
-      <meshStandardMaterial
-        map={texture}
-        transparent
-        side={THREE.DoubleSide}
-        roughness={0.7}
-        metalness={0.1}
-      />
-    </mesh>
-  );
-};
+export default function TShirt3D({ fabricCanvas, className = "" }) {
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-const TShirt3D = ({ fabricCanvas, useFallback = false }) => {
-  const texture = useMemo(() => {
-    if (!fabricCanvas) return null;
-    const tex = new THREE.CanvasTexture(fabricCanvas.getElement());
-    tex.flipY = false;
-    tex.needsUpdate = true;
-    return tex;
-  }, [fabricCanvas]);
+  useEffect(() => {
+    // Preload model
+    useGLTF.preload(MODEL_PATH);
+
+    // Simple timeout to simulate loading (remove in production if not needed)
+    const timer = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div className="brutal-3d-canvas">
-      <Canvas
-        shadows
-        dpr={[1, 2]}
-        camera={{ position: [0, 1, 5], fov: 45 }}
-        gl={{ antialias: true, alpha: false }}
-      >
-        <color attach="background" args={["#000000"]} /> {/* brutal black bg */}
+    <div className={`tshirt-3d-wrapper ${className}`}>
+      {loading && (
+        <div className="tshirt-loading">
+          <div className="tshirt-loading-spinner" />
+          <div className="tshirt-loading-text">Loading 3D preview...</div>
+        </div>
+      )}
 
-        <ambientLight intensity={0.6} />
-        <directionalLight
-          position={[5, 10, 5]}
-          intensity={1.2}
-          castShadow
-          shadow-mapSize={[1024, 1024]}
-        />
-        <pointLight position={[-5, 5, -5]} intensity={0.8} color="#9C51B6" />
+      {error && (
+        <div className="tshirt-error">
+          <div className="tshirt-error-icon">⚠️</div>
+          <div className="tshirt-error-message">{error}</div>
+        </div>
+      )}
 
-        <Environment preset="city" background={false} />
+      <div className="tshirt-canvas-container">
+        <Canvas
+          shadows
+          camera={{ position: [0, 0.8, 4], fov: 50 }}
+          gl={{ antialias: true, alpha: false }}
+        >
+          <PerspectiveCamera makeDefault position={[0, 0.8, 4]} fov={50} />
 
-        {useFallback || !MODEL_PATH ? (
-          <SimplePlaneFallback texture={texture} />
-        ) : (
+          <ambientLight intensity={0.7} />
+          <directionalLight position={[5, 10, 5]} intensity={1.2} castShadow />
+          <pointLight position={[-5, 5, -5]} intensity={0.8} />
+
+          <Environment preset="city" background={false} />
+
           <TShirtModel fabricCanvas={fabricCanvas} />
-        )}
 
-        <ContactShadows
-          position={[0, -1.2, 0]}
-          opacity={0.5}
-          scale={12}
-          blur={2.2}
-          far={4}
-          resolution={1024}
-        />
+          <ContactShadows
+            position={[0, -1.2, 0]}
+            opacity={0.5}
+            scale={12}
+            blur={2.2}
+            far={4}
+          />
 
-        <OrbitControls
-          enablePan={true}
-          enableZoom={true}
-          enableRotate={true}
-          minPolarAngle={Math.PI / 6}
-          maxPolarAngle={Math.PI - Math.PI / 6}
-          dampingFactor={0.08}
-        />
-      </Canvas>
+          <OrbitControls
+            enablePan={true}
+            enableZoom={true}
+            enableRotate={true}
+            minPolarAngle={Math.PI / 6}
+            maxPolarAngle={Math.PI - Math.PI / 6}
+            dampingFactor={0.08}
+            rotateSpeed={0.5}
+          />
+        </Canvas>
+      </div>
+
+      <div className="tshirt-controls-hint">
+        Drag to rotate • Scroll / pinch to zoom
+      </div>
     </div>
   );
-};
+}
 
-export default TShirt3D;
+
+
+
+
+
+
+
+
+// // src/components/TShirt3D.jsx
+// import React, { useRef, useMemo, useEffect } from "react";
+// import { Canvas, useFrame } from "@react-three/fiber";
+// import {
+//   OrbitControls,
+//   ContactShadows,
+//   Environment,
+//   useGLTF,
+//   PerspectiveCamera,
+// } from "@react-three/drei";
+// import * as THREE from "three";
+// import '../style/TShirt3D.css'
+
+// const MODEL_PATH = "/models/tshirt.glb"; // ← Change this to your actual GLTF/GLB path
+// // Example free models: https://sketchfab.com (search "t-shirt low poly glb")
+// // Or create in Blender and export with UVs ready for texture
+
+// const TShirtModel = ({ fabricCanvas }) => {
+//   const { scene, nodes, materials } = useGLTF(MODEL_PATH);
+//   const modelRef = useRef();
+
+//   // Create canvas texture from Fabric.js canvas
+//   const canvasTexture = useMemo(() => {
+//     if (!fabricCanvas) return null;
+
+//     const texture = new THREE.CanvasTexture(fabricCanvas.getElement());
+//     texture.flipY = false;           // Important: Fabric.js canvas is flipped by default
+//     texture.wrapS = THREE.ClampToEdgeWrapping;
+//     texture.wrapT = THREE.ClampToEdgeWrapping;
+//     texture.minFilter = THREE.LinearFilter;
+//     texture.magFilter = THREE.LinearFilter;
+//     texture.needsUpdate = true;
+
+//     return texture;
+//   }, [fabricCanvas]);
+
+//   // Apply texture to the t-shirt material(s) – adjust material name(s) based on your model
+//   useEffect(() => {
+//     if (!canvasTexture || !scene) return;
+
+//     scene.traverse((child) => {
+//       if (child.isMesh && child.material) {
+//         // Replace or add map – you might have multiple materials (front, back, sleeves)
+//         // Example: if your model has material named 'TShirt_Front' or 'Fabric'
+//         if (
+//           child.material.name.includes("TShirt") ||
+//           child.material.name.includes("Fabric") ||
+//           child.material.name.includes("Shirt")
+//         ) {
+//           child.material.map = canvasTexture;
+//           child.material.needsUpdate = true;
+//         }
+//       }
+//     });
+//   }, [canvasTexture, scene]);
+
+//   // Optional: subtle floating/breathing animation
+//   useFrame((state) => {
+//     if (!modelRef.current) return;
+//     const t = state.clock.getElapsedTime();
+//     modelRef.current.rotation.y = Math.sin(t * 0.3) * 0.15;
+//     modelRef.current.position.y = Math.sin(t * 1.2) * 0.08;
+//   });
+
+//   return (
+//     <group ref={modelRef} dispose={null} scale={1.2} position={[0, -0.6, 0]}>
+//       <primitive object={scene} />
+//     </group>
+//   );
+// };
+
+// // Fallback simple plane version (when no GLTF model is available yet)
+// const SimplePlaneFallback = ({ texture }) => {
+//   return (
+//     <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+//       <planeGeometry args={[3.5, 4.5]} />
+//       <meshStandardMaterial
+//         map={texture}
+//         transparent
+//         side={THREE.DoubleSide}
+//         roughness={0.7}
+//         metalness={0.1}
+//       />
+//     </mesh>
+//   );
+// };
+
+// const TShirt3D = ({ fabricCanvas, useFallback = false }) => {
+//   const texture = useMemo(() => {
+//     if (!fabricCanvas) return null;
+//     const tex = new THREE.CanvasTexture(fabricCanvas.getElement());
+//     tex.flipY = false;
+//     tex.needsUpdate = true;
+//     return tex;
+//   }, [fabricCanvas]);
+
+//   return (
+//     <div className="brutal-3d-canvas">
+//       <Canvas
+//         shadows
+//         dpr={[1, 2]}
+//         camera={{ position: [0, 1, 5], fov: 45 }}
+//         gl={{ antialias: true, alpha: false }}
+//       >
+//         <color attach="background" args={["#000000"]} /> {/* brutal black bg */}
+
+//         <ambientLight intensity={0.6} />
+//         <directionalLight
+//           position={[5, 10, 5]}
+//           intensity={1.2}
+//           castShadow
+//           shadow-mapSize={[1024, 1024]}
+//         />
+//         <pointLight position={[-5, 5, -5]} intensity={0.8} color="#9C51B6" />
+
+//         <Environment preset="city" background={false} />
+
+//         {useFallback || !MODEL_PATH ? (
+//           <SimplePlaneFallback texture={texture} />
+//         ) : (
+//           <TShirtModel fabricCanvas={fabricCanvas} />
+//         )}
+
+//         <ContactShadows
+//           position={[0, -1.2, 0]}
+//           opacity={0.5}
+//           scale={12}
+//           blur={2.2}
+//           far={4}
+//           resolution={1024}
+//         />
+
+//         <OrbitControls
+//           enablePan={true}
+//           enableZoom={true}
+//           enableRotate={true}
+//           minPolarAngle={Math.PI / 6}
+//           maxPolarAngle={Math.PI - Math.PI / 6}
+//           dampingFactor={0.08}
+//         />
+//       </Canvas>
+//     </div>
+//   );
+// };
+
+// export default TShirt3D;
 
 
 

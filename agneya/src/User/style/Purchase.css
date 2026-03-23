@@ -1,39 +1,287 @@
-
-
+/* src/User/style/Purchase.css */
 @import url('../../index.css');
 
+/* ============================================= */
+/*             CHECKOUT / PURCHASE PAGE          */
+/*     Address Form • Order Summary • Premium    */
+/* ============================================= */
+
 .purchase-page {
-  background: var(--bg);
-  padding: var(--space-2xl) var(--space-lg);
-  max-width: 1000px;
-  margin: 0 auto;
+  min-height: 100vh;
+  padding: 7rem 5% 5rem;
+  background: linear-gradient(135deg, var(--dark) 0%, #1a1f35 100%);
+  color: var(--light);
+  position: relative;
+  overflow-x: hidden;
 }
 
-.product-summary {
-  background: var(--bg-card);
-  border: var(--stroke-thick);
-  box-shadow: 10px 10px 0 #000;
-  padding: var(--space-xl);
-  margin-bottom: var(--space-2xl);
+.purchase-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.07) 0%, transparent 60%),
+              radial-gradient(circle at 80% 70%, rgba(34, 211, 238, 0.05) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.purchase-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2.5rem;
+}
+
+@media (max-width: 992px) {
+  .purchase-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── LEFT SIDE: Address Form ─── */
+.address-section {
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1.4rem;
+  padding: 2.5rem;
+  box-shadow: 0 12px 45px rgba(0, 0, 0, 0.5);
+}
+
+.section-title {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--primary-light);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.18);
 }
 
 .address-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.form-group label {
+  color: #cbd5e1;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 1rem 1.3rem;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 0.9rem;
+  color: var(--light);
+  font-size: 1.05rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.2);
+  background: rgba(30, 41, 59, 0.9);
+}
+
+.form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-lg);
+  gap: 1.6rem;
 }
 
-.address-form input {
-  background: #111;
-  border: var(--stroke);
-  padding: var(--space-lg);
-  color: white;
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── RIGHT SIDE: Order Summary ─── */
+.order-summary-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1.4rem;
+  padding: 2.2rem;
+  box-shadow: 0 12px 45px rgba(0, 0, 0, 0.5);
+  height: fit-content;
+  position: sticky;
+  top: 8rem;
+  align-self: start;
+}
+
+.summary-title {
+  font-size: 1.55rem;
   font-weight: 700;
+  color: var(--primary-light);
+  margin-bottom: 1.6rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.18);
 }
 
+/* Product Preview in Summary */
+.summary-product {
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 1.8rem;
+}
+
+.summary-product img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+.summary-product-info h4 {
+  font-size: 1.2rem;
+  margin: 0 0 0.4rem;
+  color: var(--light);
+}
+
+.summary-product-info p {
+  color: #94a3b8;
+  margin: 0.2rem 0;
+  font-size: 0.95rem;
+}
+
+.custom-design-note {
+  font-size: 0.9rem;
+  color: var(--secondary);
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Price Breakdown */
+.price-breakdown {
+  margin: 2rem 0;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.9rem 0;
+  font-size: 1.05rem;
+}
+
+.price-row.total {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--accent);
+  border-top: 1px solid rgba(124, 58, 237, 0.2);
+  padding-top: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+/* Proceed Button */
 .proceed-btn {
-  @extend .btn;
   width: 100%;
-  font-size: 1.5rem;
-  margin-top: var(--space-xl);
+  padding: 1.2rem;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 10px 35px rgba(124, 58, 237, 0.4);
+  margin-top: 1.5rem;
+}
+
+.proceed-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 45px rgba(124, 58, 237, 0.5);
+}
+
+.proceed-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Back / Cancel Button */
+.btn-back {
+  display: block;
+  width: 100%;
+  margin-top: 1.2rem;
+  padding: 1rem;
+  background: transparent;
+  border: 1px solid #475569;
+  color: #cbd5e1;
+  border-radius: 50px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--light);
+}
+
+/* Error / Info Messages */
+.error-message,
+.info-message {
+  padding: 1rem;
+  border-radius: 0.9rem;
+  margin: 1.2rem 0;
+  text-align: center;
+  font-weight: 500;
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+.info-message {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #93c5fd;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .purchase-container {
+    grid-template-columns: 1fr;
+  }
+
+  .order-summary-card {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .purchase-page {
+    padding: 6rem 4% 4rem;
+  }
+
+  .purchase-header {
+    padding: 1.8rem;
+  }
+
+  .section-title {
+    font-size: 1.65rem;
+  }
 }

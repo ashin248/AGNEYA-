@@ -1,64 +1,285 @@
 /* src/User/style/OnlinePayment.css */
-
 @import url('../../index.css');
 
+/* ============================================= */
+/*            ONLINE PAYMENT PAGE                */
+/*     Razorpay + Manual • Glassmorphism • Clean */
+/* ============================================= */
+
 .payment-page {
-  background: var(--bg);
-  padding: var(--space-2xl);
-  max-width: 800px;
+  min-height: 100vh;
+  padding: 6rem 5% 4rem;
+  background: linear-gradient(135deg, var(--dark) 0%, #1a1f35 100%);
+  color: var(--light);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.payment-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.08) 0%, transparent 60%),
+              radial-gradient(circle at 80% 70%, rgba(34, 211, 238, 0.06) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.payment-container {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
   margin: 0 auto;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1.4rem;
+  overflow: hidden;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.5);
 }
 
-.order-summary {
-  border: var(--stroke-thick);
-  box-shadow: 12px 12px 0 #000;
-  padding: var(--space-xl);
-  background: var(--bg-card);
-  margin-bottom: var(--space-2xl);
-}
-
-.amount-display {
-  font-size: 3rem;
-  color: var(--accent);
-  text-shadow: 4px 4px 0 #000;
-}
-
-.payment-options {
-  display: flex;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-xl);
-}
-
-.payment-method-btn {
-  flex: 1;
-  padding: var(--space-lg);
-  background: var(--bg-card);
-  border: var(--stroke);
-  font-weight: 900;
-  cursor: pointer;
-}
-
-.payment-method-btn.active {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(255,75,43,0.3);
-}
-
-.upi-id-box {
-  background: #111;
-  border: var(--stroke-thick);
-  padding: var(--space-xl);
-  font-size: 1.8rem;
+/* Header / Order Summary */
+.payment-header {
+  padding: 2rem 2.5rem;
+  background: rgba(124, 58, 237, 0.12);
+  border-bottom: 1px solid rgba(124, 58, 237, 0.18);
   text-align: center;
-  box-shadow: 8px 8px 0 #000;
 }
 
-.qr-code-box img {
-  border: var(--stroke);
-  box-shadow: 6px 6px 0 #000;
+.payment-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--primary-light), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.6rem;
 }
 
-.btn-confirm {
-  @extend .btn;
+.order-amount {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: var(--accent);
+  margin: 0.8rem 0;
+}
+
+.order-amount small {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Payment Method Tabs */
+.payment-method-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+.payment-tab {
+  flex: 1;
+  padding: 1.2rem;
+  text-align: center;
+  font-weight: 600;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.payment-tab.active {
+  color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.08);
+}
+
+.payment-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+}
+
+/* Payment Content Area */
+.payment-content {
+  padding: 2.5rem 2.5rem 3rem;
+}
+
+.payment-section-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--primary-light);
+  margin-bottom: 1.6rem;
+}
+
+/* Razorpay / UPI Section */
+.payment-notice {
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 1rem;
+  padding: 1.4rem;
+  margin-bottom: 2rem;
+  color: #86efac;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.secure-notice {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  text-align: center;
+  margin: 1.8rem 0 2.5rem;
+}
+
+/* Manual Payment Form */
+.manual-payment-form {
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 1rem;
+  padding: 1.8rem;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+}
+
+.manual-payment-form .form-group {
+  margin-bottom: 1.4rem;
+}
+
+.manual-payment-form label {
+  display: block;
+  margin-bottom: 0.6rem;
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.manual-payment-form input {
   width: 100%;
-  font-size: 1.4rem;
+  padding: 1rem 1.3rem;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 0.9rem;
+  color: var(--light);
+  font-size: 1.05rem;
+}
+
+.manual-payment-form input:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.2);
+}
+
+/* Buttons */
+.payment-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-top: 2.5rem;
+}
+
+.primary-btn,
+.btn-confirm {
+  width: 100%;
+  padding: 1.15rem;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.35);
+}
+
+.primary-btn:hover,
+.btn-confirm:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(124, 58, 237, 0.45);
+}
+
+.primary-btn:disabled,
+.btn-confirm:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-back {
+  background: transparent;
+  border: 1px solid #475569;
+  color: #cbd5e1;
+  padding: 1rem;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--light);
+}
+
+/* Success State */
+.payment-success {
+  text-align: center;
+  padding: 4rem 2rem 5rem;
+}
+
+.success-icon {
+  font-size: 5.5rem;
+  color: #34d399;
+  margin-bottom: 1.5rem;
+}
+
+.success-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #86efac;
+  margin-bottom: 1rem;
+}
+
+.success-message {
+  font-size: 1.15rem;
+  color: #cbd5e1;
+  margin-bottom: 2.5rem;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Error Message */
+.error-message {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  padding: 1rem;
+  border-radius: 0.9rem;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .payment-page {
+    padding: 5rem 4% 3rem;
+  }
+
+  .payment-container {
+    border-radius: 1.2rem;
+  }
+
+  .payment-header,
+  .payment-content {
+    padding: 1.8rem 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-title {
+    font-size: 1.9rem;
+  }
+
+  .order-amount {
+    font-size: 2.4rem;
+  }
 }

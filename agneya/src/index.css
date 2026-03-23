@@ -1,5 +1,4 @@
 
-
 * {
   margin: 0;
   padding: 0;
@@ -7,184 +6,127 @@
 }
 
 :root {
-
-  --primary: #9C51B6;       
-  --accent: #FF4B2B;        
-  --highlight: #FF8C00;   
-
-  --bg: #000000;            
-  --bg-card: #0F0F0F;       
-  --text: #FFFFFF;          /* pure white text */
-  --text-muted: #AAAAAA;
-  --border: #000000;        /* thick black borders */
-
-  /* Brutalist thick strokes */
-  --stroke: 3px solid #000000;
-  --stroke-thick: 4px solid #000000;
-
-  /* Spacing – intentional uneven, but still usable */
-  --space-xs: 0.6rem;
-  --space-sm: 1rem;
-  --space-md: 1.5rem;
-  --space-lg: 2.5rem;
-  --space-xl: 4rem;
-
-  /* Radius – mix sharp & pill for neo feel */
-  --radius-sm: 0px;         /* many sharp */
-  --radius-md: 4px;
-  --radius-pill: 999px;
-
-  /* Micro-animations */
-  --tr-micro: 0.12s ease-out;
-  --tr-bounce: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Core Brand Colors */
+  --primary: #7c3aed;           /* vibrant purple */
+  --primary-dark: #5b21b6;
+  --primary-light: #a78bfa;
+  
+  --secondary: #22d3ee;         /* cyan/turquoise */
+  --secondary-dark: #0891b2;
+  
+  --accent: #facc15;            /* gold/yellow */
+  --accent-dark: #eab308;
+  
+  --dark: #0f172a;
+  --dark-800: #1e293b;
+  --gray: #64748b;
+  --light: #f8fafc;
+  
+  /* Background gradient animation colors */
+  --bg1: #4c1d95;
+  --bg2: #1e40af;
+  --bg3: #0369a1;
+  --bg4: #312e81;
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(30, 41, 59, 0.45);
+  --glass-border: rgba(124, 58, 237, 0.18);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+  
+  /* Typography */
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Transitions */
+  --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Animated Gradient Background */
+body {
+  min-height: 100vh;
+  background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
+  background-size: 400% 400%;
+  animation: gradientBG 18s ease infinite;
+  color: var(--light);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Glassmorphism utility class */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+}
+
+/* Smooth scroll behavior */
 html {
-  font-size: 100%;
   scroll-behavior: smooth;
 }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', system-ui, sans-serif;
-  line-height: 1.4;
-  font-weight: 700; /* bold by default for brutalism */
-}
-
-/* Headings – oversized, bold, tight */
-h1, h2, h3 {
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-}
-
-h1 { font-size: clamp(3rem, 10vw, 6rem); }
-h2 { font-size: clamp(2.2rem, 7vw, 4rem); }
-h3 { font-size: clamp(1.6rem, 5vw, 2.5rem); }
-
-/* Brutalist Card */
-.brutal-card {
-  background: var(--bg-card);
-  border: var(--stroke-thick);
-  box-shadow: 8px 8px 0 #000000; /* offset thick shadow – scissors cut look */
-  padding: var(--space-lg);
-  transition: transform var(--tr-bounce), box-shadow var(--tr-micro);
-}
-
-.brutal-card:hover {
-  transform: translate(-4px, -4px) scale(1.02) rotate(1deg); /* micro tilt + lift */
-  box-shadow: 12px 12px 0 #000000;
-}
-
-/* Button – huge, thick border, micro bounce */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem 2.2rem;
-  font-size: 1.2rem;
-  font-weight: 900;
-  border: var(--stroke-thick);
-  background: var(--primary);
-  color: white;
-  cursor: pointer;
-  transition: all var(--tr-bounce);
-  box-shadow: 6px 6px 0 #000000;
-  transform: translate(0, 0);
-}
-
-.btn:hover {
-  transform: translate(-3px, -3px) scale(1.05);
-  box-shadow: 10px 10px 0 #000000;
-  background: var(--accent);
-}
-
-.btn-accent {
-  background: var(--accent);
-}
-
-/* Product Card – compact brutal */
-.product-card {
-  border: var(--stroke);
-  box-shadow: 6px 6px 0 #000;
-  background: var(--bg-card);
-  transition: all var(--tr-bounce);
-  overflow: hidden;
-}
-
-.product-card:hover {
-  transform: translate(-4px, -4px);
-  box-shadow: 10px 10px 0 #000;
-}
-
-.product-card img {
-  width: 100%;
-  aspect-ratio: 1 / 1.2;
-  object-fit: cover;
-  border-bottom: var(--stroke);
-}
-
-.product-info {
-  padding: var(--space-md);
-}
-
-/* Grid – uneven but responsive */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--space-xl); /* big gaps for brutal feel */
-}
-
-/* Inputs – raw, thick border */
-input, textarea, select {
-  width: 100%;
-  padding: var(--space-md);
-  background: #111;
-  border: var(--stroke);
-  color: white;
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(255,75,43,0.3);
-}
-
-/* Links */
+/* Remove default link styles */
 a {
-  color: var(--highlight);
-  text-decoration: underline wavy var(--accent) 2px;
-  text-underline-offset: 4px;
+  text-decoration: none;
+  color: inherit;
 }
 
-a:hover {
+/* Buttons - Premium look */
+.primary-btn {
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 10px 25px rgba(124, 58, 237, 0.35);
+}
+
+.primary-btn:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 15px 35px rgba(124, 58, 237, 0.45);
+}
+
+.primary-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Secondary button */
+.secondary-btn {
+  background: transparent;
+  border: 2px solid var(--accent);
   color: var(--accent);
+  padding: 0.85rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: var(--transition);
 }
 
-/* Container */
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: var(--space-xl) var(--space-md);
+.secondary-btn:hover {
+  background: var(--accent);
+  color: var(--dark);
 }
 
-/* Scrollbar – thick & raw */
-::-webkit-scrollbar {
-  width: 12px;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border: 3px solid #000;
+/* Headings */
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.5px;
 }
 
-/* Mobile-first responsive */
-@media (min-width: 768px) {
-  .grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
-}
-
-@media (min-width: 1024px) {
-  .container { padding: var(--space-xl) var(--space-2xl); }
+h1 {
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
+  background: linear-gradient(90deg, var(--primary-light), var(--secondary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

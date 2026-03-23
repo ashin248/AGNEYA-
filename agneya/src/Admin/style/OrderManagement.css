@@ -1,78 +1,265 @@
 /* src/Admin/style/OrderManagement.css */
+@import url("../../index.css");
 
-@import url('../../index.css');
+/* ============================================= */
+/*           ORDER MANAGEMENT - ADMIN PANEL      */
+/*     Tables • Bulk Actions • Status Badges     */
+/* ============================================= */
 
-.order-management {
-  background: var(--bg);
-  padding: var(--space-xl);
+.order-management-page {
+  padding: 2.5rem 3rem 4rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--dark) 0%, #1a1f35 100%);
+  color: var(--light);
+  position: relative;
 }
 
-.tabs-header {
+.order-management-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at 20% 30%,
+      rgba(124, 58, 237, 0.05) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      rgba(34, 211, 238, 0.04) 0%,
+      transparent 65%
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.management-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Header + Bulk Actions Bar */
+.orders-header {
   display: flex;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-2xl);
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.tab-btn {
-  background: var(--bg-card);
-  border: var(--stroke-thick);
-  color: var(--text);
-  padding: var(--space-lg) var(--space-xl);
-  font-weight: 900;
-  font-size: 1.3rem;
-  cursor: pointer;
-  box-shadow: 6px 6px 0 #000;
-  transition: all var(--tr-bounce);
+.page-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--primary-light), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
 }
 
-.tab-btn.active {
-  background: var(--accent);
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.bulk-select-info {
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+.bulk-status-select,
+.bulk-action-btn {
+  padding: 0.8rem 1.3rem;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 0.8rem;
+  color: var(--light);
+  font-size: 0.95rem;
+}
+
+.bulk-action-btn {
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border: none;
   color: white;
-  transform: translate(-3px, -3px);
-  box-shadow: 10px 10px 0 #000;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.table-section {
-  background: var(--bg-card);
-  border: var(--stroke-thick);
-  box-shadow: 12px 12px 0 #000;
-  padding: var(--space-xl);
-  margin-bottom: var(--space-2xl);
+.bulk-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.35);
 }
 
-.table-wrapper table {
+.bulk-action-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Tabs: Normal Orders / Custom Orders */
+.orders-tabs {
+  display: flex;
+  margin-bottom: 2rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+  padding: 0.5rem;
+  width: fit-content;
+}
+
+.tab-button {
+  padding: 0.9rem 1.8rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  background: transparent;
+  border: none;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-button.active {
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  color: white;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
+}
+
+/* Table Container */
+.table-container {
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1.2rem;
+  overflow: hidden;
+  box-shadow: 0 12px 45px rgba(0, 0, 0, 0.5);
+  margin-bottom: 3rem;
+}
+
+.table-header {
+  background: rgba(124, 58, 237, 0.12);
+  padding: 1.2rem 1.8rem;
+  font-weight: 600;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Checkbox Column */
+th.checkbox-col,
+td.checkbox-col {
+  width: 50px;
+  text-align: center;
+}
+
+/* Table Body */
+.order-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-th, td {
-  padding: var(--space-lg);
-  border: var(--stroke);
-  text-align: left;
+.order-row {
+  transition: background 0.2s ease;
 }
 
-th {
-  background: var(--primary);
-  color: white;
-  font-weight: 900;
-  text-shadow: 2px 2px 0 #000;
+.order-row:hover,
+.order-row.selected {
+  background: rgba(124, 58, 237, 0.08);
 }
 
-tr:hover {
-  background: rgba(156,81,182,0.15);
+.order-row td {
+  padding: 1.2rem 1.6rem;
+  border-top: 1px solid rgba(124, 58, 237, 0.08);
+  vertical-align: middle;
 }
 
-.product-thumb {
-  width: 80px;
-  border: var(--stroke);
-  box-shadow: 4px 4px 0 #000;
+.order-id {
+  font-weight: 600;
+  color: var(--primary-light);
 }
 
-.btn-cancel, .btn-process {
-  padding: var(--space-md) var(--space-lg);
-  margin: 0 var(--space-sm);
-  font-weight: 900;
+.customer-name {
+  font-weight: 500;
 }
 
-.btn-cancel { background: var(--danger); }
-.btn-process { background: var(--primary); }
+.status-badge {
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  min-width: 100px;
+  display: inline-block;
+}
+
+.status-pending {
+  background: rgba(249, 115, 22, 0.2);
+  color: #fb923c;
+}
+
+.status-printing {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.status-shipped {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.status-delivered {
+  background: rgba(34, 197, 94, 0.3);
+  color: #86efac;
+}
+
+.status-cancelled {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+/* Empty / Loading State */
+.empty-state,
+.loading-state {
+  text-align: center;
+  padding: 6rem 2rem;
+  color: #94a3b8;
+}
+
+.empty-state h3 {
+  font-size: 1.6rem;
+  color: var(--light);
+  margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .order-table {
+    min-width: 1100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .orders-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .bulk-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .orders-tabs {
+    width: 100%;
+  }
+}

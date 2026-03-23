@@ -1,30 +1,245 @@
-
 @import url('../../index.css');
 
+/* ============================================= */
+/*              LOGIN / REGISTER PAGE            */
+/*     OTP Flow • Glassmorphism • Modern Form    */
+/* ============================================= */
+
 .login-page {
-  background: var(--bg);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-2xl);
+  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 50%, var(--bg4) 100%);
+  background-size: 300% 300%;
+  animation: gradientFlow 18s ease infinite;
+  padding: 2rem 1rem;
+}
+
+@keyframes gradientFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .login-container {
-  background: var(--bg-card);
-  border: var(--stroke-thick);
-  box-shadow: 16px 16px 0 #000;
-  padding: var(--space-2xl);
-  max-width: 600px;
+  position: relative;
   width: 100%;
+  max-width: 480px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1.6rem;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  padding: 2.5rem 2rem;
+  z-index: 2;
 }
 
-.step-box {
-  display: grid;
-  gap: var(--space-lg);
+/* Optional subtle glow border */
+.login-container::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 1.8rem;
+  background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
+  z-index: -1;
+  opacity: 0.25;
+  filter: blur(12px);
 }
 
+/* Heading */
+.login-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.login-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--primary-light), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.6rem;
+}
+
+.login-subtitle {
+  color: #94a3b8;
+  font-size: 1.05rem;
+}
+
+/* Progress Steps (1 → 2 → 3) */
+.steps-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-bottom: 2.2rem;
+}
+
+.step-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(124, 58, 237, 0.3);
+  border: 2px solid transparent;
+  transition: all 0.4s ease;
+}
+
+.step-dot.active {
+  background: var(--primary);
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.25);
+}
+
+.step-dot.completed {
+  background: var(--accent);
+  border-color: var(--accent-dark);
+}
+
+/* Form Fields */
+.form-group {
+  margin-bottom: 1.6rem;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.6rem;
+  color: #cbd5e1;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 1rem 1.3rem;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 0.9rem;
+  color: var(--light);
+  font-size: 1.05rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+  background: rgba(30, 41, 59, 0.9);
+}
+
+/* Required field indicator */
+.required-input::after {
+  content: " *";
+  color: #f87171;
+}
+
+/* OTP Input (special styling) */
+.otp-input-group {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.otp-input {
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(124, 58, 237, 0.4);
+  border-radius: 0.8rem;
+  color: var(--accent);
+  transition: all 0.3s ease;
+}
+
+.otp-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.25);
+}
+
+/* Buttons */
 .primary-btn {
-  @extend .btn;
   width: 100%;
+  padding: 1.1rem;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.35);
+  margin-top: 1rem;
+}
+
+.primary-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(124, 58, 237, 0.45);
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Error message */
+.error-message {
+  color: #fca5a5;
+  font-size: 0.95rem;
+  margin-top: 0.8rem;
+  text-align: center;
+  background: rgba(239, 68, 68, 0.15);
+  padding: 0.7rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Back / Change email link */
+.back-link,
+.change-email {
+  color: var(--secondary);
+  text-align: center;
+  display: block;
+  margin-top: 1.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.back-link:hover,
+.change-email:hover {
+  color: var(--secondary-dark);
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 2rem 1.4rem;
+    border-radius: 1.2rem;
+  }
+
+  .login-title {
+    font-size: 2.1rem;
+  }
+
+  .otp-input {
+    width: 50px;
+    height: 50px;
+    font-size: 1.6rem;
+  }
+
+  .primary-btn {
+    padding: 1rem;
+    font-size: 1.05rem;
+  }
 }
