@@ -48,7 +48,9 @@ exports.uploadCustomBase = (req, res) => {
         return res.status(400).json({ success: false, message: 'Name and basePrice required' });
       }
 
-      const imageUrl = `/uploads/custom-bases/${req.file.filename}`;
+      // Build absolute URL so Vercel frontend can load from Render backend
+      const backendUrl = process.env.BACKEND_URL || `http://localhost:6060`;
+      const imageUrl = `${backendUrl}/uploads/custom-bases/${req.file.filename}`;
 
       const customBase = new CustomBase({
         name: name.trim(),

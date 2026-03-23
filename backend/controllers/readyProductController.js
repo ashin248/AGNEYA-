@@ -52,7 +52,9 @@ exports.uploadReadyProduct = (req, res) => {
         return res.status(400).json({ success: false, message: 'Name and price required' });
       }
 
-      const imageUrl = `/uploads/products/${req.file.filename}`;
+      // Build absolute URL so Vercel frontend can load from Render backend
+      const backendUrl = process.env.BACKEND_URL || `http://localhost:6060`;
+      const imageUrl = `${backendUrl}/uploads/products/${req.file.filename}`;
 
       const product = new Product({
         name: name.trim(),
@@ -129,6 +131,8 @@ exports.bulkUploadReady = async (req, res) => {
           const destPath = path.join(__dirname, '../uploads/products', newFilename);
           fs.renameSync(imagePath, destPath);
 
+          const backendUrl = process.env.BACKEND_URL || `http://localhost:6060`;
+          const imageUrl = `${backendUrl}/uploads/products/${newFilename}`;
           const product = new Product({
             name: name.trim(),
             type: 'ready',
@@ -138,7 +142,7 @@ exports.bulkUploadReady = async (req, res) => {
             category,
             description,
             stock: stock ? Number(stock) : 50,
-            imageUrl: `/uploads/products/${newFilename}`,
+            imageUrl,
           });
 
           await product.save();
