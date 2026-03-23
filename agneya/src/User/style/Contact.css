@@ -1,0 +1,94 @@
+.contact-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2.5rem;
+  padding: 120px 0;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.info-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  padding: 2.5rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  text-decoration: none;
+  transition: all var(--transition-normal);
+  animation: dropImpact 0.8s var(--ease-gravity) both;
+}
+
+.info-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--color-primary);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.icon-box {
+  width: 70px;
+  height: 70px;
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  font-size: 1.8rem;
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(156, 81, 182, 0.3);
+}
+
+.info-text span {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 5px;
+}
+
+.info-text p {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.why-choose-box {
+  padding: 3rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+}
+
+.why-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--color-primary);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.why-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.why-list li {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+}
+
+.why-list i {
+  color: var(--color-accent);
+  font-size: 1.4rem;
+}

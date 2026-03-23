@@ -1,0 +1,214 @@
+/* OrderManagement.css - Premium Glassmorphism Order Admin 2026 Style */
+
+/* Main Container */
+.admin-orders {
+  padding: var(--space-lg) var(--space-md);
+  max-width: 1800px;
+  margin: 0 auto;
+  animation: fadeIn 0.7s var(--transition-normal);
+}
+
+.admin-orders h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--color-highlight); /* #DDA0DD */
+  margin-bottom: var(--space-xl);
+  text-align: center;
+  letter-spacing: -0.6px;
+}
+
+/* Sections */
+section {
+  margin-bottom: var(--space-2xl);
+}
+
+section h2, section h3 {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+  font-weight: 600;
+}
+
+/* Bulk Actions Bar */
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.bulk-actions h3 {
+  margin: 0;
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.bulk-actions select,
+.bulk-actions button.bulk-btn {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: rgba(30, 10, 50, 0.5);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.bulk-btn {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  box-shadow: 0 4px 15px rgba(156, 81, 182, 0.3);
+}
+
+.bulk-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(156, 81, 182, 0.45);
+}
+
+.bulk-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Glass Card for Tables */
+.order-table-container {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+  transition: var(--transition-normal);
+}
+
+.order-table-container:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 45px rgba(156, 81, 182, 0.25);
+}
+
+/* Table Styles */
+.order-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.5rem;
+}
+
+.order-table thead th {
+  background: rgba(156, 81, 182, 0.15);
+  color: var(--color-highlight);
+  padding: 1.1rem 1.2rem;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.order-table tbody tr {
+  background: rgba(30, 10, 50, 0.35);
+  transition: all var(--transition-normal);
+}
+
+.order-table tbody tr:hover {
+  background: rgba(156, 81, 182, 0.18);
+  transform: scale(1.005);
+}
+
+.order-table td {
+  padding: 1rem 1.2rem;
+  vertical-align: middle;
+}
+
+.order-table td input[type="checkbox"] {
+  accent-color: var(--color-accent);
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+/* Status Badges */
+.status-pending       { background: rgba(255, 193, 7, 0.2);  color: #ffecb3; }
+.status-processing    { background: rgba(33, 150, 243, 0.2); color: #bbdefb; }
+.status-shipped       { background: rgba(76, 175, 80, 0.2);  color: #c8e6c9; }
+.status-delivered     { background: rgba(0, 150, 136, 0.2);  color: #b2dfdb; }
+.status-cancelled     { background: rgba(244, 67, 54, 0.2);  color: #ffcdd2; }
+.status-approved      { background: rgba(139, 195, 74, 0.2); color: #dcedc8; }
+.status-in-production { background: rgba(255, 152, 0, 0.2);  color: #ffe0b2; }
+.status-unknown       { background: rgba(158, 158, 158, 0.2); color: #eeeeee; }
+
+td[class^="status-"] {
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+/* Images in Custom Orders */
+.order-table img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-hover);
+  transition: var(--transition-fast);
+}
+
+.order-table img:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 15px rgba(156, 81, 182, 0.3);
+}
+
+/* Empty / Loading / Error States */
+.empty-state,
+.admin-loading,
+.admin-error {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+}
+
+.admin-error {
+  color: #ff9999;
+}
+
+.admin-error button {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .order-table thead { display: none; }
+  .order-table tr {
+    display: block;
+    margin-bottom: 1.5rem;
+    border-radius: var(--radius-lg);
+    background: rgba(30, 10, 50, 0.4);
+    padding: 1rem;
+  }
+  .order-table td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .order-table td:last-child { border-bottom: none; }
+  .order-table td:before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: var(--text-secondary);
+    margin-right: 1rem;
+  }
+}

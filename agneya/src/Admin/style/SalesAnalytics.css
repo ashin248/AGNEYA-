@@ -1,0 +1,199 @@
+/* SalesAnalytics.css - 2026 Premium Glassmorphism Analytics (Dark + Moody) */
+
+.sales-analytics {
+  padding: var(--space-lg) var(--space-md);
+  max-width: 1800px;
+  margin: 0 auto;
+  animation: fadeIn 0.8s var(--ease-float);
+}
+
+.analytics-header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.analytics-header h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--color-highlight), var(--color-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: var(--space-sm);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Stats Grid - KPI Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.stat-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+  transition: var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(156, 81, 182, 0.35);
+}
+
+/* Luxury subtle gradient border */
+.luxury-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius-lg);
+  padding: 1px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.stat-icon {
+  font-size: 2.8rem;
+  opacity: 0.7;
+  margin-bottom: var(--space-sm);
+}
+
+.stat-content h4 {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-bottom: var(--space-xs);
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--color-highlight);
+  line-height: 1;
+}
+
+.stat-trend.up {
+  color: var(--color-accent);
+  font-size: 0.95rem;
+  margin-top: var(--space-xs);
+}
+
+.stat-trend.text-dim {
+  color: var(--text-muted);
+}
+
+/* Charts Section */
+.analytics-main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-lg);
+}
+
+@media (max-width: 1200px) {
+  .analytics-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-section, .top-products-section {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+.section-header h3 {
+  color: var(--color-highlight);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.date-badge {
+  background: rgba(156, 81, 182, 0.2);
+  color: var(--color-highlight);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.chart-wrapper {
+  height: 380px;
+}
+
+/* Top Products Table */
+.products-table-wrapper {
+  overflow-x: auto;
+}
+
+.luxury-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.6rem;
+}
+
+.luxury-table th {
+  background: rgba(156, 81, 182, 0.15);
+  color: var(--color-highlight);
+  padding: 1rem 1.2rem;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.luxury-table td {
+  padding: 1.1rem 1.2rem;
+  background: rgba(30, 10, 50, 0.35);
+  transition: var(--transition-normal);
+}
+
+.luxury-table tr:hover td {
+  background: rgba(156, 81, 182, 0.2);
+}
+
+.product-name-cell {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.text-grape {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+/* Loading / Error */
+.analytics-loading, .analytics-error {
+  text-align: center;
+  padding: 8rem 2rem;
+  font-size: 1.4rem;
+  color: var(--text-secondary);
+}
+
+.analytics-error { color: #ff9999; }

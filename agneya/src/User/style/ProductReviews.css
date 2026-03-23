@@ -1,0 +1,80 @@
+.reviews-container {
+    width: 100%;
+    margin-top: 3rem;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.star-rating {
+    display: flex;
+    gap: 5px;
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star {
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 200ms;
+}
+
+textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.upload-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.image-upload-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background: #f0f0f0;
+    border-radius: 6px;
+    cursor: pointer;
+    width: fit-content;
+    font-size: 0.9rem;
+}
+
+.preview-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.preview-images img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.submit-review {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    align-self: flex-start;
+}

@@ -1,0 +1,188 @@
+/* Profile.css - Premium Dark Glass Profile 2026 */
+
+.profile-container {
+  padding: var(--space-xl) var(--space-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.profile-container h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--color-highlight);
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.profile-info {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+  text-align: center;
+}
+
+.profile-info p {
+  font-size: 1.15rem;
+  margin: 1rem 0;
+  color: var(--text-secondary);
+}
+
+.profile-info .points {
+  color: var(--color-accent);
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+/* Sections Grid */
+.profile-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
+}
+
+@media (max-width: 1100px) {
+  .profile-sections {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Address Section */
+.address-section, .designs-section {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+}
+
+.address-section h2, .designs-section h2 {
+  color: var(--color-highlight);
+  margin-bottom: 1.8rem;
+}
+
+.address-list {
+  display: grid;
+  gap: 1.2rem;
+  margin-bottom: 2.5rem;
+}
+
+.address-card {
+  background: rgba(30, 10, 50, 0.45);
+  padding: 1.4rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-hover);
+  transition: var(--transition-normal);
+}
+
+.address-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(156, 81, 182, 0.25);
+}
+
+.remove-btn {
+  margin-top: 1rem;
+  background: rgba(220, 53, 69, 0.2);
+  color: #ff9999;
+  border: 1px solid #dc3545;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.remove-btn:hover {
+  background: #dc3545;
+  color: white;
+}
+
+/* Add Address Form */
+.address-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.address-form h3 {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.address-form input {
+  padding: 1rem 1.3rem;
+  background: rgba(30, 10, 50, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: 1rem;
+}
+
+.address-form .row {
+  display: flex;
+  gap: 1rem;
+}
+
+.address-form .row input {
+  flex: 1;
+}
+
+.address-form button {
+  padding: 1.1rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.address-form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(156, 81, 182, 0.4);
+}
+
+/* Design History Grid */
+.design-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.design-card {
+  background: rgba(30, 10, 50, 0.45);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: var(--transition-normal);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.design-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 35px rgba(156, 81, 182, 0.35);
+}
+
+.design-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.design-card p {
+  padding: 1rem;
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.design-card small {
+  display: block;
+  padding: 0 1rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}

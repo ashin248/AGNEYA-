@@ -1,0 +1,215 @@
+/* CustomerInsights.css - Premium Glassmorphism Analytics Page */
+
+/* Container & Header */
+.customer-insights {
+  padding: var(--space-lg) var(--space-md);
+  max-width: 1600px;
+  margin: 0 auto;
+  animation: fadeIn 0.7s var(--transition-normal);
+}
+
+.analytics-header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.analytics-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--color-highlight); /* #DDA0DD */
+  margin-bottom: var(--space-sm);
+  letter-spacing: -0.8px;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Main Grid Layout */
+.insights-grid {
+  display: grid;
+  grid-template-columns: 3fr 1fr; /* main table bigger, sidebar smaller */
+  gap: var(--space-lg);
+}
+
+@media (max-width: 1100px) {
+  .insights-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Glass Cards */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transition: var(--transition-normal);
+}
+
+.glass-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 48px rgba(156, 81, 182, 0.3);
+}
+
+/* Luxury subtle border gradient (premium touch) */
+.luxury-border {
+  position: relative;
+}
+
+.luxury-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius-lg);
+  padding: 1px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent), var(--color-highlight));
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* Table Styles - Clean & Readable */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+}
+
+.luxury-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.6rem;
+}
+
+.luxury-table th,
+.luxury-table td {
+  padding: 1.1rem 1.3rem;
+  text-align: left;
+}
+
+.luxury-table thead th {
+  background: rgba(156, 81, 182, 0.18);
+  color: var(--color-highlight);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.luxury-table tbody tr {
+  background: rgba(30, 10, 50, 0.4);
+  transition: var(--transition-normal);
+}
+
+.luxury-table tbody tr:hover {
+  background: rgba(156, 81, 182, 0.22);
+  transform: scale(1.01);
+}
+
+.cust-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.cust-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cust-email {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.text-grape {
+  color: var(--color-accent); /* #84BD00 - money green */
+  font-weight: 700;
+}
+
+.text-center {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* Mini Stats Sidebar */
+.stats-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.mini-stat {
+  text-align: center;
+  padding: var(--space-lg) var(--space-md);
+}
+
+.mini-stat h4 {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-bottom: var(--space-sm);
+  font-weight: 500;
+}
+
+.val {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--color-highlight);
+  margin: var(--space-sm) 0;
+  line-height: 1;
+}
+
+.trend {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.trend.up {
+  color: var(--color-accent);
+}
+
+.trend.text-dim {
+  color: var(--text-muted);
+}
+
+/* Loading & Error States */
+.analytics-loading,
+.analytics-error {
+  text-align: center;
+  padding: 6rem 2rem;
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+}
+
+.analytics-error {
+  color: #ff9999;
+}
+
+/* Fade-in Animation */
+.animate-fade-in {
+  animation: fadeIn 0.8s var(--ease-float);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .insights-grid {
+    gap: var(--space-md);
+  }
+  
+  .luxury-table th,
+  .luxury-table td {
+    padding: 0.9rem 1rem;
+  }
+}

@@ -1,0 +1,114 @@
+/* Purchase.css - Premium Checkout Flow 2026 */
+
+.purchase-container {
+  padding: var(--space-xl) var(--space-lg);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.purchase-container h1 {
+  text-align: center;
+  color: var(--color-highlight);
+  font-size: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+/* Product Preview */
+.product-preview {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.product-preview img {
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-hover);
+}
+
+.product-info h2 {
+  color: var(--text-primary);
+  margin-bottom: 0.8rem;
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+/* Address Form */
+.address-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: 0 12px 45px rgba(0, 0, 0, 0.45);
+}
+
+.address-form input {
+  padding: 1.1rem 1.4rem;
+  background: rgba(30, 10, 50, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: 1.05rem;
+  transition: all var(--transition-normal);
+}
+
+.address-form input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(156, 81, 182, 0.22);
+}
+
+.address-form input::placeholder {
+  color: var(--text-muted);
+}
+
+.proceed-btn {
+  grid-column: 1 / -1;
+  padding: 1.3rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: 0 8px 25px rgba(156, 81, 182, 0.4);
+}
+
+.proceed-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(156, 81, 182, 0.55);
+}
+
+.proceed-btn:disabled {
+  background: #4a2a5e;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .product-preview {
+    flex-direction: column;
+    text-align: center;
+  }
+  .address-form {
+    grid-template-columns: 1fr;
+  }
+}

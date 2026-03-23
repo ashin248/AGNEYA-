@@ -1,0 +1,55 @@
+/* AdminSidebar.css */
+
+.admin-layout-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  transition: all var(--transition-normal);
+}
+
+/* മെയിൻ കണ്ടന്റ് ഏരിയ */
+.admin-main-content {
+  flex: 1;
+  transition: all var(--transition-normal);
+  padding: var(--space-md);
+  overflow-x: hidden;
+}
+
+.admin-content-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  min-height: 85vh;
+  margin-top: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Sidebar തുറന്നിരിക്കുമ്പോൾ കണ്ടന്റ് അഡ്ജസ്റ്റ് ചെയ്യാൻ */
+.sidebar-open .admin-main-content {
+  margin-left: 260px;
+}
+
+.sidebar-closed .admin-main-content {
+  margin-left: 84px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .sidebar-open .admin-main-content {
+    margin-left: 0;
+    opacity: 0.3; /* സൈഡ് ബാർ തുറക്കുമ്പോൾ കണ്ടന്റ് മങ്ങാൻ */
+  }
+  
+  .sidebar-closed .admin-main-content {
+    margin-left: 0;
+  }
+
+  .admin-content-inner {
+    padding: var(--space-sm);
+    margin-top: 10px;
+  }
+}
