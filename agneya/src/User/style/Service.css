@@ -1,5 +1,7 @@
 /* src/style/Service.css */
-
+.user-main-page {
+  background-color: #050505;
+}
 .service-section {
   padding: 6rem 1rem;
   background-color: #050505; /* Matches the dark theme of the Hero section */

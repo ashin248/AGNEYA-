@@ -18,7 +18,7 @@
 
 /* Optional: Alternate background colors for sections */
 .user-main-page > *:nth-child(even) {
-  background-color: var(--bg-light);
+  /* background-color: var(--bg-light); */
   max-width: 100%; /* Stretch background full width */
   padding-left: calc((100% - var(--max-width)) / 2 + 2rem);
   padding-right: calc((100% - var(--max-width)) / 2 + 2rem);
