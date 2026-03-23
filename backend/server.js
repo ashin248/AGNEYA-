@@ -72,7 +72,7 @@ const reactBuildPath = path.join(__dirname, '../agneya/dist');
 app.use(express.static(reactBuildPath));
 
 // Catch-all for React Router (must be LAST)
-app.get('*', (req, res) => {
+app.get('/{*splat}', (req, res) => {
   res.sendFile(path.join(reactBuildPath, 'index.html'));
 });
 
