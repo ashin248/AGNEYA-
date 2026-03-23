@@ -1,1 +1,33 @@
-@import url('./index.css');
+/* src/App.css */
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  background-color: var(--bg-white);
+  padding: 2rem;
+}
+
+/* Targeting the className="404" */
+[class="404"] {
+  font-size: 6rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.pageNotFond {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+}
+
+.LookingPagr {
+  font-size: 1.1rem;
+  color: var(--text-dim);
+}
