@@ -1,205 +1,222 @@
-@import url('../../index.css');
-
+/* src/style/Hero.css */
 
 .hero-section {
   position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 50%, var(--bg4) 100%);
-  background-size: 300% 300%;
-  animation: gradientFlow 18s ease infinite;
+  justify-content: center;
+  background-color: #050505; /* Deep dark background */
+  color: #ffffff;
   overflow: hidden;
-  padding: 0 5%;
+  padding: 4rem 1rem;
 }
 
-@keyframes gradientFlow {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Background glow layer */
+/* Central glowing background effect */
 .hero-bg-glow {
   position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 30% 20%, rgba(124, 58, 237, 0.18) 0%, transparent 60%),
-              radial-gradient(circle at 70% 80%, rgba(34, 211, 238, 0.14) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(106, 27, 154, 0.25) 0%, transparent 70%);
+  filter: blur(80px);
+  z-index: 0;
   pointer-events: none;
-  z-index: 1;
 }
 
-/* Main content container */
+/* Main container holding the content */
 .hero-container {
   position: relative;
-  z-index: 3;
-  max-width: 1400px;
-  width: 100%;
-  margin: 0 auto;
+  z-index: 1;
+  max-width: 900px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 2.5rem;
+  align-items: center;
+  text-align: center;
 }
 
-/* Floating particles (decorative) */
+/* Badge Styling */
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  margin-bottom: 2rem;
+}
+
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #b388ff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #b388ff;
+}
+
+.hero-badge-Heading {
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #e0e0e0;
+  margin: 0;
+}
+
+/* Typography */
+.hero-heading {
+  margin-bottom: 1.5rem;
+}
+
+.hero-heading h1 {
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.brand-highlight {
+  background: linear-gradient(135deg, #b388ff 0%, #ff4081 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  padding: 0.5rem 0;
+}
+
+.sub-heading {
+  display: block;
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  font-weight: 400;
+  color: #aaaaaa;
+  margin-top: 0.5rem;
+}
+
+/* Description */
+.hero-description {
+  max-width: 600px;
+  margin: 0 auto 2.5rem auto;
+}
+
+.hero-description p {
+  font-size: 1.125rem;
+  color: #a0a0a0;
+  line-height: 1.6;
+}
+
+/* Features List */
+.hero-features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.feature-item {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #cccccc;
+  letter-spacing: 0.5px;
+}
+
+/* Call to Action Buttons */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.primary-btn, .secondary-btn {
+  padding: 14px 28px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.primary-btn {
+  background: #6a1b9a;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 15px rgba(106, 27, 154, 0.4);
+}
+
+.secondary-btn {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Floating Particles Background Animation */
 .hero-particles {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
   pointer-events: none;
-  z-index: 2;
 }
 
 .hero-particles span {
   position: absolute;
-  width: 3px;
-  height: 3px;
-  background: rgba(168, 85, 247, 0.6);
+  display: block;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
-  animation: float 18s infinite linear;
-  opacity: 0.6;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  animation: floatUp 15s linear infinite;
+  bottom: -10px;
 }
 
-.hero-particles span:nth-child(odd) {
-  background: rgba(34, 211, 238, 0.7);
-  box-shadow: 0 0 14px rgba(34, 211, 238, 0.8);
-}
+/* Staggering particle sizes and animation durations */
+.hero-particles span:nth-child(1) { left: 10%; width: 6px; height: 6px; animation-duration: 12s; }
+.hero-particles span:nth-child(2) { left: 30%; width: 3px; height: 3px; animation-duration: 18s; animation-delay: 2s; }
+.hero-particles span:nth-child(3) { left: 50%; width: 5px; height: 5px; animation-duration: 14s; animation-delay: 4s; }
+.hero-particles span:nth-child(4) { left: 70%; width: 7px; height: 7px; animation-duration: 16s; animation-delay: 1s; }
+.hero-particles span:nth-child(5) { left: 85%; width: 4px; height: 4px; animation-duration: 11s; animation-delay: 5s; }
+.hero-particles span:nth-child(6) { left: 95%; width: 6px; height: 6px; animation-duration: 19s; animation-delay: 3s; }
 
-@keyframes float {
-  0%   { transform: translate(0, 0) rotate(0deg); }
-  25%  { transform: translate(80px, -120px) rotate(90deg); }
-  50%  { transform: translate(-60px, 140px) rotate(180deg); }
-  75%  { transform: translate(100px, -80px) rotate(270deg); }
-  100% { transform: translate(0, 0) rotate(360deg); }
-}
-
-/* Badge (Premium Printing Solutions) */
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.8rem;
-  padding: 0.6rem 1.4rem;
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(10px);
-  border-radius: 50px;
-  border: 1px solid rgba(124, 58, 237, 0.3);
-  margin-bottom: 1rem;
-}
-
-.badge-dot {
-  width: 10px;
-  height: 10px;
-  background: var(--accent);
-  border-radius: 50%;
-  box-shadow: 0 0 12px var(--accent);
-  animation: pulse 2.2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 0.9; }
-  50%      { transform: scale(1.4); opacity: 0.4; }
-}
-
-.hero-badge-Heading {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--light);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-/* Main Headline */
-.hero-heading h1 {
-  font-size: clamp(3.6rem, 8vw, 8.5rem);
-  font-weight: 900;
-  line-height: 0.92;
-  margin-bottom: 1.5rem;
-  letter-spacing: -3px;
-}
-
-/* Features chips */
-.hero-features {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.2rem;
-  margin: 1.5rem 0 2.5rem;
-}
-
-.feature-item {
-  background: rgba(124, 58, 237, 0.15);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(124, 58, 237, 0.3);
-  color: var(--primary-light);
-  padding: 0.7rem 1.5rem;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 1.05rem;
-}
-
-/* CTA Buttons */
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-}
-
-.hero-actions .primary-btn {
-  padding: 1.1rem 2.4rem;
-  font-size: 1.15rem;
-  min-width: 180px;
-}
-
-.hero-actions .secondary-btn {
-  padding: 1.05rem 2.3rem;
-  font-size: 1.15rem;
-  min-width: 180px;
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) scale(0);
+    opacity: 0;
+  }
 }
 
 /* Responsive adjustments */
-@media (max-width: 992px) {
-  .hero-section {
-    padding: 0 6%;
-    text-align: center;
-  }
-
-  .hero-container {
-    align-items: center;
-  }
-
-  .hero-actions {
-    justify-content: center;
-  }
-
-  .hero-features {
-    justify-content: center;
-  }
-}
-
 @media (max-width: 768px) {
-  .hero-heading h1 {
-    font-size: clamp(3rem, 10vw, 5.2rem);
-  }
-
-  .hero-badge {
-    font-size: 0.95rem;
-    padding: 0.5rem 1.2rem;
-  }
-
   .hero-actions {
     flex-direction: column;
     width: 100%;
-    max-width: 360px;
+    max-width: 300px;
   }
-
-  .hero-actions button {
+  
+  .primary-btn, .secondary-btn {
     width: 100%;
   }
-}
-
-@media (max-width: 480px) {
+  
   .hero-features {
-    flex-direction: column;
-    gap: 0.9rem;
+    gap: 1rem;
   }
 }
