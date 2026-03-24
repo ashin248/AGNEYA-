@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import API from "../../shared/utils/api";  
+import API, { getImageUrl } from "../../shared/utils/api";  
 import "../style/MyOrders.css";
 
 const STATUS_STEPS = [
@@ -136,7 +136,7 @@ function MyOrders() {
           {order.items?.map((item, idx) => (
             <div key={idx} className="order-item-row">
               <img
-                src={item.customDesignUrl || item.productId?.imageUrl || "/placeholder-product.jpg"}
+                src={item.customDesignUrl || (item.productId?.imageUrl ? getImageUrl(item.productId.imageUrl) : "/placeholder-product.jpg")}
                 alt={item.name}
                 className="product-thumb"
                 onError={(e) => (e.target.src = "/placeholder-fallback.jpg")}

@@ -12,10 +12,7 @@ const app = express();
 const connectDB = require('./config/db');
 connectDB();
 
-// 2. Serve Static Uploads (public, no auth)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// 3. CORS – allow frontend (Vercel) to call this API
+// 2. CORS – allow frontend (Vercel) to call this API
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
   'https://agneya.vercel.app',
@@ -33,6 +30,9 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+// 3. Serve Static Uploads (public, no auth)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 4. Body Parsers
 app.use(express.json());

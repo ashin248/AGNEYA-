@@ -75,7 +75,7 @@ const Login = () => {
       });
 
       if (res.data.success) {
-        if (res.data.isNewUser) {
+        if (!res.data.user.profileComplete) {
           // New user → go to profile completion
           setStep(3);
         } else {

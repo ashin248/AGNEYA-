@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { staggeredGravityContainer, gravityScrollVariant } from "../../shared/animations/framerVariants";
 import { Helmet } from "react-helmet-async";
 import ProductReviews from "../components/ProductReviews";
-import API from "../../shared/utils/api";
+import API, { getImageUrl } from "../../shared/utils/api";
 import "../style/OnlineShopping.css";
 
 function OnlineShopping() {
@@ -397,7 +397,7 @@ function OnlineShopping() {
                 <div className="product-img-wrapper">
                   <img
                     className="product-img"
-                    src={p.imageUrl}
+                    src={getImageUrl(p.imageUrl)}
                     alt={p.name}
                     onError={e => e.target.src = "/placeholder-product.jpg"}
                   />
@@ -435,7 +435,7 @@ function OnlineShopping() {
                 <div className="product-img-wrapper">
                   <img
                     className="product-img"
-                    src={p.imageUrl}
+                    src={getImageUrl(p.imageUrl)}
                     alt={p.name}
                     onError={e => e.target.src = "/placeholder-product.jpg"}
                   />

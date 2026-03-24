@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/cartSlice";
 import * as fabric from "fabric"; // Fabric.js v6 support
 import { Helmet } from "react-helmet-async";
+import { getImageUrl } from "../../shared/utils/api";
 import "../style/ProductCustomize.css";
 
 // ─── 🖼️ കസ്റ്റമൈസേഷൻ മാസ്കുകൾ (Masks for Clipping) 🖼️ ───
@@ -66,7 +67,7 @@ function ProductCustomize() {
       // 1. Load Background Image
       const bgImgElement = new Image();
       bgImgElement.crossOrigin = "anonymous";
-      bgImgElement.src = baseProduct?.imageUrl || "/placeholder-product.jpg";
+      bgImgElement.src = baseProduct?.imageUrl ? getImageUrl(baseProduct.imageUrl) : "/placeholder-product.jpg";
 
       bgImgElement.onload = () => {
         const fabricBgImg = new fabric.Image(bgImgElement);
