@@ -1,7 +1,7 @@
 
 // src/admin/components/OrderManagement.jsx
 import React, { useState, useEffect } from "react";
-import API from "../../shared/utils/api";
+import API, { getImageUrl } from "../../shared/utils/api";
 import "../style/OrderManagement.css";
 
 const OrderManagement = () => {
@@ -339,7 +339,7 @@ const OrderManagement = () => {
                   <td>
                     {o.designImage ? (
                       <img
-                        src={o.designImage}
+                        src={getImageUrl(o.designImage)}
                         alt="design preview"
                         width="60"
                         style={{ borderRadius: "4px" }}
