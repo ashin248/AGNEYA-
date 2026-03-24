@@ -23,9 +23,43 @@ const Login = () => {
     mobile: "",
     addressLine: "",
     city: "",
+    state: "",
     landmark: "",
     pincode: "",
   });
+
+  const [pincodeLoading, setPincodeLoading] = useState(false);
+  const [pincodeError, setPincodeError] = useState("");
+
+  // Auto-fetch City and State when Pincode reaches 6 digits
+  React.useEffect(() => {
+    const fetchPincodeDetails = async (pin) => {
+      setPincodeLoading(true);
+      setPincodeError("");
+      try {
+        const response = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+        const data = await response.json();
+        if (data && data[0] && data[0].Status === "Success") {
+          const postOffice = data[0].PostOffice[0];
+          setFormData(prev => ({
+            ...prev,
+            city: postOffice.District,
+            state: postOffice.State
+          }));
+        } else {
+          setPincodeError("Invalid Pincode. Please check your entry.");
+        }
+      } catch (error) {
+        console.error("Error fetching pincode:", error);
+      } finally {
+        setPincodeLoading(false);
+      }
+    };
+
+    if (formData.pincode?.length === 6) {
+      fetchPincodeDetails(formData.pincode);
+    }
+  }, [formData.pincode]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -112,16 +146,15 @@ const Login = () => {
     setErrorMsg("");
 
     try {
-      const res = await API.post("/api/auth/complete-profile", {
-        email: formData.email,
-        fullName: formData.fullName,
-        mobile: formData.mobile,
-        address: {
-          addressLine: formData.addressLine,
-          city: formData.city,
-          landmark: formData.landmark,
-          pincode: formData.pincode,
-        },
+      const res = await API.post("/api/auth/complete-registration", {
+        email: formData.email.trim(),
+        fullName: formData.fullName.trim(),
+        mobile: formData.mobile.trim(),
+        addressLine: formData.addressLine?.trim() || "",
+        city: formData.city?.trim() || "",
+        state: formData.state?.trim() || "",
+        landmark: formData.landmark.trim(),
+        pincode: formData.pincode?.trim() || "",
       });
 
       if (res.data.success) {
@@ -292,6 +325,17 @@ const Login = () => {
                 </div>
 
                 <div className="form-group">
+                  <label>State *</label>
+                  <input
+                    name="state"
+                    placeholder="Kerala"
+                    value={formData.state}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
                   <label>Landmark *</label>
                   <input
                     name="landmark"
@@ -303,7 +347,7 @@ const Login = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>PIN Code</label>
+                  <label>PIN Code {pincodeLoading && <span style={{fontSize: "0.8rem", color: "#999"}}>(Checking...)</span>}</label>
                   <input
                     name="pincode"
                     type="text"
@@ -314,6 +358,7 @@ const Login = () => {
                       if (/^\d{0,6}$/.test(e.target.value)) handleChange(e);
                     }}
                   />
+                  {pincodeError && <div style={{color: "red", fontSize: "0.8rem", marginTop: "4px"}}>{pincodeError}</div>}
                 </div>
 
                 {errorMsg && <div className="error-message">{errorMsg}</div>}

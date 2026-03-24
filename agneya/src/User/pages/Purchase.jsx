@@ -57,6 +57,38 @@ const Purchase = () => {
   };
 
   const [loading, setLoading] = useState(false);
+  const [pincodeLoading, setPincodeLoading] = useState(false);
+  const [pincodeError, setPincodeError] = useState("");
+
+  // Auto-fetch City and State when Pincode reaches 6 digits
+  useEffect(() => {
+    const fetchPincodeDetails = async (pin) => {
+      setPincodeLoading(true);
+      setPincodeError("");
+      try {
+        const response = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+        const data = await response.json();
+        if (data && data[0] && data[0].Status === "Success") {
+          const postOffice = data[0].PostOffice[0];
+          setAddress(prev => ({
+            ...prev,
+            city: postOffice.District,
+            state: postOffice.State
+          }));
+        } else {
+          setPincodeError("Invalid Pincode. Please check your entry.");
+        }
+      } catch (error) {
+        console.error("Error fetching pincode:", error);
+      } finally {
+        setPincodeLoading(false);
+      }
+    };
+
+    if (address.pincode?.length === 6) {
+      fetchPincodeDetails(address.pincode);
+    }
+  }, [address.pincode]);
 
   const proceedPayment = async () => {
     if (
@@ -172,12 +204,20 @@ const Purchase = () => {
           placeholder="State"
         />
 
-        <input
-          name="pincode"
-          value={address.pincode}
-          onChange={handleChange}
-          placeholder="Pincode"
-        />
+        <div style={{display: "flex", flexDirection: "column", gap: "4px", width: "100%", marginBottom: "15px"}}>
+          <label style={{fontSize: "14px", fontWeight: "bold", color: "#333"}}>PIN Code {pincodeLoading && <span style={{fontSize: "0.8rem", color: "#999", fontWeight: "normal"}}>(Checking...)</span>}</label>
+          <input
+            name="pincode"
+            value={address.pincode}
+            maxLength={6}
+            onChange={(e) => {
+              if (/^\d{0,6}$/.test(e.target.value)) handleChange(e);
+            }}
+            placeholder="6-digit PIN"
+            style={{marginBottom: "0"}}
+          />
+          {pincodeError && <span style={{color: "red", fontSize: "0.8rem"}}>{pincodeError}</span>}
+        </div>
       </div>
 
       <button

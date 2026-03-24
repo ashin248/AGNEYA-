@@ -14,6 +14,39 @@ const Profile = () => {
     state: "",
   });
 
+  const [pincodeLoading, setPincodeLoading] = useState(false);
+  const [pincodeError, setPincodeError] = useState("");
+
+  // Auto-fetch City and State when Pincode reaches 6 digits
+  useEffect(() => {
+    const fetchPincodeDetails = async (pin) => {
+      setPincodeLoading(true);
+      setPincodeError("");
+      try {
+        const response = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+        const data = await response.json();
+        if (data && data[0] && data[0].Status === "Success") {
+          const postOffice = data[0].PostOffice[0];
+          setNewAddress(prev => ({
+            ...prev,
+            city: postOffice.District,
+            state: postOffice.State
+          }));
+        } else {
+          setPincodeError("Invalid Pincode.");
+        }
+      } catch (error) {
+        console.error("Error fetching pincode:", error);
+      } finally {
+        setPincodeLoading(false);
+      }
+    };
+
+    if (newAddress.pincode?.length === 6) {
+      fetchPincodeDetails(newAddress.pincode);
+    }
+  }, [newAddress.pincode]);
+
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -87,8 +120,32 @@ const Profile = () => {
             <input type="text" placeholder="City" value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} required />
             <input type="text" placeholder="Landmark" value={newAddress.landmark} onChange={(e) => setNewAddress({ ...newAddress, landmark: e.target.value })} required />
             <div className="row">
-              <input type="text" placeholder="Pincode" value={newAddress.pincode} onChange={(e) => setNewAddress({ ...newAddress, pincode: e.target.value })} required />
-              <input type="text" placeholder="State" value={newAddress.state} onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })} required />
+              <div style={{display: "flex", flexDirection: "column", gap: "2px", width: "48%"}}>
+                <label style={{fontSize: "12px", color: "#555"}}>Pincode {pincodeLoading && <span>(Loading...)</span>}</label>
+                <input 
+                  type="text" 
+                  maxLength={6}
+                  placeholder="6-digit PIN" 
+                  value={newAddress.pincode} 
+                  onChange={(e) => {
+                    if (/^\d{0,6}$/.test(e.target.value)) setNewAddress({ ...newAddress, pincode: e.target.value });
+                  }} 
+                  required 
+                  style={{marginBottom: "0"}}
+                />
+                {pincodeError && <span style={{color: "red", fontSize: "11px"}}>{pincodeError}</span>}
+              </div>
+              <div style={{display: "flex", flexDirection: "column", gap: "2px", width: "48%"}}>
+                <label style={{fontSize: "12px", color: "#555"}}>State</label>
+                <input 
+                  type="text" 
+                  placeholder="State" 
+                  value={newAddress.state} 
+                  onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })} 
+                  required 
+                  style={{marginBottom: "0"}}
+                />
+              </div>
             </div>
             <button type="submit">Add Address</button>
           </form>
