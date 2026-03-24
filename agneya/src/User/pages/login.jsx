@@ -115,6 +115,7 @@ const Login = () => {
         } else {
           // Existing user → login success
           localStorage.setItem("token", res.data.token);
+          localStorage.setItem("user", JSON.stringify(res.data.user));
           navigate(location.state?.from || "/");
         }
       } else {
@@ -159,6 +160,7 @@ const Login = () => {
 
       if (res.data.success) {
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
         navigate(location.state?.from || "/");
       } else {
         setErrorMsg(res.data.message || "Profile completion failed");
