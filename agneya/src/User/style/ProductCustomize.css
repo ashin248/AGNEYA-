@@ -1,340 +1,260 @@
 
 
-.customize-page {
+/* --- Global Studio Setup --- */
+.customize-page.studio-theme {
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--dark) 0%, #1a1f35 100%);
-  color: var(--light);
-  padding: 1rem;
-  position: relative;
-  overflow-x: hidden;
-}
-
-.customize-page::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.07) 0%, transparent 60%),
-              radial-gradient(circle at 80% 70%, rgba(34, 211, 238, 0.05) 0%, transparent 65%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Main Layout - Two Columns */
-.customize-layout {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr 360px;
-  gap: 1.8rem;
-  max-width: 1600px;
-  margin: 0 auto;
-  height: calc(100vh - 2rem);
-  padding: 1rem 0;
-}
-
-@media (max-width: 1024px) {
-  .customize-layout {
-    grid-template-columns: 1fr;
-    height: auto;
-  }
-}
-
-/* ─── LEFT SIDE: 3D Preview + Canvas Editor ─── */
-.preview-and-canvas {
+  background-color: #050505;
+  color: #e0e0e0;
+  padding: 80px 0 0 0;
   display: flex;
   flex-direction: column;
-  gap: 1.6rem;
-  height: 100%;
 }
 
-.preview-3d-container {
-  flex: 1;
-  min-height: 480px;
-  background: rgba(15, 23, 42, 0.65);
-  border-radius: 1.2rem;
-  overflow: hidden;
-  border: 1px solid rgba(124, 58, 237, 0.18);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-}
-
-/* Fabric Canvas Area */
-.canvas-container {
-  flex: 1;
-  background: #111827;
-  border-radius: 1.2rem;
-  overflow: hidden;
-  border: 1px solid rgba(124, 58, 237, 0.18);
-  position: relative;
-}
-
-#fabric-canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* ─── RIGHT SIDEBAR: Tools & Controls ─── */
-.customize-sidebar {
-  background: var(--glass-bg);
-  backdrop-filter: blur(14px);
-  border: 1px solid var(--glass-border);
-  border-radius: 1.2rem;
-  overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+/* 1. Studio Header */
+.studio-header {
   display: flex;
-  flex-direction: column;
-  height: 100%;
-  max-height: 100vh;
-  overflow-y: auto;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: #0f0f12;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.sidebar-header {
-  padding: 1.4rem 1.6rem;
-  border-bottom: 1px solid rgba(124, 58, 237, 0.18);
-  background: rgba(124, 58, 237, 0.08);
-}
+.studio-title { font-size: 1.4rem; font-weight: 700; }
+.studio-title span { color: #b388ff; font-weight: 300; }
 
-.sidebar-title {
-  font-size: 1.45rem;
-  font-weight: 700;
-  color: var(--primary-light);
-  margin: 0;
-}
-
-/* Tools Section */
-.tools-section {
-  padding: 1.6rem;
-  border-bottom: 1px solid rgba(124, 58, 237, 0.12);
-}
-
-.tool-group-title {
-  font-size: 1.1rem;
+.price-display {
+  font-size: 1.2rem;
   font-weight: 600;
-  color: #cbd5e1;
-  margin-bottom: 1rem;
+  background: rgba(179, 136, 255, 0.1);
+  padding: 8px 20px;
+  border-radius: 50px;
+  border: 1px solid rgba(179, 136, 255, 0.2);
 }
 
-.tool-buttons {
+.price-display span { color: #b388ff; }
+
+/* 2. Main Studio Grid */
+.studio-main-container {
+  display: grid;
+  grid-template-columns: 280px 1fr 300px;
+  height: calc(100vh - 145px);
+  overflow: hidden;
+}
+
+/* 3. Side Panels (Left & Right) */
+.studio-side-panel {
+  background: #0f0f12;
+  border: 1px solid rgba(255, 255, 255, 0.03);
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
+  flex-direction: column;
 }
 
-.tool-btn {
-  flex: 1 1 45%;
-  min-width: 110px;
-  padding: 0.9rem 0.6rem;
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(124, 58, 237, 0.25);
-  border-radius: 0.8rem;
-  color: var(--light);
-  font-size: 0.95rem;
+.left-panel { border-right: 1px solid rgba(255, 255, 255, 0.05); }
+.right-panel { border-left: 1px solid rgba(255, 255, 255, 0.05); }
+
+.panel-header {
+  display: flex;
+  padding: 10px;
+  background: rgba(255, 255, 25.5, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.panel-header button {
+  flex: 1;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: 0.3s;
+}
+
+.panel-header button.active {
+  color: #b388ff;
+  border-bottom: 2px solid #b388ff;
+}
+
+.panel-content {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* 4. Tool Sections & Sliders */
+.tool-section {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tool-section label {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  letter-spacing: 1px;
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.tool-grid button, .upload-label {
+  padding: 12px;
+  background: #1a1a1f;
+  border: 1px solid #2a2a2f;
+  color: #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
   text-align: center;
 }
 
-.tool-btn:hover,
-.tool-btn.active {
-  background: rgba(124, 58, 237, 0.25);
-  border-color: var(--primary-light);
-  transform: translateY(-2px);
+.tool-grid button:hover { border-color: #b388ff; color: #fff; }
+
+/* 🖼️ PHOTO EDITING SLIDERS 🖼️ */
+.slider-group {
+  margin-top: 15px;
 }
 
-/* Text Controls */
-.text-controls {
-  padding: 1.6rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.4rem;
+.slider-group label {
+  text-transform: none;
+  color: #aaa;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
 }
 
-.text-input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.text-input {
+.slider-group input[type="range"] {
   width: 100%;
-  padding: 0.9rem 1.2rem;
-  background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(124, 58, 237, 0.3);
-  border-radius: 0.8rem;
-  color: var(--light);
-  font-size: 1.05rem;
-}
-
-.font-family-select,
-.font-size-select,
-.color-picker {
-  padding: 0.9rem;
-  background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(124, 58, 237, 0.3);
-  border-radius: 0.8rem;
-  color: var(--light);
-}
-
-/* Color Picker Grid */
-.color-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 0.6rem;
-}
-
-.color-swatch {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 0.6rem;
+  accent-color: #b388ff;
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
+  margin-top: 5px;
 }
 
-.color-swatch:hover,
-.color-swatch.active {
-  transform: scale(1.12);
-  border-color: white;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.4);
-}
-
-/* Action Buttons (Bottom) */
-.sidebar-actions {
-  padding: 1.6rem;
-  border-top: 1px solid rgba(124, 58, 237, 0.18);
-  margin-top: auto;
-}
-
-.action-btn {
+.ai-btn {
   width: 100%;
-  padding: 1.1rem;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 1.05rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 1rem;
+  margin-top: 15px;
+  background: linear-gradient(135deg, #7c4dff, #ff4081) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  border: none !important;
 }
 
-.btn-add-to-cart {
-  background: linear-gradient(90deg, var(--primary), var(--primary-light));
-  color: white;
-  border: none;
-  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.35);
-}
+.reset-btn { color: #ff4081 !important; border-color: rgba(255, 64, 129, 0.2) !important; }
 
-.btn-add-to-cart:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 35px rgba(124, 58, 237, 0.45);
-}
-
-.btn-preview {
-  background: transparent;
-  border: 2px solid var(--secondary);
-  color: var(--secondary);
-}
-
-.btn-preview:hover {
-  background: var(--secondary);
-  color: var(--dark);
-}
-
-/* Preview Modal */
-.preview-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
+/* 5. Canvas Viewport (Center) */
+.studio-center-panel {
+  background: #15151a;
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 2000;
-}
-
-.preview-modal-content {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  border-radius: 1.4rem;
-  padding: 2rem;
-  max-width: 90%;
-  max-height: 92vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.7);
+  align-items: center;
   position: relative;
+  overflow: auto;
 }
 
-.preview-close-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1.5rem;
-  background: rgba(239, 68, 68, 0.8);
-  color: white;
-  border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  font-size: 1.4rem;
-  cursor: pointer;
+.canvas-wrapper {
+  background: white;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  line-height: 0;
+}
+
+/* 6. Layer List Items */
+.layer-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.preview-close-btn:hover {
-  background: #ef4444;
-  transform: scale(1.1);
+.layer-item:hover { background: rgba(179, 136, 255, 0.1); }
+.layer-icon { color: #b388ff; }
+.layer-actions { margin-left: auto; display: flex; gap: 5px; }
+.layer-actions button { background: none; border: none; color: #555; cursor: pointer; }
+.layer-actions button:hover { color: #fff; }
+
+/* 7. Finish/Action Buttons */
+.finish-btn {
+  width: 100%;
+  padding: 15px;
+  background: #b388ff;
+  color: white;
+  font-weight: 700;
+  border-radius: 12px;
+  border: none;
+  margin-top: 15px;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(179, 136, 255, 0.2);
 }
 
-.preview-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  margin-top: 2rem;
-}
+.finish-btn:hover { background: #9c51b6; transform: translateY(-2px); }
 
-.download-btn {
-  background: var(--accent);
-  color: var(--dark);
-  padding: 1rem 2rem;
-  border-radius: 50px;
+/* Error Banner */
+.error-banner {
+  background: #ff4081;
+  color: white;
+  padding: 10px;
+  text-align: center;
   font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s;
 }
 
-.download-btn:hover {
-  background: var(--accent-dark);
-  transform: translateY(-2px);
+/* QR Modal Overlay */
+.qr-input-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #1a1a1f;
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid #333;
+  z-index: 100;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
 }
 
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .customize-layout {
-    grid-template-columns: 1fr;
+.qr-input-modal input {
+  padding: 10px;
+  background: #050505;
+  border: 1px solid #333;
+  color: white;
+  margin-right: 10px;
+  border-radius: 5px;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .studio-main-container {
+    grid-template-columns: 240px 1fr;
   }
-
-  .customize-sidebar {
-    max-height: 600px;
-  }
+  .right-panel { display: none; } /* Mobile/Tablet-ൽ ടൂളുകൾ അഡ്ജസ്റ്റ് ചെയ്യണം */
 }
 
+
+/* src/style/ProductCustomize.css */
+
+/* ...നിങ്ങളുടെ പഴയ എല്ലാ CSS-ഉം അതുപോലെ നിലനിർത്തുക... */
+
+.canvas-holder {
+  background: #ffffff; /* കാൻവാസിന്റെ ബേസ് കളർ വൈറ്റ് തന്നെ നിൽക്കട്ടെ */
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  line-height: 0;
+  overflow: hidden;
+}
+
+/* responsive adjustment */
 @media (max-width: 768px) {
-  .customize-page {
-    padding: 5rem 4% 3rem;
-  }
-
-  .preview-3d-container {
-    min-height: 420px;
-  }
-}
-
-@media (max-width: 480px) {
-  .preview-and-canvas {
-    gap: 1.2rem;
-  }
-
-  .sidebar-actions {
-    padding: 1.2rem;
+  .canvas-wrapper canvas {
+    width: 100% !important;
+    height: auto !important;
   }
 }

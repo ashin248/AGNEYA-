@@ -190,3 +190,456 @@
     gap: 1.5rem;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+/* src/style/Service.css */
+
+.service-section {
+  padding: 8rem 1rem 6rem 1rem; /* മുകളിൽ നൂലിന് നിൽക്കാൻ സ്ഥലം കൊടുക്കുന്നു */
+  background-color: #050505; 
+  color: #ffffff;
+  min-height: 100vh;
+  position: relative;
+}
+
+.service-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Heading Styles */
+.service-heading {
+  text-align: center;
+  margin-bottom: 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.service-heading h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.service-underline {
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #b388ff, transparent);
+  border-radius: 2px;
+  box-shadow: 0 0 10px #b388ff;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 3rem; /* നൂലുകൾ തമ്മിൽ കൂട്ടിമുട്ടാതിരിക്കാൻ ഗ്യാപ്പ് കൂട്ടി */
+  padding: 1rem;
+}
+
+/* =========================================
+   🧵 HANGING THREAD & SWAY ANIMATION
+   ========================================= */
+
+/* കാർഡിനെയും നൂലിനെയും ഒന്നിച്ചു നിർത്തുന്ന Wrapper */
+.service-card-wrapper {
+  position: relative;
+  /* നൂലിന്റെ മുകൾ ഭാഗത്തുനിന്ന് കാറ്റിലാടാൻ (Pivot point) */
+  transform-origin: 50% -60px; 
+  animation: dangleSway 4s ease-in-out infinite alternate;
+  z-index: 1;
+}
+
+/* ഓരോ കാർഡും വ്യത്യസ്ത സമയങ്ങളിൽ ആടാൻ (Staggered Swaying) */
+.service-card-wrapper:nth-child(1) { animation-duration: 4.2s; animation-delay: 0s; }
+.service-card-wrapper:nth-child(2) { animation-duration: 5.1s; animation-delay: -1.5s; }
+.service-card-wrapper:nth-child(3) { animation-duration: 4.8s; animation-delay: -3s; }
+.service-card-wrapper:nth-child(4) { animation-duration: 5.3s; animation-delay: -0.5s; }
+.service-card-wrapper:nth-child(5) { animation-duration: 4.5s; animation-delay: -2.2s; }
+.service-card-wrapper:nth-child(6) { animation-duration: 5.0s; animation-delay: -1s; }
+
+/* കാറ്റിലാടുന്ന ആനിമേഷൻ (Pendulum swing) */
+@keyframes dangleSway {
+  0% { transform: rotate(-3deg); }
+  100% { transform: rotate(3deg); }
+}
+
+/* കെട്ടിത്തൂക്കിയ നൂൽ (The Thread) */
+.hanging-thread {
+  position: absolute;
+  top: -60px; /* കാർഡിന് മുകളിൽ 60px ഉയരത്തിൽ */
+  left: 50%;
+  width: 2px;
+  height: 60px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(179, 136, 255, 0.8));
+  transform: translateX(-50%);
+  z-index: 0;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* വലിച്ചു നീട്ടാനുള്ള ട്രാൻസിഷൻ */
+}
+
+/* നൂൽ ഉറപ്പിച്ചു നിർത്തിയിരിക്കുന്ന ആണി (The Nail / Anchor) */
+.nail {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, #e0e0e0 0%, #555 100%);
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8), 0 0 10px rgba(179, 136, 255, 0.5);
+}
+
+/* =========================================
+   📦 SERVICE CARD DESIGN
+   ========================================= */
+
+.service-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  z-index: 2;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ⚠️ HOVER EFFECT: "ABOUT TO FALL" (താഴേക്ക് വീഴാൻ പോകുന്ന ഫീൽ) ⚠️ */
+.service-card-wrapper:hover {
+  animation-play-state: paused; /* മൗസ് വെക്കുമ്പോൾ ആടുന്നത് നിൽക്കും */
+  z-index: 10;
+}
+
+.service-card-wrapper:hover .hanging-thread {
+  height: 75px; /* നൂൽ ഭാരം കൊണ്ട് വലിഞ്ഞു നീളുന്നു! */
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 82, 82, 0.9)); /* പൊട്ടാൻ പോകുന്നപോലെ ഒരു ചുവപ്പ് നിറം */
+}
+
+.service-card-wrapper:hover .service-card {
+  transform: translateY(15px) rotate(2deg); /* കാർഡ് പെട്ടെന്ന് താഴേക്ക് വീഴാനായി ചരിഞ്ഞു നിൽക്കുന്നു! */
+  border-color: rgba(255, 82, 82, 0.4); /* അപായസൂചനയായി ചുവന്ന ബോർഡർ */
+  box-shadow: 0 40px 60px rgba(0, 0, 0, 0.9), 0 -5px 20px rgba(255, 82, 82, 0.2);
+}
+
+/* ഷൈൻ എഫക്ട് (നേരത്തത്തെ പോലെ തന്നെ) */
+.card-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-20deg);
+  transition: all 0.7s ease;
+}
+
+.service-card-wrapper:hover .card-shine {
+  left: 200%;
+}
+
+/* ഐക്കൺ എഫക്ട് (Zero Gravity) */
+.icon-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(106, 27, 154, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(179, 136, 255, 0.2);
+  box-shadow: inset 0 0 15px rgba(106, 27, 154, 0.3);
+  animation: levitate 4s ease-in-out infinite;
+}
+
+.service-card:nth-child(even) .icon-wrapper { animation-delay: 1s; }
+.service-card:nth-child(3n) .icon-wrapper { animation-delay: 2s; }
+
+.service-icon {
+  font-size: 2.5rem;
+  color: #b388ff;
+  filter: drop-shadow(0 0 8px rgba(179, 136, 255, 0.6));
+}
+
+.service-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #e0e0e0;
+  flex-grow: 1; 
+}
+
+/* ബട്ടൺ ഡിസൈൻ */
+.service-btn {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.service-card-wrapper:hover .service-btn {
+  background: #ff5252; /* വീഴാൻ പോകുമ്പോൾ ബട്ടൺ ചുവപ്പാകുന്നു */
+  border-color: #ff5252;
+  box-shadow: 0 4px 15px rgba(255, 82, 82, 0.4);
+}
+
+.arrow {
+  display: flex;
+  align-items: center;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+
+.service-card-wrapper:hover .arrow {
+  transform: translateX(5px);
+}
+
+/* Physics Keyframes */
+@keyframes levitate {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .service-section {
+    padding: 6rem 1rem 4rem 1rem;
+  }
+  .service-grid {
+    gap: 4rem; /* മൊബൈലിൽ നൂല് വ്യക്തമായി കാണാൻ ഗ്യാപ്പ് കൂട്ടി */
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Service Page Base Styles (Existing) */
+.service-section {
+  padding: 8rem 1rem 4rem 1rem;
+  background-color: #050505;
+  color: #fff;
+}
+
+.service-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.service-heading {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.service-heading h2 {
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 4rem;
+}
+
+/* Hanging Card Animation (Thread) */
+.service-card-wrapper {
+  position: relative;
+  transform-origin: top center;
+  animation: sway 4s ease-in-out infinite alternate;
+}
+
+@keyframes sway {
+  from { transform: rotate(-3deg); }
+  to { transform: rotate(3deg); }
+}
+
+.hanging-thread {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  width: 2px;
+  height: 50px;
+  background: rgba(179, 136, 255, 0.5);
+}
+
+.nail {
+  position: absolute;
+  top: -5px;
+  left: -4px;
+  width: 10px;
+  height: 10px;
+  background: #555;
+  border-radius: 50%;
+}
+
+.service-card {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 2.5rem;
+  border-radius: 20px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+/* =========================================
+   🚚 DELIVERY JOURNEY ANIMATION STYLES
+   ========================================= */
+
+.delivery-journey-section {
+  background-color: #050505;
+  padding: 100px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.journey-title {
+  text-align: center;
+  color: #b388ff;
+  font-size: 1.8rem;
+  margin-bottom: 80px;
+  letter-spacing: 2px;
+}
+
+.journey-track-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  height: 150px;
+}
+
+.journey-line {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255, 255, 255, 0.2) 10px, rgba(255, 255, 255, 0.2) 20px);
+}
+
+.journey-points {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.point {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 150px;
+}
+
+.icon-circle {
+  width: 60px;
+  height: 60px;
+  background: #111;
+  border: 2px solid rgba(179, 136, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8rem;
+  color: #fff;
+  margin-bottom: 15px;
+  box-shadow: 0 0 15px rgba(179, 136, 255, 0.1);
+}
+
+.point span {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* 🚚 Van Animation */
+.moving-van {
+  position: absolute;
+  top: 25px;
+  left: -10%;
+  font-size: 2.8rem;
+  color: #b388ff;
+  z-index: 3;
+  animation: vanTravel 12s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  filter: drop-shadow(0 0 10px rgba(179, 136, 255, 0.5));
+}
+
+/* 📦 Parcel Animation */
+.dropping-parcel {
+  position: absolute;
+  top: 15px;
+  right: 50px;
+  font-size: 2rem;
+  color: #00e676;
+  opacity: 0;
+  z-index: 2;
+  animation: parcelDrop 12s infinite;
+}
+
+/* KEYFRAMES */
+
+@keyframes vanTravel {
+  0% { left: -10%; opacity: 0; }
+  5% { opacity: 1; }
+  
+  /* Stop at Hub */
+  35% { left: 42%; }
+  45% { left: 42%; } 
+  
+  /* Go to Home */
+  75% { left: 88%; opacity: 1; }
+  85% { left: 88%; opacity: 0; }
+  100% { left: 88%; opacity: 0; }
+}
+
+@keyframes parcelDrop {
+  0%, 75% { opacity: 0; transform: translateY(-20px) scale(0.5); }
+  80% { opacity: 1; transform: translateY(20px) scale(1.2); }
+  90% { opacity: 1; transform: translateY(20px) scale(1); }
+  100% { opacity: 0; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .journey-points { flex-direction: column; align-items: center; gap: 50px; }
+  .journey-line, .moving-van, .dropping-parcel { display: none; }
+}

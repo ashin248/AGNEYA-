@@ -18,6 +18,7 @@ const ProductReviews = ({ productId }) => {
     alert(`Review submitted for product ${productId}! (Rating: ${rating})`);
     // API call would go here
   };
+  
 
   return (
     <div className="reviews-container">

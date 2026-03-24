@@ -1,172 +1,125 @@
-@import url('../../index.css');
-
-
-
+/* --- 3D Canvas Wrapper --- */
 .tshirt-3d-wrapper {
   position: relative;
   width: 100%;
-  height: 480px;
-  min-height: 420px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  border-radius: 1.2rem;
+  height: 600px;
+  background: radial-gradient(circle at 50% 50%, #1a1a21 0%, #050505 100%);
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(124, 58, 237, 0.18);
-  transition: all 0.4s ease;
+  border: 1px solid rgba(179, 136, 255, 0.1);
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
 }
 
-/* When hovered / focused */
-.tshirt-3d-wrapper:hover,
-.tshirt-3d-wrapper:focus-within {
-  box-shadow: 0 20px 60px rgba(124, 58, 237, 0.28);
-  transform: translateY(-4px);
-}
-
-/* Glassmorphism overlay frame */
-.tshirt-3d-wrapper::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 1.2rem;
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(34, 211, 238, 0.05));
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  pointer-events: none;
-  z-index: 2;
-  opacity: 0.6;
-  transition: opacity 0.5s ease;
-}
-
-.tshirt-3d-wrapper:hover::before {
-  opacity: 0.85;
-}
-
-/* Canvas container */
 .tshirt-canvas-container {
   width: 100%;
   height: 100%;
-  position: relative;
-  z-index: 1;
+  cursor: grab;
 }
 
-/* Loading / placeholder state */
+.tshirt-canvas-container:active {
+  cursor: grabbing;
+}
+
+/* --- Loading State --- */
 .tshirt-loading {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(8px);
-  color: var(--light);
+  align-items: center;
+  background: #0b0b0e;
   z-index: 10;
-  gap: 1.2rem;
 }
 
 .tshirt-loading-spinner {
-  width: 60px;
-  height: 60px;
-  border: 5px solid rgba(124, 58, 237, 0.2);
-  border-top: 5px solid var(--primary-light);
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(179, 136, 255, 0.1);
+  border-top: 3px solid #b388ff;
   border-radius: 50%;
-  animation: spin 1.2s linear infinite;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
 }
 
+.tshirt-loading-text {
+  color: #b388ff;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* --- Error State --- */
+.tshirt-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 11;
+}
+
+.tshirt-error-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+.tshirt-error-message {
+  color: #ff4081;
+  font-weight: 500;
+}
+
+/* --- Controls Hint --- */
+.tshirt-controls-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* --- Animations --- */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-.tshirt-loading-text {
-  font-size: 1.1rem;
-  color: #94a3b8;
-  font-weight: 500;
-}
-
-/* Error state */
-.tshirt-error {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(239, 68, 68, 0.15);
-  color: #fca5a5;
-  z-index: 10;
-  padding: 2rem;
-  text-align: center;
-  gap: 1rem;
-}
-
-.tshirt-error-icon {
-  font-size: 3.5rem;
-  color: #ef4444;
-}
-
-.tshirt-error-message {
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-/* Controls hint (optional - can be toggled via prop) */
-.tshirt-controls-hint {
-  position: absolute;
-  bottom: 1.2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(10px);
-  padding: 0.6rem 1.4rem;
-  border-radius: 50px;
-  font-size: 0.9rem;
-  color: #cbd5e1;
-  z-index: 5;
-  pointer-events: none;
-  opacity: 0.85;
-  transition: opacity 0.4s ease;
-}
-
-.tshirt-3d-wrapper:hover .tshirt-controls-hint {
-  opacity: 1;
-}
-
-/* Responsive adjustments */
-@media (max-width: 992px) {
-  .tshirt-3d-wrapper {
-    height: 420px;
-    min-height: 380px;
-  }
-}
-
+/* Responsive adjustment for small screens */
 @media (max-width: 768px) {
   .tshirt-3d-wrapper {
-    height: 380px;
-    min-height: 340px;
-    border-radius: 1rem;
+    height: 450px;
   }
-
-  .tshirt-loading-spinner {
-    width: 50px;
-    height: 50px;
-    border-width: 4px;
-  }
-
+  
   .tshirt-controls-hint {
-    font-size: 0.85rem;
-    padding: 0.5rem 1.2rem;
+    font-size: 0.65rem;
+    width: 80%;
+    text-align: center;
   }
 }
 
-@media (max-width: 576px) {
-  .tshirt-3d-wrapper {
-    height: 340px;
-    min-height: 300px;
-  }
-
-  .tshirt-loading-text,
-  .tshirt-error-message {
-    font-size: 1rem;
-  }
+/* ബ്ലൂടൂത്ത് ഐക്കൺ പോലെ തോന്നിക്കുന്ന ചെറിയ ഡെക്കറേഷൻ (Optional) */
+.tshirt-3d-wrapper::before {
+  content: '3D PREVIEW';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 0.6rem;
+  color: #b388ff;
+  border: 1px solid #b388ff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  opacity: 0.5;
+  letter-spacing: 1px;
 }

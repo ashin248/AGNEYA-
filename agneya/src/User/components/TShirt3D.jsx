@@ -11,6 +11,7 @@ import {
 import * as THREE from "three";
 import "../style/TShirt3D.css";
 
+
 const MODEL_PATH = "/models/tshirt.glb"; // ← Make sure this file exists in public/models/
 
 function TShirtModel({ fabricCanvas }) {

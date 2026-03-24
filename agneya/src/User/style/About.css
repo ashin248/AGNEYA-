@@ -1,27 +1,33 @@
+
+
+
+
+
+
 /* src/style/About.css */
 
+/* =========================================
+   1. MAIN LAYOUT & TEXT STYLES
+   ========================================= */
 .about-section {
   position: relative;
-  padding: 8rem 1rem;
-  background-color: #050505;
+  padding: 6rem 1rem;
+  background-color: #030305;
   color: #ffffff;
   overflow: hidden;
-  /* പശ്ചാത്തലത്തിൽ വളരെ നേർത്ത ഒരു കളർ മിക്സിങ് (Melted feel) */
-  background-image: radial-gradient(circle at 10% 20%, rgba(106, 27, 154, 0.05) 0%, transparent 50%),
-                    radial-gradient(circle at 90% 80%, rgba(179, 136, 255, 0.05) 0%, transparent 50%);
+  background-image: radial-gradient(circle at 50% 100%, rgba(106, 27, 154, 0.08) 0%, transparent 60%);
 }
 
 .about-container {
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
-  z-index: 2;
+  z-index: 2; /* കണ്ടന്റ് മുകളിൽ നിൽക്കാൻ */
 }
 
-/* Heading Styles - Smooth fading text */
 .about-heading {
   text-align: center;
-  margin-bottom: 5rem;
+  margin-bottom: 3rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -31,7 +37,6 @@
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-weight: 800;
   margin-bottom: 0.5rem;
-  /* ബോക്സ് ഇല്ലാതെ ടെക്സ്റ്റ് ബാക്ക്ഗ്രൗണ്ടിലേക്ക് അലിഞ്ഞു ചേരാൻ */
   background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.3) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -43,10 +48,8 @@
   background: linear-gradient(90deg, transparent, rgba(179, 136, 255, 0.8), transparent);
   border-radius: 50%;
   box-shadow: 0 0 20px rgba(179, 136, 255, 0.6);
-  filter: blur(1px); /* ലേശം ബ്ലർ ചെയ്ത് സ്മൂത്താക്കുന്നു */
 }
 
-/* Main Content Layout */
 .about-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -54,7 +57,6 @@
   align-items: center;
 }
 
-/* Text Content - No boxes, pure flowing text */
 .about-text {
   display: flex;
   flex-direction: column;
@@ -72,17 +74,15 @@
 .about-text p {
   font-size: 1.15rem;
   line-height: 1.8;
-  color: rgba(255, 255, 255, 0.7); /* നേർത്ത സുതാര്യത (opacity) അലിഞ്ഞ ഫീൽ നൽകും */
+  color: rgba(255, 255, 255, 0.7);
   margin: 0;
 }
 
-/* Stats Section */
 .about-stats {
   display: flex;
   gap: 4rem;
   margin-top: 2rem;
   padding-top: 2rem;
-  /* വരകൾ ഒഴിവാക്കി പകരം ഒരു നേർത്ത ഗ്രേഡിയന്റ് */
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
 }
 
@@ -100,7 +100,6 @@
   -webkit-text-fill-color: transparent;
   line-height: 1;
   margin: 0;
-  filter: drop-shadow(0 10px 20px rgba(106, 27, 154, 0.2));
 }
 
 .stat-item p {
@@ -111,21 +110,13 @@
   text-transform: uppercase;
 }
 
-/* Image Frame - MELTED EFFECT (അലിഞ്ഞ ചേർന്ന ഫീൽ) */
-.about-image {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .image-frame {
   position: relative;
   width: 100%;
   max-width: 450px;
+  margin: 0 auto;
 }
 
-/* ചിത്രത്തിന് പിന്നിലെ പ്രകാശം (Glow Instead of Border) */
 .image-frame::before {
   content: '';
   position: absolute;
@@ -135,47 +126,183 @@
   width: 110%;
   height: 110%;
   background: radial-gradient(circle, rgba(106, 27, 154, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
-  filter: blur(40px); /* ഈ ബ്ലർ ആണ് അലിഞ്ഞു ചേർന്ന ഫീൽ നൽകുന്നത് */
+  filter: blur(40px);
   z-index: 0;
   border-radius: 50%;
-  transition: all 0.8s ease;
 }
 
 .image-frame img {
   width: 100%;
   height: auto;
-  border-radius: 24px; /* Soft rounded corners */
-  display: block;
+  border-radius: 24px;
   position: relative;
   z-index: 1;
-  /* ഹാർഷ് ആയ ഷാഡോ ഒഴിവാക്കി സ്മൂത്ത് ഷാഡോ നൽകുന്നു */
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
-  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Hover ചെയ്യുമ്പോൾ ആ പ്രകാശം കുറച്ചുകൂടി വലുതാകുന്നു */
-.image-frame:hover::before {
-  width: 130%;
-  height: 130%;
-  background: radial-gradient(circle, rgba(179, 136, 255, 0.5) 0%, rgba(0, 0, 0, 0) 70%);
-}
-
-.image-frame:hover img {
-  transform: translateY(-10px) scale(1.02);
-}
-
-/* Responsive adjustments */
 @media (max-width: 992px) {
-  .about-content {
-    grid-template-columns: 1fr;
-    gap: 4rem;
-  }
-  .about-text, .about-heading {
-    text-align: center;
-    align-items: center;
-  }
-  .about-stats {
-    justify-content: center;
-    width: 100%;
-  }
+  .about-content { grid-template-columns: 1fr; gap: 4rem; }
+  .about-text, .about-heading { text-align: center; align-items: center; }
+  .about-stats { justify-content: center; width: 100%; }
 }
+
+/* =========================================
+   2. UNDERWATER WORLD (PLANTS & BUBBLES)
+   ========================================= */
+.underwater-world {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.sea-plant {
+  position: absolute;
+  bottom: -20px;
+  width: 6px;
+  border-radius: 50px;
+  background: linear-gradient(to top, rgba(106, 27, 154, 0.2), rgba(179, 136, 255, 0.6));
+  box-shadow: 0 0 10px rgba(179, 136, 255, 0.4);
+  transform-origin: bottom center;
+  animation: underwaterSway 5s ease-in-out infinite alternate;
+  filter: blur(1px);
+}
+
+.sea-plant::before, .sea-plant::after {
+  content: '';
+  position: absolute;
+  background: rgba(179, 136, 255, 0.5);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(179, 136, 255, 0.4);
+}
+
+.sea-plant::before { width: 15px; height: 30px; top: 20%; left: -10px; transform: rotate(-30deg); }
+.sea-plant::after { width: 12px; height: 25px; top: 50%; right: -8px; transform: rotate(30deg); }
+
+.plant-1 { left: 5%; height: 180px; animation-duration: 6s; }
+.plant-2 { left: 15%; height: 120px; animation-duration: 4.5s; animation-delay: -2s; opacity: 0.6; }
+.plant-3 { right: 10%; height: 220px; animation-duration: 7s; animation-delay: -1s; }
+.plant-4 { right: 20%; height: 140px; animation-duration: 5s; animation-delay: -3s; opacity: 0.7; }
+
+@keyframes underwaterSway {
+  0% { transform: rotate(-8deg); }
+  100% { transform: rotate(8deg); }
+}
+
+.sea-bubble {
+  position: absolute;
+  bottom: -20px;
+  width: 4px; height: 4px;
+  background-color: rgba(179, 136, 255, 0.6);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(179, 136, 255, 0.8);
+  animation: floatUpSpore 15s linear infinite;
+}
+
+.bubble-1 { left: 10%; animation-duration: 12s; animation-delay: 2s; }
+.bubble-2 { left: 30%; animation-duration: 18s; animation-delay: 0s; width: 6px; height: 6px; }
+.bubble-3 { left: 50%; animation-duration: 14s; animation-delay: 5s; opacity: 0.5; }
+.bubble-4 { left: 70%; animation-duration: 16s; animation-delay: 1s; width: 3px; height: 3px; }
+.bubble-5 { left: 85%; animation-duration: 20s; animation-delay: 4s; }
+.bubble-6 { left: 20%; animation-duration: 15s; animation-delay: 7s; }
+.bubble-7 { left: 60%; animation-duration: 19s; animation-delay: 3s; width: 5px; height: 5px; }
+.bubble-8 { left: 90%; animation-duration: 13s; animation-delay: 6s; opacity: 0.4; }
+
+@keyframes floatUpSpore {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  50% { transform: translateY(-300px) translateX(20px); }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-600px) translateX(-20px); opacity: 0; }
+}
+
+/* =========================================
+   3. FISH SCHOOL (AGNEYA) WITH WAVY FLAG
+   ========================================= */
+.fish-school-container {
+  position: absolute;
+  top: 30%; 
+  transform: translateY(-50%);
+  width: auto;
+  z-index: 1; 
+  pointer-events: none;
+}
+
+.fish-school {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: transform 0.6s ease-in-out;
+  transform-origin: center center;
+}
+
+/* തിരിയുമ്പോൾ (Flip) */
+.fish-school.left {
+  transform: scaleX(-1);
+}
+
+/* തിളങ്ങുന്ന പേരിന്റെ കണ്ടെയ്നർ */
+.brand-fish {
+  display: flex;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  filter: drop-shadow(0 0 15px rgba(179, 136, 255, 0.6));
+}
+
+/* അക്ഷരങ്ങൾ തലതിരിയാതിരിക്കാൻ */
+.fish-school.left .brand-fish {
+  transform: scaleX(-1);
+}
+
+/* കൊടി പാറുന്ന ഫീൽ - ഓരോ അക്ഷരത്തിനും */
+.brand-fish span {
+  display: inline-block;
+  background: linear-gradient(135deg, #ffffff 0%, #b388ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: waveFlag 1.5s ease-in-out infinite alternate;
+  margin-right: 2px; 
+}
+
+/* വെള്ളത്തിനടിയിൽ കൊടി പാറുന്ന ആനിമേഷൻ */
+@keyframes waveFlag {
+  0% { transform: translateY(-4px) skewX(-5deg); }
+  100% { transform: translateY(4px) skewX(5deg); }
+}
+
+/* ചെറിയ മത്സ്യങ്ങൾ */
+.fish {
+  position: absolute;
+  width: 15px; height: 8px;
+  background-color: rgba(255, 255, 255, 0.4); 
+  border-radius: 50% 50% 10px 10px;
+  filter: blur(0.5px);
+  box-shadow: 0 0 8px rgba(179, 136, 255, 0.2);
+}
+
+.fish::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: -8px;
+  transform: translateY(-50%) rotate(30deg);
+  width: 6px; height: 2px;
+  background: rgba(179, 136, 255, 0.6);
+  border-radius: 2px;
+}
+
+/* ഓരോ മത്സ്യത്തിനും വ്യത്യസ്ത സ്ഥാനം */
+.fish:nth-child(2) { top: -20px; left: -10px; }
+.fish:nth-child(3) { top: 20px; left: -10px; }
+.fish:nth-child(4) { top: -35px; left: -30px; }
+.fish:nth-child(5) { top: 35px; left: -30px; }
+.fish:nth-child(6) { top: 0px; left: -45px; }
+
+@media (max-width: 768px) {
+  .brand-fish { font-size: 1.5rem; }
+  .fish { width: 12px; height: 6px; }
+}
+
+

@@ -238,6 +238,7 @@ function OnlinePayment() {
                       {loading ? "Processing..." : "Pay Now with Razorpay"}
                     </button>
                  </div>
+                 
                ) : (
                  <div className="manual-upi-section">
                     <h3>Direct UPI Payment</h3>

@@ -1,5 +1,24 @@
 /* src/style/Hero.css */
-
+/* Main container holding the content */
+.hero-container {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+/* Badge Styling */
+.hero-birds {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 2; 
+  pointer-events: none; 
+}
 .hero-section {
   position: relative;
   min-height: 100vh;
@@ -26,29 +45,8 @@
   pointer-events: none;
 }
 
-/* Main container holding the content */
-.hero-container {
-  position: relative;
-  z-index: 1;
-  max-width: 900px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
 
-/* Badge Styling */
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  margin-bottom: 2rem;
-}
+
 
 .badge-dot {
   width: 8px;
@@ -219,4 +217,234 @@
   .hero-features {
     gap: 1rem;
   }
+}
+
+
+
+/* src/style/Hero.css (Append this to the bottom, replacing previous bird code) */
+
+/* --- Bird Section Styles (Improved Realistic Look) --- */
+.hero-birds {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 2; /* Particles നു മുകളിൽ */
+}
+
+/* പക്ഷിയുടെ ഡിസൈൻ - കുറച്ചുകൂടി യഥാർത്ഥ രൂപം (organic shape) */
+.bird {
+  --bird-scale: 1; /* വലിപ്പം മാറ്റാനുള്ള CSS വേരിയബിൾ */
+  position: absolute;
+  width: 40px; /* വലിപ്പം കുറച്ചു കൂട്ടി */
+  height: 18px;
+  background: transparent;
+  opacity: 0; 
+  /* ഇവിടെ നമ്മൾ 3 ആനിമേഷനുകൾ ഒരുമിച്ച് കൊടുക്കുന്നു: 
+     1. മുന്നോട്ട് പോകാൻ (birdForward)
+     2. അങ്ങോട്ടും ഇങ്ങോട്ടും തെന്നാൻ (birdSwoop)
+     3. ചിറക് അനക്കാൻ (wingFlap) - പുതിയത്! */
+  animation: birdForward 25s linear infinite, 
+             birdSwoop 6s ease-in-out infinite alternate,
+             wingFlap 1s ease-in-out infinite alternate;
+}
+
+/* പക്ഷിയുടെ തലയും ഉടലും (Head and Body center point) */
+.bird::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.4); 
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(179, 136, 255, 0.3);
+  z-index: 2; /* കണ്ടന്റിന് മുകളിൽ */
+}
+
+/* ചിറകുകളുടെ രൂപം - CSS pseudo-element വെച്ച് (ORGANIC SHAPE) */
+.bird::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  /* പരുന്തിന്റെയോ മറ്റോ ചിറകുകളുടെ ആകൃതി (curved shape) */
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+  border-radius: 50% 50% 0 0;
+  transform-origin: center top; /* ചിറകുകൾ അനങ്ങുന്ന പോയിന്റ് */
+  filter: blur(0.5px); /* നേർത്ത ബ്ലർ - സ്മൂത്ത് ഫീൽ നൽകും */
+  box-shadow: 0 -3px 8px rgba(179, 136, 255, 0.1); /* നേർത്ത glow */
+  z-index: 1;
+}
+
+/* 3 പക്ഷികൾക്കും വ്യത്യാസം നൽകുന്നു (Delays & Scales) */
+.bird-1 { 
+  top: 25%; 
+  animation-delay: 0s, 0s, 0s; 
+  --bird-scale: 1; 
+}
+
+.bird-2 { 
+  top: 28%; 
+  animation-delay: 2s, 0.7s, 0.2s; /* മൂന്നാമത്തെ സമയം Flap animation delay ആണ് */
+  --bird-scale: 0.85; /* കുറച്ചു ചെറുത് */
+}
+
+.bird-3 { 
+  top: 26%; 
+  animation-delay: 4s, 1.4s, 0.4s;
+  --bird-scale: 0.7; /* ഏറ്റവും ചെറുത് */
+}
+
+/* =========================================
+   KEYFRAMES FOR THE ANIMATIONS
+   ========================================= */
+
+/* 1. ഇടത്തുനിന്ന് വലത്തേക്ക് മുന്നോട്ട് പോകാൻ ( Linear motion) */
+@keyframes birdForward {
+  0% { left: -10%; opacity: 0; }
+  10% { opacity: 0.3; } /* വളരെ സുതാര്യമായ വെള്ള */
+  90% { opacity: 0.3; }
+  100% { left: 110%; opacity: 0; }
+}
+
+/* 2. മുകളിലേക്കും താഴേക്കും അലയടിക്കാൻ (Sine Wave Swoop) */
+@keyframes birdSwoop {
+  0% { 
+    transform: translateY(-50px) scale(var(--bird-scale)); 
+  }
+  100% { 
+    transform: translateY(50px) scale(var(--bird-scale)); 
+  }
+}
+
+/* 3. ചിറക് പതുക്കെ അനക്കാൻ (Subtle Wing Flap - പുതിയത്!) */
+@keyframes wingFlap {
+  0% { 
+    transform: rotateX(-15deg); /* ചിറക് താഴേക്ക് */
+  }
+  100% { 
+    transform: rotateX(15deg); /* ചിറക് മുകളിലേക്ക് */
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================
+   ⚡ LIGHTNING & SPARK EFFECT (FIXED) ⚡
+   ========================================= */
+
+.hero-lightning {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* കണ്ടന്റിന് താഴെ, എന്നാൽ ബാക്ക്ഗ്രൗണ്ടിന് മുകളിൽ */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* 1. സ്ക്രീനിൽ പരക്കുന്ന മിന്നൽ പ്രകാശം (Background Flash) */
+.lightning-flash {
+  position: absolute;
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%;
+  /* വലതുവശത്ത് നിന്നും വരുന്ന ഒരു വലിയ പ്രകാശം */
+  background: radial-gradient(circle at 75% 30%, rgba(179, 136, 255, 0.4) 0%, transparent 70%);
+  opacity: 0;
+  animation: flashAnim 8s infinite;
+}
+
+/* 2. ഇടിവെട്ട് (The Lightning Bolt) */
+.lightning-bolt {
+  position: absolute;
+  top: -5%;
+  left: 70%; /* വലതുവശത്തായി മിന്നൽ വരാൻ */
+  width: 60px; /* മിന്നലിന്റെ വീതി */
+  height: 70vh; /* മിന്നലിന്റെ നീളം */
+  background: #ffffff;
+  /* മിന്നലിന്റെ ആകൃതി (Zig-zag shape) */
+  clip-path: polygon(40% 0%, 60% 0%, 50% 30%, 80% 30%, 30% 70%, 60% 70%, 0% 100%, 30% 100%, 70% 70%, 40% 70%, 90% 30%, 60% 30%);
+  /* നല്ല തിളക്കം കിട്ടാൻ */
+  box-shadow: 0 0 20px 5px rgba(179, 136, 255, 0.9),
+              0 0 40px 10px rgba(255, 255, 255, 0.8);
+  transform: rotate(15deg);
+  opacity: 0;
+  animation: strikeAnim 8s infinite;
+  filter: drop-shadow(0 0 10px white);
+}
+
+/* 3. മിന്നൽ വന്ന് അവസാനിക്കുന്നിടത്തെ തീപ്പൊരി (The Spark) */
+.lightning-spark {
+  position: absolute;
+  /* മിന്നലിന്റെ അറ്റത്ത് കൃത്യമായി വരാൻ calc() ഉപയോഗിച്ചു */
+  top: calc(-5% + 70vh - 20px); 
+  left: calc(70% - 15vh + 15px); 
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  /* തീപ്പൊരിയുടെ വലിയ തിളക്കം */
+  box-shadow: 0 0 30px 15px rgba(255, 255, 255, 1),
+              0 0 60px 30px rgba(179, 136, 255, 0.8);
+  opacity: 0;
+  transform: scale(0);
+  animation: sparkAnim 8s infinite;
+}
+
+/* =========================================
+   ⚡ KEYFRAMES FOR LIGHTNING (Timings) ⚡
+   ========================================= */
+
+/* മിന്നൽ പിണർ (2 തവണ തുടർച്ചയായി മിന്നുന്നു) */
+@keyframes strikeAnim {
+  0%, 90%, 100% { opacity: 0; }
+  92% { opacity: 1; }
+  93% { opacity: 0; }
+  94% { opacity: 1; }
+  96% { opacity: 0; }
+}
+
+/* ബാക്ക്ഗ്രൗണ്ടിലെ പ്രകാശം */
+@keyframes flashAnim {
+  0%, 90%, 100% { opacity: 0; }
+  92% { opacity: 0.8; }
+  93% { opacity: 0.2; }
+  94% { opacity: 0.6; }
+  96% { opacity: 0; }
+}
+
+/* തീപ്പൊരി വിതറുന്നത് */
+@keyframes sparkAnim {
+  0%, 90%, 100% { opacity: 0; transform: scale(0); }
+  92% { opacity: 1; transform: scale(1.5); }
+  93% { opacity: 0.5; transform: scale(0.8); }
+  94% { opacity: 1; transform: scale(1.2); }
+  96% { opacity: 0; transform: scale(0); }
 }

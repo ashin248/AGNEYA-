@@ -1,4 +1,228 @@
+
+
 /* src/style/User.css */
+
+/* =========================================
+   1. GLOBAL PAGE RESET & WRAPPER
+   ========================================= */
+.user-main-page {
+  width: 100%;
+  background-color: #050505; /* Base Background */
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden; /* സൈഡ് സ്ക്രോളിംഗ് ഒഴിവാക്കാൻ */
+}
+
+/* =========================================
+   2. SECTION WRAPPER (Full Width Logic)
+   ========================================= */
+/* ഓരോ പേജിനെയും (Hero, Service, etc.) പൊതിയുന്ന കണ്ടെയ്നർ */
+.section-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* ഉള്ളിലെ സെക്ഷനെ നടുവിൽ നിർത്തുന്നു */
+  align-items: center;
+  position: relative;
+  /* ലളിതമായ Fade-in ആനിമേഷനായി */
+}
+
+/* =========================================
+   3. SPECIFIC SECTION ALIGNMENTS (100% Width)
+   ========================================= */
+/* ഹീറോ, സർവീസ്, എബൗട്ട്, കോൺടാക്റ്റ് സെക്ഷനുകൾ 100% വീതി എടുക്കുന്നു */
+.hero-section, 
+.service-section, 
+.about-section, 
+.contact-section {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100vh; /* ഓരോ സെക്ഷനും ഒരു ഫുൾ സ്ക്രീൻ ഉയരം */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 !important;
+  padding: 6rem 0; /* മുകളിലും താഴെയും പാഡിംഗ് */
+  position: relative;
+}
+
+/* =========================================
+   4. CONTENT CONTAINERS (Max Width Logic)
+   ========================================= */
+/* സെക്ഷനുകൾ 100% വീതി എടുക്കുമ്പോഴും, അതിനുള്ളിലെ അക്ഷരങ്ങളും 
+   ചിത്രങ്ങളും 1200px-ൽ ഒതുങ്ങി നിൽക്കണം. */
+.hero-container,
+.service-container,
+.about-container,
+.contact-container {
+  width: 100%;
+  max-width: 1200px; /* കണ്ടന്റ് മാത്രം ഈ വിഡ്ത്തിൽ നിൽക്കും */
+  margin: 0 auto;
+  padding: 0 2rem; /* വശങ്ങളിൽ ചെറിയ ഗ്യാപ്പ് */
+  z-index: 5; /* ബാക്ക്ഗ്രൗണ്ട് ആനിമേഷനുകൾക്ക് മുകളിൽ വരാൻ */
+}
+
+/* =========================================
+   5. SPECIAL ADJUSTMENTS FOR BACKGROUNDS
+   ========================================= */
+/* About പേജിലെ സമുദ്രത്തിന്റെ അടിത്തട്ടിലെ എഫക്ട് സ്ക്രീൻ മുഴുവൻ പടരാൻ */
+.underwater-world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Service പേജിലെ നൂലിൽ തൂങ്ങുന്ന ആനിമേഷന് കുറച്ചു കൂടി സ്പേസ് നൽകുന്നു */
+.service-section {
+  padding-top: 10rem;
+}
+
+/* Contact പേജിലെ Glassmorphism കാർഡുകൾ കൃത്യമായി വരാൻ */
+.contact-container {
+  display: grid;
+  gap: 3rem;
+}
+
+/* =========================================
+   6. RESPONSIVE DESIGN
+   ========================================= */
+@media (max-width: 768px) {
+  .hero-section, 
+  .service-section, 
+  .about-section, 
+  .contact-section {
+    padding: 4rem 0;
+    min-height: auto; /* മൊബൈലിൽ കണ്ടന്റിന് അനുസരിച്ച് ഹൈറ്റ് മാറാൻ */
+  }
+
+  .hero-container,
+  .service-container,
+  .about-container,
+  .contact-container {
+    padding: 0 1.5rem;
+  }
+}
+
+/* ലളിതമായ സ്ക്രോൾ ആനിമേഷൻ സ്റ്റൈൽ */
+.section-wrapper {
+  opacity: 1; /* Framer Motion ഇത് കൈകാര്യം ചെയ്യും */
+  transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* src/style/About.css */
+
+/* 1. ഇമേജ് ഫ്രെയിമിന്റെ അടിസ്ഥാന സ്റ്റൈൽ */
+.image-frame {
+  position: relative;
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  cursor: pointer;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 5;
+}
+
+/* 2. ചിത്രത്തിന് പിന്നിലെ തിളക്കം (The Light Glow) */
+.image-frame::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 100%;
+  height: 100%;
+  /* തുടക്കത്തിൽ വെള്ള കലർന്ന നേർത്ത പർപ്പിൾ തിളക്കം */
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(179, 136, 255, 0) 70%);
+  filter: blur(40px);
+  z-index: -1;
+  transition: all 0.6s ease-in-out;
+  opacity: 0.5;
+}
+
+/* 3. ചിത്രത്തിന്റെ സ്റ്റൈൽ */
+.image-frame img {
+  width: 100%;
+  height: auto;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  transition: all 0.5s ease;
+}
+
+/* =========================================
+   ✨ HOVER EFFECT: WHITE TO YELLOW LIGHT ✨
+   ========================================= */
+
+.image-frame:hover {
+  transform: translateY(-10px) scale(1.02);
+}
+
+/* മൗസ് വെക്കുമ്പോൾ പുറകിലെ വെളിച്ചം മഞ്ഞയായി മാറുന്നു */
+.image-frame:hover::before {
+  transform: translate(-50%, -50%) scale(1.3);
+  /* വെള്ളയിൽ തുടങ്ങി മഞ്ഞയിലേക്ക് മാറുന്ന ഗ്രാഡിയന്റ് */
+  background: radial-gradient(
+    circle, 
+    rgba(255, 255, 255, 0.4) 0%, 
+    rgba(255, 215, 0, 0.3) 40%, 
+    rgba(255, 165, 0, 0) 70%
+  );
+  filter: blur(50px);
+  opacity: 1;
+}
+
+/* ചിത്രത്തിന് ഒരു ഗോൾഡൻ ബോർഡർ തിളക്കം നൽകാൻ */
+.image-frame:hover img {
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 
+              0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+/* ചിത്രത്തിന് മുകളിലൂടെ ഒരു വെളിച്ചം പാഞ്ഞുപോകാൻ (Flash Effect) */
+.image-frame::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transform: skewX(-25deg);
+  transition: 0.7s;
+  pointer-events: none;
+}
+
+.image-frame:hover::after {
+  left: 150%;
+}
+
+
+
+
+
+
+/* src/style/User.css
 
 .user-main-page {
   display: flex;
@@ -8,7 +232,6 @@
   background-color: black;
 }
 
-/* Add some spacing between your sub-components */
 .user-main-page > * {
   padding: 4rem 2rem;
   max-width: var(--max-width);
@@ -16,10 +239,47 @@
   width: 100%;
 }
 
-/* Optional: Alternate background colors for sections */
 .user-main-page > *:nth-child(even) {
-  /* background-color: var(--bg-light); */
-  max-width: 100%; /* Stretch background full width */
+ background-color: var(--bg-light); 
+  max-width: 100%;
   padding-left: calc((100% - var(--max-width)) / 2 + 2rem);
   padding-right: calc((100% - var(--max-width)) / 2 + 2rem);
 }
+
+
+
+
+
+.user-main-page {
+  width: 100%;
+  background-color: #050505;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-container {
+  width: 100%;
+  min-height: 100vh; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03); 
+}
+
+.section-container > * {
+  width: 100%;
+  max-width: 1400px; 
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+.section-container:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.01);
+}
+
+@media (max-width: 768px) {
+  .section-container > * {
+    padding: 2rem 1rem;
+  }
+} */
