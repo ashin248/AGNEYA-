@@ -19,8 +19,12 @@ const allowedOrigins = [
 ];
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, Postman, etc.)
-    if (!origin || allowedOrigins.some(o => origin.startsWith(o))) {
+    // Allow requests with no origin, matched exact origins, or any Vercel preview domain
+    if (
+      !origin ||
+      allowedOrigins.some(o => origin.startsWith(o)) ||
+      origin.endsWith('.vercel.app')
+    ) {
       callback(null, true);
     } else {
       callback(new Error(`CORS blocked: ${origin}`));
