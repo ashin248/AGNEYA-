@@ -28,6 +28,7 @@ import ReadyProductUpload from "./Admin/components/ReadyProductUpload";
 import CustomBaseUpload from "./Admin/components/CustomBaseUpload";
 import SalesAnalytics from "./Admin/components/SalesAnalytics";
 import CustomerInsights from "./Admin/components/CustomerInsights";
+import ProductManagement from "./Admin/components/ProductManagement";
 
 // Protected Route
 const ProtectedRoute = ({ children }) => {
@@ -104,6 +105,7 @@ function App() {
             <Route path="custom-base" element={<CustomBaseUpload />} />
             <Route path="analytics" element={<SalesAnalytics />} />
             <Route path="customers" element={<CustomerInsights />} />
+            <Route path="manage-products" element={<ProductManagement />} />
           </Route>
         </Route>
 

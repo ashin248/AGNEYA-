@@ -11,7 +11,7 @@
   background-color: #050505;
   background-image: 
     linear-gradient(rgba(179, 136, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(179, 136, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
   background-size: 30px 30px;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 4px 0 25px rgba(0, 0, 0, 0.5);
@@ -37,6 +37,7 @@
 .admin-sidebar.collapsed {
   width: 80px;
 }
+/* .admin-sidebar{} */
 
 .admin-sidebar.collapsed .nav-label,
 .admin-sidebar.collapsed .logo span,

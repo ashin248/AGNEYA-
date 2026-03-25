@@ -22,7 +22,7 @@ const Admin = () => {
     { id: "customers", label: "Customer Insights", path: "/admin/customers" },
     { id: "ready-upload", label: "Ready Products", path: "/admin/ready-upload" },
     { id: "custom-base", label: "Custom Bases", path: "/admin/custom-base" },
-
+    { id: "manage-products", label: "Manage Products", path: "/admin/manage-products" },
   ];
 
   return (

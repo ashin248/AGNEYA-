@@ -8,9 +8,10 @@ const CustomBase = require('../models/CustomBase');
 const {
   uploadReadyProduct,
   bulkUploadReady,
+  deleteReadyProduct,
 } = require('../controllers/readyProductController');
 
-const { uploadCustomBase } = require('../controllers/customBaseController');
+const { uploadCustomBase, deleteCustomBase } = require('../controllers/customBaseController');
 const { adminProtect } = require('../middleware/authMiddleware');
 
 // Ready products endpoints
@@ -25,6 +26,7 @@ router.get('/ready', async (req, res) => {
 
 router.post('/ready', adminProtect, uploadReadyProduct);
 router.post('/bulk-ready', adminProtect, bulkUploadReady);
+router.delete('/ready/:id', adminProtect, deleteReadyProduct);
 
 // Custom bases endpoints
 router.get('/custom-bases', async (req, res) => {
@@ -37,5 +39,6 @@ router.get('/custom-bases', async (req, res) => {
 });
 
 router.post('/custom-base', adminProtect, uploadCustomBase);
+router.delete('/custom-base/:id', adminProtect, deleteCustomBase);
 
 module.exports = router;

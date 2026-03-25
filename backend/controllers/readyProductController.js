@@ -165,3 +165,27 @@ exports.bulkUploadReady = async (req, res) => {
     }
   });
 };
+
+// Delete Ready Product
+exports.deleteReadyProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    // Delete image file if it exists
+    if (product.imageUrl) {
+      const filename = product.imageUrl.split('/').pop();
+      const filePath = path.join(__dirname, '../uploads/products/', filename);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Product deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to delete product', error: error.message });
+  }
+};

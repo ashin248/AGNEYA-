@@ -68,9 +68,33 @@ exports.uploadCustomBase = (req, res) => {
         customBase,
       });
     } catch (error) {
-      console.error('Save error:', error);
+      console.error('Save error:', error.message);
       if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
       res.status(500).json({ success: false, message: error.message });
     }
   });
+};
+
+// Delete Custom Base
+exports.deleteCustomBase = async (req, res) => {
+  try {
+    const customBase = await CustomBase.findById(req.params.id);
+    if (!customBase) {
+      return res.status(404).json({ success: false, message: 'Custom base not found' });
+    }
+
+    // Delete image file if it exists
+    if (customBase.imageUrl) {
+      const filename = customBase.imageUrl.split('/').pop();
+      const filePath = path.join(__dirname, '../uploads/custom-bases/', filename);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    await CustomBase.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Custom base deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to delete custom base', error: error.message });
+  }
 };
