@@ -203,6 +203,20 @@ exports.updateOrderStatus = async (req, res) => {
     );
 
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+    
+    // Trigger Status Update Email (Async)
+    if (newStatus) {
+      try {
+        const { sendStatusUpdateEmail } = require('../utils/emailService');
+        const User = require('../models/User');
+        const fullUser = await User.findById(order.userId);
+        if (fullUser && fullUser.email) {
+          sendStatusUpdateEmail(fullUser, order, newStatus).catch(e => console.error("Status Update Email Error:", e));
+        }
+      } catch (e) {
+        console.error("Failed to trigger status update email:", e);
+      }
+    }
 
     res.json({ success: true, order });
   } catch (err) {

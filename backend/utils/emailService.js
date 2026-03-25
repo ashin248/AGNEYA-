@@ -72,8 +72,33 @@ const sendPaymentSuccess = async (user, order) => {
   return sendEmail(user.email, subject, html);
 };
 
+/**
+ * Status Update Email Template
+ */
+const sendStatusUpdateEmail = async (user, order, newStatus) => {
+  const subject = `Order Update - #${order.razorpayOrderId || order._id.toString().slice(-8)}`;
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee;">
+      <h2 style="color: #9b51e0;">Good News!</h2>
+      <p>Hi ${user.fullName || 'Valued Customer'},</p>
+      <p>The status of your order <strong>#${order.razorpayOrderId || order._id.toString().slice(-8)}</strong> has been updated.</p>
+      <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+        <span style="font-size: 1.2rem; font-weight: bold; color: #9b51e0; text-transform: uppercase;">
+          ${newStatus}
+        </span>
+      </div>
+      <p>We are working hard to get your order to you as quickly as possible!</p>
+      <br />
+      <p>Check the latest updates on your <a href="https://agneya.vercel.app/profile">profile</a>.</p>
+      <p>Thank you for choosing Agneya!</p>
+    </div>
+  `;
+  return sendEmail(user.email, subject, html);
+};
+
 module.exports = {
   sendEmail,
   sendOrderConfirmation,
   sendPaymentSuccess,
+  sendStatusUpdateEmail,
 };
