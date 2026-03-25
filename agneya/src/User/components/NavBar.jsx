@@ -2,6 +2,7 @@
 // src/User/components/NavBar.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { staggeredGravityContainer, gravityScrollVariant } from "../../shared/animations/framerVariants";
 import { useAuth } from "../../shared/context/AuthContext";
@@ -12,6 +13,8 @@ function NavBar() {
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const { user, logout, loading } = useAuth();
+  const cartItems = useSelector((state) => state.cart.items);
+  const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   // Scroll effect
   useEffect(() => {
@@ -100,6 +103,11 @@ function NavBar() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.5 }}
         >
+          <Link to="/cart" className="user-nav-cart-btn" title="View Cart">
+            <i className="bi bi-bag-heart"></i>
+            {cartCount > 0 && <span className="cart-count-badge">{cartCount}</span>}
+          </Link>
+
           {user ? (
             <div className="user-profile-nav desktop-only">
               <span className="user-name-text">Hi, {user.fullName?.split(" ")[0] || "User"}</span>
