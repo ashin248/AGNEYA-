@@ -10,6 +10,15 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // If already logged in, skip login page
+  React.useEffect(() => {
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+    const adminToken = localStorage.getItem("adminToken");
+    if (isAdmin && adminToken) {
+      navigate("/admin", { replace: true });
+    }
+  }, [navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);

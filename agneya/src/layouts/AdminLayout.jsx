@@ -13,10 +13,11 @@ const AdminLayout = () => {
 
   // Check if user is authenticated as admin
   const isAdmin = localStorage.getItem("isAdmin") === "true";
+  const adminToken = localStorage.getItem("adminToken");
   const location = useLocation();
 
-  // Redirect to login if not admin
-  if (!isAdmin) {
+  // Redirect to login if not admin or missing token
+  if (!isAdmin || !adminToken) {
     return <Navigate to="/admin/login" state={{ from: location.pathname }} replace />;
   }
 
