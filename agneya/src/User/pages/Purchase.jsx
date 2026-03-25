@@ -27,6 +27,13 @@ const Purchase = () => {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
 
+    // Verify user exists on backend to catch "User no longer exists" early
+    if (user) {
+      API.get("/api/users/profile").catch(() => {
+        // Interceptor will handle logout if 401
+      });
+    }
+
     if (!user) {
       if (product) {
         localStorage.setItem("redirectAfterLogin", JSON.stringify({ 
