@@ -239,9 +239,86 @@
 }
 
 
-/* src/style/ProductCustomize.css */
+/* 8. Multi-Side Switcher */
+.side-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px;
+  border-radius: 15px;
+}
 
-/* ...നിങ്ങളുടെ പഴയ എല്ലാ CSS-ഉം അതുപോലെ നിലനിർത്തുക... */
+.side-thumb {
+  width: 70px;
+  height: 70px;
+  background: #fff;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.side-thumb img {
+  width: 100%;
+  height: 45px;
+  object-fit: contain;
+  padding: 5px;
+}
+
+.side-thumb span {
+  font-size: 0.7rem;
+  color: #333;
+  font-weight: 700;
+  background: #ddd;
+  width: 100%;
+  text-align: center;
+  padding: 2px 0;
+}
+
+.side-thumb.active {
+  border-color: #ff4081;
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(255, 64, 129, 0.4);
+}
+
+.side-thumb.active span {
+  background: #ff4081;
+  color: #fff;
+}
+
+/* 9. Guide Toggle */
+.guide-toggle {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.guide-toggle label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #888;
+  padding: 8px 15px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 50px;
+  transition: 0.3s;
+}
+
+.guide-toggle input {
+  accent-color: #ff4081;
+}
+
+.guide-toggle label:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+}
 
 .canvas-holder {
   background: #ffffff; /* കാൻവാസിന്റെ ബേസ് കളർ വൈറ്റ് തന്നെ നിൽക്കട്ടെ */

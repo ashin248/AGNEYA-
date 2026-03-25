@@ -52,61 +52,7 @@ function ProductCustomize() {
 
     fabricCanvasRef.current = canvas;
 
-    const loadStudio = () => {
-      const bgImgElement = new Image();
-      bgImgElement.crossOrigin = "anonymous";
-      bgImgElement.src = baseProduct?.imageUrl ? getImageUrl(baseProduct.imageUrl) : "/placeholder-product.jpg";
-
-      bgImgElement.onload = () => {
-        const fabricBgImg = new fabric.Image(bgImgElement);
-        const scale = Math.min(canvas.width / fabricBgImg.width, canvas.height / fabricBgImg.height);
-
-        // Background image (centered)
-        canvas.backgroundImage = fabricBgImg;
-        fabricBgImg.set({
-          scaleX: scale,
-          scaleY: scale,
-          left: (canvas.width - fabricBgImg.width * scale) / 2,
-          top: (canvas.height - fabricBgImg.height * scale) / 2,
-          selectable: false,
-        });
-        canvas.renderAll();
-
-        // Clipping Mask
-        const projectType = baseProduct?.category?.toLowerCase() || "tshirt";
-        const maskUrl = productMasks[projectType] || productMasks.tshirt;
-
-        if (maskUrl) {
-          const maskImgElement = new Image();
-          maskImgElement.crossOrigin = "anonymous";
-          maskImgElement.src = maskUrl;
-
-          maskImgElement.onload = () => {
-            const fabricMask = new fabric.Image(maskImgElement);
-            fabricMask.set({
-              scaleX: scale,
-              scaleY: scale,
-              left: (canvas.width - fabricBgImg.width * scale) / 2,
-              top: (canvas.height - fabricBgImg.height * scale) / 2,
-              selectable: false,
-              evented: false,
-              opacity: 0,
-              name: "clipping-mask",
-            });
-            canvas.add(fabricMask);
-            canvas.sendToBack(fabricMask);
-
-            // Set this mask as clipPath for all future added objects
-            canvas.clipPath = fabricMask;
-            canvas.renderAll();
-          };
-        }
-
-        saveState();
-      };
-    };
-
-    loadStudio();
+    loadSide(activeSideIndex);
 
     const syncState = () => {
       saveState();
@@ -129,6 +75,109 @@ function ProductCustomize() {
       fabricCanvasRef.current = null;
     };
   }, [baseProduct]);
+
+  const loadSide = (index) => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+
+    setIsSaving(true);
+    canvas.clear();
+    
+    const imageUrl = baseProduct.images && baseProduct.images[index] 
+      ? baseProduct.images[index] 
+      : baseProduct.imageUrl;
+
+    const bgImgElement = new Image();
+    bgImgElement.crossOrigin = "anonymous";
+    bgImgElement.src = getImageUrl(imageUrl) || "/placeholder-product.jpg";
+
+    bgImgElement.onload = () => {
+      const fabricBgImg = new fabric.Image(bgImgElement);
+      const scale = Math.min(canvas.width / fabricBgImg.width, canvas.height / fabricBgImg.height);
+
+      canvas.backgroundImage = fabricBgImg;
+      fabricBgImg.set({
+        scaleX: scale,
+        scaleY: scale,
+        left: (canvas.width - fabricBgImg.width * scale) / 2,
+        top: (canvas.height - fabricBgImg.height * scale) / 2,
+        selectable: false,
+      });
+
+      // Clipping Mask logic (re-add for new side)
+      const projectType = baseProduct?.category?.toLowerCase() || "tshirt";
+      const maskUrl = productMasks[projectType] || productMasks.tshirt;
+      
+      const maskImgElement = new Image();
+      maskImgElement.crossOrigin = "anonymous";
+      maskImgElement.src = maskUrl;
+      maskImgElement.onload = () => {
+        const fabricMask = new fabric.Image(maskImgElement);
+        fabricMask.set({
+          scaleX: scale, scaleY: scale,
+          left: (canvas.width - fabricBgImg.width * scale) / 2,
+          top: (canvas.height - fabricBgImg.height * scale) / 2,
+          selectable: false, evented: false, opacity: 0, name: "clipping-mask"
+        });
+        canvas.add(fabricMask);
+        canvas.sendToBack(fabricMask);
+        canvas.clipPath = fabricMask;
+
+        // Safety Area
+        const safetyRect = new fabric.Rect({
+          left: canvas.width / 2 - 150,
+          top: canvas.height / 2 - 200,
+          width: 300,
+          height: 400,
+          fill: "transparent",
+          stroke: "#ff4081",
+          strokeDashArray: [5, 5],
+          selectable: false,
+          evented: false,
+          name: "safety-area",
+          visible: showSafetyArea,
+          opacity: 0.5
+        });
+        canvas.add(safetyRect);
+        canvas.bringToFront(safetyRect);
+
+        // Load existing objects for this side if any
+        if (sidesData[index]) {
+          canvas.loadFromJSON(sidesData[index], () => {
+            canvas.renderAll();
+            // Ensure safety area stays on top
+            const sArea = canvas.getObjects().find(o => o.name === "safety-area");
+            if (sArea) canvas.bringToFront(sArea);
+            setIsSaving(false);
+          });
+        } else {
+          canvas.renderAll();
+          setIsSaving(false);
+        }
+      };
+    };
+  };
+
+  const switchSide = (newIndex) => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+
+    // Save current side
+    const json = canvas.toJSON(["name", "selectable", "evented", "filters", "crossOrigin"]);
+    setSidesData(prev => ({ ...prev, [activeSideIndex]: JSON.stringify(json) }));
+
+    setActiveSideIndex(newIndex);
+    loadSide(newIndex);
+  };
+
+  useEffect(() => {
+    const canvas = fabricCanvasRef.current;
+    const sArea = canvas?.getObjects().find(o => o.name === "safety-area");
+    if (sArea) {
+      sArea.set("visible", showSafetyArea);
+      canvas.renderAll();
+    }
+  }, [showSafetyArea]);
 
   const handleObjectSelection = (e) => {
     updateObjectList();
@@ -272,7 +321,18 @@ function ProductCustomize() {
     }
 
     const canvas = fabricCanvasRef.current;
+    
+    // Temporarily hide safety area for export
+    const sArea = canvas.getObjects().find(o => o.name === "safety-area");
+    if (sArea) sArea.set("visible", false);
+    
     const designDataUrl = canvas.toDataURL({ format: "png", multiplier: 2 });
+    
+    // Restore safety area
+    if (sArea) sArea.set("visible", showSafetyArea);
+
+    // Collect all sides data for the order
+    const finalSides = { ...sidesData, [activeSideIndex]: JSON.stringify(canvas.toJSON(["name", "selectable", "evented", "filters", "crossOrigin"])) };
 
     dispatch(
       addToCart({
@@ -280,11 +340,12 @@ function ProductCustomize() {
         name: baseProduct.name,
         price: totalPrice,
         customDesignUrl: designDataUrl,
+        allSides: finalSides,
         quantity: 1,
       })
     );
 
-    alert("Added to cart successfully!");
+    alert("Multi-side design added to cart!");
     navigate("/shop");
   };
 
@@ -317,7 +378,7 @@ function ProductCustomize() {
   return (
     <div className="customize-page studio-theme">
       <Helmet>
-        <title>Design Your {baseProduct?.name} | Agneya Studio</title>
+        <title>{`Design Your ${baseProduct?.name || "Product"} | Agneya Studio`}</title>
       </Helmet>
 
       <div className="studio-header">
@@ -352,6 +413,28 @@ function ProductCustomize() {
         <main className="studio-center-panel">
           <div className="canvas-wrapper">
             <canvas ref={canvasRef} />
+            
+            {/* Side Switcher Controls */}
+            <div className="side-switcher">
+              {(baseProduct.images && baseProduct.images.length > 0 ? baseProduct.images : [baseProduct.imageUrl]).map((img, idx) => (
+                <div 
+                  key={idx} 
+                  className={`side-thumb ${activeSideIndex === idx ? 'active' : ''}`}
+                  onClick={() => switchSide(idx)}
+                >
+                  <img src={getImageUrl(img)} alt={`Side ${idx + 1}`} />
+                  <span>Side {idx + 1}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Guide Toggle */}
+            <div className="guide-toggle">
+              <label>
+                <input type="checkbox" checked={showSafetyArea} onChange={(e) => setShowSafetyArea(e.target.checked)} />
+                Show Print Guide
+              </label>
+            </div>
           </div>
         </main>
 
@@ -414,290 +497,6 @@ function ProductCustomize() {
 }
 
 export default ProductCustomize;
-
-
-
-
-// // src/user/pages/ProductCustomize.jsx
-// import React, { useEffect, useRef, useState, useCallback } from "react";
-// import { useLocation, useNavigate } from "react-router-dom";
-// import { useDispatch } from "react-redux";
-// import { addToCart } from "../../store/cartSlice";
-// import * as fabric from "fabric"; // Fabric.js v6 support
-// import { Helmet } from "react-helmet-async";
-// import { getImageUrl } from "../../shared/utils/api";
-// import "../style/ProductCustomize.css";
-
-// // ─── 🖼️ കസ്റ്റമൈസേഷൻ മാസ്കുകൾ (Masks for Clipping) 🖼️ ───
-// // ഈ മാസ്കുകൾ നിങ്ങളുടെ /public ഫോൾഡറിൽ ഉണ്ടായിരിക്കണം.
-// // കറുത്ത നിറത്തിലുള്ള മാസ്ക് ചിത്രങ്ങളാണ് ഏറ്റവും നല്ലത്.
-// const productMasks = {
-//   // ടി-ഷർട്ടിന്റെ ആകൃതിയിലുള്ള കറുത്ത മാസ്ക് PNG/SVG
-//   tshirt: "/masks/tshirt_mask.png", 
-//   // കപ്പിന്റെ ആകൃതിയിലുള്ള മാസ്ക്
-//   mug: "/masks/mug_mask.png", 
-//   // ...മറ്റുള്ളവ
-// };
-
-// function ProductCustomize() {
-//   const { state } = useLocation();
-//   const navigate = useNavigate();
-//   const dispatch = useDispatch();
-
-//   // Redirect only if no base product selected
-//   const baseProduct = state?.baseProduct;
-//   useEffect(() => {
-//     if (!baseProduct?._id) {
-//       navigate("/shop");
-//     }
-//   }, [navigate, baseProduct]);
-
-//   const canvasRef = useRef(null);
-//   const fabricCanvasRef = useRef(null);
-
-//   const [textSize, setTextSize] = useState(40);
-//   const [textColor, setTextColor] = useState("#000000");
-//   const [selectedFont, setSelectedFont] = useState("Arial");
-//   const [history, setHistory] = useState([]);
-//   const [redoStack, setRedoStack] = useState([]);
-//   const [error, setError] = useState("");
-//   const [totalPrice, setTotalPrice] = useState(baseProduct?.price || baseProduct?.basePrice || 0);
-//   const [isProcessing, setIsProcessing] = useState(false);
-//   const [activeTab, setActiveTab] = useState("text"); 
-//   const [canvasObjects, setCanvasObjects] = useState([]);
-//   const [activeImage, setActiveImage] = useState(null); 
-
-//   // Initialize Fabric Canvas
-//   useEffect(() => {
-//     if (!canvasRef.current) return;
-
-//     // Initialize Fabric Canvas
-//     const canvas = new fabric.Canvas(canvasRef.current, {
-//       width: 700,
-//       height: 700,
-//       backgroundColor: "#ffffff",
-//       preserveObjectStacking: true,
-//       selection: true,
-//     });
-
-//     fabricCanvasRef.current = canvas;
-
-//     // Load Product Background & Clipping Mask
-//     const loadStudio = () => {
-//       // 1. Load Background Image
-//       const bgImgElement = new Image();
-//       bgImgElement.crossOrigin = "anonymous";
-//       bgImgElement.src = baseProduct?.imageUrl ? getImageUrl(baseProduct.imageUrl) : "/placeholder-product.jpg";
-
-//       bgImgElement.onload = () => {
-//         const fabricBgImg = new fabric.Image(bgImgElement);
-//         const scale = Math.min(canvas.width / fabricBgImg.width, canvas.height / fabricBgImg.height);
-
-//         canvas.backgroundImage = fabricBgImg;
-//         fabricBgImg.set({
-//           scaleX: scale,
-//           scaleY: scale,
-//           left: (canvas.width - fabricBgImg.width * scale) / 2,
-//           top: (canvas.height - fabricBgImg.height * scale) / 2,
-//           selectable: false,
-//           crossOrigin: "anonymous",
-//         });
-//         canvas.renderAll();
-
-//         // 2. 🛡️ Load Clipping Mask 🛡️
-//         // പ്രോജക്റ്റിന്റെ മാസ്ക് ലോഡ് ചെയ്യുന്നു (ടി-ഷർട്ട് അല്ലെങ്കിൽ കപ്പ്)
-//         const projectType = baseProduct?.category?.toLowerCase() || "tshirt";
-//         const maskUrl = productMasks[projectType] || productMasks.tshirt; // Default to tshirt mask
-
-//         if (maskUrl) {
-//           const maskImgElement = new Image();
-//           maskImgElement.crossOrigin = "anonymous";
-//           maskImgElement.src = maskUrl;
-
-//           maskImgElement.onload = () => {
-//             const fabricMask = new fabric.Image(maskImgElement);
-//             fabricMask.set({
-//               // ബാക്ക്ഗ്രൗണ്ടിന്റെ അതേ സ്കെയിലും അലൈൻമെന്റും നൽകുക
-//               scaleX: scale,
-//               scaleY: scale,
-//               left: (canvas.width - fabricBgImg.width * scale) / 2,
-//               top: (canvas.height - fabricBgImg.height * scale) / 2,
-//               selectable: false,
-//               evented: false, // മാസ്കിൽ ക്ലിക്ക് ചെയ്യാൻ പറ്റില്ല
-//               opacity: 0, // മാസ്ക് അദൃശ്യമാക്കുക
-//               name: "clipping-mask",
-//             });
-//             canvas.add(fabricMask);
-//             canvas.sendToBack(fabricMask); // മാസ്ക് ബാക്ക്ഗ്രൗണ്ടിന്റെ മുകളിലും ചിത്രങ്ങൾക്ക് താഴെയും നിൽക്കണം
-//             canvas.renderAll();
-//           };
-//         }
-        
-//         saveState(); // Save initial state
-//       };
-//     };
-
-//     loadStudio();
-
-//     // History & Sync listeners
-//     const syncState = () => {
-//       saveState();
-//       updateObjectList();
-//       updatePrice();
-//     };
-
-//     canvas.on("object:modified", syncState);
-//     canvas.on("object:added", syncState);
-//     canvas.on("object:removed", syncState);
-//     canvas.on("selection:created", handleObjectSelection);
-//     canvas.on("selection:updated", handleObjectSelection);
-//     canvas.on("selection:cleared", () => setActiveImage(null));
-
-//     return () => {
-//       canvas.dispose();
-//       fabricCanvasRef.current = null;
-//     };
-//   }, [baseProduct]);
-
-//   // Object Selection Handler
-//   const handleObjectSelection = (e) => {
-//     updateObjectList();
-//     const selected = e.selected[0];
-//     if (selected && selected.type === "image") {
-//       setActiveImage(selected);
-//       setActiveTab("image");
-//     } else {
-//       setActiveImage(null);
-//     }
-//   };
-
-//   // PRICE CALCULATION
-//   const updatePrice = useCallback(() => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-//     const objs = canvas.getObjects().filter(o => o.name !== "clipping-mask");
-
-//     const textLayers = objs.filter((o) => o.type === "i-text").length;
-//     const imageLayers = objs.filter((o) => o.type === "image").length;
-
-//     const textCost = 30; // ₹30 per text layer
-//     const imageCost = 50; // ₹50 per image layer
-
-//     const base = baseProduct?.price || baseProduct?.basePrice || 0;
-//     setTotalPrice(base + textLayers * textCost + imageLayers * imageCost);
-//   }, [baseProduct]);
-
-//   // OBJECT LIST (LAYERS)
-//   const updateObjectList = useCallback(() => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-//     const objs = [...canvas.getObjects()].filter(o => o.name !== "clipping-mask").reverse();
-//     setCanvasObjects(objs);
-//   }, []);
-
-//   // History Management
-//   const saveState = useCallback(() => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-//     try {
-//       const json = canvas.toJSON(["name", "selectable", "evented", "crossOrigin", "filters"]);
-//       setHistory((prev) => {
-//         const newHistory = [...prev, JSON.stringify(json)];
-//         if (newHistory.length > 30) newHistory.shift();
-//         return newHistory;
-//       });
-//       setRedoStack([]);
-//     } catch (err) {
-//       console.error("Failed to save canvas state:", err);
-//     }
-//   }, []);
-
-//   const undo = () => {
-//     if (history.length <= 1) return;
-//     const current = history[history.length - 1];
-//     const previous = history[history.length - 2];
-//     setHistory((prev) => prev.slice(0, -1));
-//     setRedoStack((prev) => [current, ...prev]);
-//     loadState(previous);
-//   };
-
-//   const redo = () => {
-//     if (!redoStack.length) return;
-//     const next = redoStack[0];
-//     setRedoStack((prev) => prev.slice(1));
-//     setHistory((prev) => [...prev, next]);
-//     loadState(next);
-//   };
-
-//   const loadState = (jsonString) => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-//     canvas.loadFromJSON(jsonString, () => {
-//       canvas.renderAll();
-//     });
-//   };
-
-//   // Add Text
-//   const addText = () => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-//     const text = new fabric.IText("Double click to edit", {
-//       left: 180,
-//       top: 180,
-//       fontSize: textSize,
-//       fill: textColor,
-//       fontFamily: selectedFont,
-//       cornerColor: "#b388ff",
-//       cornerSize: 10,
-//     });
-//     canvas.add(text);
-//     canvas.setActiveObject(text);
-//     canvas.requestRenderAll();
-//   };
-
-//   // ─── 🛡️ IMAGE UPLOAD WITH CLIPPING 🛡️ ───
-//   const handleImageUpload = (e) => {
-//     const file = e.target.files?.[0];
-//     if (!file) return;
-
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-
-//     const reader = new FileReader();
-//     reader.onload = (event) => {
-//       const imgElement = new Image();
-//       imgElement.src = event.target.result;
-//       imgElement.onload = () => {
-//         const img = new fabric.Image(imgElement);
-//         img.scale(0.5);
-//         img.set({ left: 100, top: 100, selectable: true, crossOrigin: "anonymous" });
-        
-//         // 🛡️ ഈ ചിത്രം മാസ്കിനുള്ളിൽ മാത്രം കാണാൻ സെറ്റ് ചെയ്യുന്നു (Clipping Logic)
-//         img.set("globalCompositeOperation", "source-atop");
-
-//         canvas.add(img);
-//         canvas.centerObject(img);
-//         canvas.setActiveObject(img);
-//         setActiveImage(img);
-//         setActiveTab("image");
-//         canvas.renderAll();
-//       };
-//     };
-//     reader.readAsDataURL(file);
-//   };
-
-//   // Layer Management
-//   const moveLayer = (direction) => {
-//     const canvas = fabricCanvasRef.current;
-//     const active = canvas?.getActiveObject();
-//     if (!active) return;
-//     if (direction === "forward") canvas.bringObjectForward(active);
-//     else if (direction === "backward") canvas.sendObjectBackwards(active);
-//     canvas.renderAll();
-//     updateObjectList();
-//   };
-
-//   // Save Design & Add to Cart
 //   const saveAndProceed = () => {
 //     const token = localStorage.getItem("token");
 //     if (!token) {
