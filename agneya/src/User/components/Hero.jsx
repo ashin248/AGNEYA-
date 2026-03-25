@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { gravityScrollVariant, staggeredGravityContainer } from "../../shared/animations/framerVariants";
 import { useAuth } from "../../shared/context/AuthContext";
 import "../style/Hero.css";
 
