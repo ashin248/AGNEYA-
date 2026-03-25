@@ -60,7 +60,7 @@ function TShirtModel({ fabricCanvas }) {
   );
 }
 
-export default function TShirt3D({ fabricCanvas, className = "" }) {
+export function TShirt3D({ fabricCanvas, className = "" }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -100,4 +100,4 @@ export default function TShirt3D({ fabricCanvas, className = "" }) {
     </div>
   );
 }
-ault TShirt3D;
+export default TShirt3D;
