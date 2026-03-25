@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/cartSlice";
 import * as fabric from "fabric";
 import { Helmet } from "react-helmet-async";
+import TShirt3D from "../components/TShirt3D";
 import { getImageUrl } from "../../shared/utils/api";
 import "../style/ProductCustomize.css";
 
@@ -12,6 +13,22 @@ const productMasks = {
   tshirt: "/masks/tshirt_mask.png",
   mug: "/masks/mug_mask.png",
 };
+
+const GOOGLE_FONTS = [
+  "Arial", "Pacifico", "Graduate", "Bangers", "Bebas Neue", "Orbitron", 
+  "Lobster", "Righteous", "Permanent Marker", "Monoton"
+];
+
+const CLIPART_ITEMS = [
+  { name: "Flame", url: "https://www.svgrepo.com/show/439169/flame.svg" },
+  { name: "Crown", url: "https://www.svgrepo.com/show/439139/crown.svg" },
+  { name: "Star", url: "https://www.svgrepo.com/show/439321/star.svg" },
+  { name: "Heart", url: "https://www.svgrepo.com/show/439189/heart.svg" },
+  { name: "Lightning", url: "https://www.svgrepo.com/show/439226/lightning.svg" },
+  { name: "Diamond", url: "https://www.svgrepo.com/show/439149/diamond.svg" },
+  { name: "Skull", url: "https://www.svgrepo.com/show/439311/skull.svg" },
+  { name: "Rocket", url: "https://www.svgrepo.com/show/439304/rocket.svg" },
+];
 
 function ProductCustomize() {
   const { state } = useLocation();
@@ -28,6 +45,9 @@ function ProductCustomize() {
   const [selectedFont, setSelectedFont] = useState("Arial");
   const [history, setHistory] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
+  const [isNeon, setIsNeon] = useState(false);
+  const [textCurve, setTextCurve] = useState(0);
+  const [show3D, setShow3D] = useState(false);
   const [error, setError] = useState("");
   const [totalPrice, setTotalPrice] = useState(baseProduct?.price || baseProduct?.basePrice || 0);
   const [activeTab, setActiveTab] = useState("text");
@@ -37,6 +57,13 @@ function ProductCustomize() {
   // Redirect if no product
   useEffect(() => {
     if (!baseProduct?._id) navigate("/shop");
+
+    // Load Google Fonts
+    const link = document.createElement("link");
+    link.href = `https://fonts.googleapis.com/css2?family=${GOOGLE_FONTS.filter(f => f !== "Arial").map(f => f.replace(" ", "+")).join("&family=")}&display=swap`;
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+    return () => document.head.removeChild(link);
   }, [navigate, baseProduct]);
 
   // Initialize Canvas
@@ -259,6 +286,68 @@ function ProductCustomize() {
     canvas.requestRenderAll();
   };
 
+  const applyNeon = (enabled) => {
+    const canvas = fabricCanvasRef.current;
+    const active = canvas?.getActiveObject();
+    if (!active || active.type !== 'i-text') return;
+
+    if (enabled) {
+      active.set({
+        shadow: new fabric.Shadow({
+          color: textColor,
+          blur: 20,
+          offsetX: 0,
+          offsetY: 0
+        })
+      });
+    } else {
+      active.set('shadow', null);
+    }
+    setIsNeon(enabled);
+    canvas.renderAll();
+    saveState();
+  };
+
+  const applyCurve = (value) => {
+    const canvas = fabricCanvasRef.current;
+    const active = canvas?.getActiveObject();
+    if (!active || active.type !== 'i-text') return;
+
+    // Fast path for 0 curve (standard text)
+    if (value === 0) {
+      active.set('path', null);
+    } else {
+      // Create an arc path
+      const radius = 5000 / Math.abs(value); // inverse relationship
+      const direction = value > 0 ? 1 : -1;
+      const pathData = `M 0 0 Q 150 ${value * 2} 300 0`; 
+      // Note: Truly circular paths are complex in basic Fabric. Using a quadratic bezier for simple arcing.
+      active.set('path', new fabric.Path(pathData, { visible: false }));
+    }
+    
+    setTextCurve(value);
+    canvas.renderAll();
+    saveState();
+  };
+
+  const addClipArt = (url) => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+    
+    fabric.Image.fromURL(url, (img) => {
+      img.scaleToWidth(150);
+      img.set({
+        left: 100,
+        top: 100,
+        crossOrigin: "anonymous",
+      });
+      canvas.add(img);
+      canvas.centerObject(img);
+      canvas.setActiveObject(img);
+      canvas.renderAll();
+    }, { crossOrigin: 'anonymous' });
+  };
+
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -349,6 +438,35 @@ function ProductCustomize() {
     navigate("/shop");
   };
 
+  const handleSaveDraft = () => {
+    const canvas = fabricCanvasRef.current;
+    // Save current side to sidesData first
+    const updatedSides = { ...sidesData, [activeSideIndex]: JSON.stringify(canvas.toJSON(["name", "selectable", "evented", "filters", "crossOrigin"])) };
+    localStorage.setItem(`agneya_draft_${baseProduct._id}`, JSON.stringify(updatedSides));
+    alert("Progress saved as draft!");
+  };
+
+  const handleLoadDraft = () => {
+    const draft = localStorage.getItem(`agneya_draft_${baseProduct._id}`);
+    if (draft) {
+      try {
+        const parsed = JSON.parse(draft);
+        setSidesData(parsed);
+        // Load active side
+        const activeData = parsed[activeSideIndex];
+        if (activeData) {
+          fabricCanvasRef.current.loadFromJSON(activeData, () => {
+            fabricCanvasRef.current.renderAll();
+            // Re-add safety area if needed
+            addSafetyArea(fabricCanvasRef.current);
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load draft:", err);
+      }
+    }
+  };
+
   const handleBuyNow = () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -394,9 +512,10 @@ function ProductCustomize() {
         <aside className="studio-side-panel left-panel">
           <div className="panel-header">
             <button className={activeTab === "layers" ? "active" : ""} onClick={() => setActiveTab("layers")}>Layers</button>
+            <button className={activeTab === "clipart" ? "active" : ""} onClick={() => setActiveTab("clipart")}>ClipArt</button>
           </div>
           <div className="panel-content">
-            {canvasObjects.map((obj, idx) => (
+            {activeTab === "layers" && canvasObjects.map((obj, idx) => (
               <div key={idx} className="layer-item" onClick={() => fabricCanvasRef.current.setActiveObject(obj)}>
                 <i className={obj.type === "i-text" ? "bi bi-type" : "bi bi-image"}></i>
                 <span className="layer-name">{obj.type} {idx + 1}</span>
@@ -406,6 +525,16 @@ function ProductCustomize() {
                 </div>
               </div>
             ))}
+
+            {activeTab === "clipart" && (
+              <div className="clipart-grid">
+                {CLIPART_ITEMS.map((item, idx) => (
+                  <div key={idx} className="clipart-item" onClick={() => addClipArt(item.url)}>
+                    <img src={item.url} alt={item.name} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </aside>
 
@@ -458,11 +587,38 @@ function ProductCustomize() {
               <span>Size: {textSize}</span>
             </div>
             <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} />
-            <select value={selectedFont} onChange={(e) => setSelectedFont(e.target.value)}>
-              <option value="Arial">Arial</option>
-              <option value="Helvetica">Helvetica</option>
-              <option value="Times New Roman">Times New Roman</option>
+            <select value={selectedFont} onChange={(e) => {
+              setSelectedFont(e.target.value);
+              const active = fabricCanvasRef.current?.getActiveObject();
+              if (active && active.type === 'i-text') {
+                active.set('fontFamily', e.target.value);
+                fabricCanvasRef.current.renderAll();
+              }
+            }}>
             </select>
+          </div>
+
+          <div className="tool-section">
+            <label>Text Visuals</label>
+            <div className="effect-grid">
+              <button 
+                className={isNeon ? "active neon-btn" : "neon-btn"} 
+                onClick={() => applyNeon(!isNeon)}
+              >
+                <i className="bi bi-lightbulb"></i> Neon Glow
+              </button>
+            </div>
+            
+            <div className="slider-group">
+              <label>Curved Text ({textCurve})</label>
+              <input 
+                type="range" 
+                min="-100" 
+                max="100" 
+                value={textCurve} 
+                onChange={(e) => applyCurve(+e.target.value)} 
+              />
+            </div>
           </div>
 
           {/* Image Filters */}
@@ -483,6 +639,12 @@ function ProductCustomize() {
           </div>
 
           <div className="action-buttons">
+            <button className="finish-btn draft-btn" onClick={handleSaveDraft}>
+              <i className="bi bi-save"></i> Save Draft
+            </button>
+            <button className="finish-btn preview-3d-btn" onClick={() => setShow3D(true)}>
+              <i className="bi bi-box"></i> 3D Preview
+            </button>
             <button className="finish-btn add-cart" onClick={handleAddToCart}>
               <i className="bi bi-cart-plus"></i> Add to Cart
             </button>
@@ -492,736 +654,29 @@ function ProductCustomize() {
           </div>
         </aside>
       </div>
+
+      {/* 3D Modal */}
+      {show3D && (
+        <div className="studio-modal-overlay" onClick={() => setShow3D(false)}>
+          <div className="studio-modal 3d-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>3D Product Mockup</h2>
+              <button className="close-modal" onClick={() => setShow3D(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              <TShirt3D fabricCanvas={fabricCanvasRef.current} />
+            </div>
+            <div className="modal-footer">
+              <p>Drag to rotate. Designs are rendered in real-time.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default ProductCustomize;
-//   const saveAndProceed = () => {
-//     const token = localStorage.getItem("token");
-//     if (!token) {
-//       setError("⚠️ Please login to add items to cart. Your design is saved!");
-//       setTimeout(() => navigate("/login", { state: { redirectTo: `/customize`, baseProduct } }), 2000);
-//       return;
-//     }
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-
-//     // Generate high-quality preview (clipping works here)
-//     const designDataUrl = canvas.toDataURL({
-//       format: "png",
-//       quality: 1,
-//       multiplier: 2,
-//     });
-
-//     const cartItem = {
-//       productId: baseProduct._id,
-//       name: baseProduct.name,
-//       price: totalPrice,
-//       customDesignUrl: designDataUrl,
-//       quantity: 1,
-//     };
-
-//     dispatch(addToCart(cartItem));
-//     alert("Added to cart!");
-//     navigate("/shop");
-//   };
-
-//   return (
-//     <div className="customize-page studio-theme">
-//       <Helmet>
-//         <title>{`Design Your ${baseProduct?.name || "Product"} | Agneya Studio`}</title>
-//       </Helmet>
-
-//       {/* Header */}
-//       <div className="studio-header">
-//         <button className="back-btn" onClick={() => navigate("/shop")}>
-//           <i className="bi bi-arrow-left"></i> Back
-//         </button>
-//         <h1 className="studio-title">
-//           Agneya <span>Design Studio</span>
-//         </h1>
-//         <div className="price-display">
-//           Total: <span>₹{totalPrice.toFixed(2)}</span>
-//         </div>
-//       </div>
-
-//       {error && <p className="error-banner">{error}</p>}
-
-//       {/* Main Studio Layout */}
-//       <div className="studio-main-container">
-//         {/* Left Panel: Layers and Templates */}
-//         <aside className="studio-side-panel left-panel">
-//           <div className="panel-header">
-//             <button className={activeTab === 'templates' ? 'active' : ''} onClick={() => setActiveTab('templates')}>Templates</button>
-//             <button className={activeTab === 'layers' ? 'active' : ''} onClick={() => setActiveTab('layers')}>Layers</button>
-//           </div>
-          
-//           <div className="panel-content">
-//             {activeTab === 'templates' && (
-//               <div className="template-grid">
-//                 {Object.keys(templates).map(key => (
-//                   <div key={key} className="template-item" onClick={() => loadTemplate(key)}>
-//                     <div className="template-icon">{templates[key].name[0]}</div>
-//                     <span>{templates[key].name}</span>
-//                   </div>
-//                 ))}
-//               </div>
-//             )}
-            
-//             {activeTab === 'layers' && (
-//               <div className="layer-list">
-//                 {canvasObjects.map((obj, idx) => (
-//                   <div key={idx} className="layer-item" onClick={() => {
-//                     fabricCanvasRef.current.setActiveObject(obj);
-//                     fabricCanvasRef.current.renderAll();
-//                   }}>
-//                     <i className={obj.type === 'i-text' ? 'bi bi-type' : 'bi bi-image'}></i>
-//                     <span className="layer-name">{obj.type} {idx + 1}</span>
-//                     <div className="layer-actions">
-//                       <button onClick={(e) => { e.stopPropagation(); moveLayer("forward"); }}><i className="bi bi-arrow-up-short"></i></button>
-//                       <button onClick={(e) => { e.stopPropagation(); fabricCanvasRef.current.remove(obj); }}><i className="bi bi-trash"></i></button>
-//                     </div>
-//                   </div>
-//                 ))}
-//               </div>
-//             )}
-//           </div>
-//         </aside>
-
-//         {/* Center Panel: Canvas */}
-//         <main className="studio-center-panel">
-//           <div className="canvas-wrapper">
-//             <canvas ref={canvasRef} />
-//           </div>
-//         </main>
-
-//         {/* Right Panel: Tools (Text or Image) */}
-//         <aside className="studio-side-panel right-panel">
-//           <div className="panel-header">
-//             <span>Editor Tools</span>
-//           </div>
-          
-//           <div className="panel-content">
-//             <div className="tool-section add-elements">
-//               <label>Add to Design</label>
-//               <div className="tool-grid">
-//                 <button onClick={addText}><i className="bi bi-plus-square"></i> Text</button>
-//                 <label className="upload-label">
-//                   <i className="bi bi-upload"></i> Image
-//                   <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
-//                 </label>
-//               </div>
-//             </div>
-
-//             {/* History and Save actions */}
-//             <div className="tool-section history-actions">
-//               <div className="tool-grid">
-//                 <button onClick={undo} disabled={history.length <= 1}><i className="bi bi-arrow-counterclockwise"></i> Undo</button>
-//                 <button onClick={redo} disabled={!redoStack.length}><i className="bi bi-arrow-clockwise"></i> Redo</button>
-//               </div>
-//               <button onClick={saveAndProceed} className="primary-btn finish-btn">
-//                 Add to Cart
-//               </button>
-//             </div>
-//           </div>
-//         </aside>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default ProductCustomize;
-
-
-
-
-
-
-// // src/user/pages/ProductCustomize.jsx
-// import React, { useEffect, useRef, useState, useCallback } from "react";
-// import { useLocation, useNavigate } from "react-router-dom";
-// import { useDispatch } from "react-redux";
-// import { addToCart } from "../../store/cartSlice";
-// import * as fabric from "fabric";
-// import { Helmet } from "react-helmet-async";
-// import TShirt3D from "../components/TShirt3D";
-// import API from "../../shared/utils/api"; 
-// import "../style/ProductCustomize.css";
-
-// // ─── Sample Templates (expand as needed) ───
-// const templates = {
-//   birthday: {
-//     name: "Happy Birthday Basic",
-//     objects: [
-//       {
-//         type: "i-text",
-//         text: "Happy Birthday",
-//         fontSize: 72,
-//         fill: "#ff6b6b",
-//         left: 120,
-//         top: 60,
-//         fontFamily: "Lobster",
-//       },
-//       {
-//         type: "i-text",
-//         text: "[Your Name]",
-//         fontSize: 90,
-//         fill: "#4ecdc4",
-//         left: 100,
-//         top: 180,
-//         fontFamily: "Great Vibes",
-//       },
-//     ],
-//   },
-//   wedding: {
-//     name: "Wedding Special",
-//     objects: [
-//       { type: "i-text", text: "Save the Date", fontSize: 60, fill: "#9C51B6", left: 150, top: 100, fontFamily: "Dancing Script" },
-//     ]
-//   },
-//   minimal: {
-//     name: "Minimalist Cool",
-//     objects: [
-//       { type: "i-text", text: "LESS IS MORE", fontSize: 40, fill: "#333", left: 200, top: 200, fontFamily: "Roboto" },
-//     ]
-//   }
-// };
-
-// function ProductCustomize() {
-//   const { state } = useLocation();
-//   const navigate = useNavigate();
-//   const dispatch = useDispatch();
-
-//   const baseProduct = state?.baseProduct;
-
-//   const canvasRef = useRef(null);
-//   const fabricCanvasRef = useRef(null);
-
-//   const [textSize, setTextSize] = useState(40);
-//   const [textColor, setTextColor] = useState("#000000");
-//   const [selectedFont, setSelectedFont] = useState("Arial");
-//   const [bold, setBold] = useState(false);
-//   const [italic, setItalic] = useState(false);
-//   const [underline, setUnderline] = useState(false);
-
-//   const [history, setHistory] = useState([]);
-//   const [redoStack, setRedoStack] = useState([]);
-//   const [previewUrl, setPreviewUrl] = useState(null);
-//   const [showPreview, setShowPreview] = useState(false);
-//   const [error, setError] = useState("");
-
-//   // ─── NEW FEATURES STATES ───
-//   const [currentSide, setCurrentSide] = useState("front"); // "front" | "back"
-//   const [sideData, setSideData] = useState({ front: null, back: null });
-//   const [canvasObjects, setCanvasObjects] = useState([]);
-//   const [totalPrice, setTotalPrice] = useState(baseProduct?.price || baseProduct?.basePrice || 0);
-//   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
-//   const [hasSafeZone, setHasSafeZone] = useState(true);
-//   const [qrText, setQrText] = useState("");
-//   const [showQrInput, setShowQrInput] = useState(false);
-//   const [show3D, setShow3D] = useState(false);
-//   const [isProcessing, setIsProcessing] = useState(false);
-//   // Redirect only if no base product selected
-//   useEffect(() => {
-//     if (!baseProduct?._id) {
-//       navigate("/shop");
-//     }
-//   }, [navigate, baseProduct]);
-
-//   // Load Google Fonts
-//   useEffect(() => {
-//     const link = document.createElement("link");
-//     link.href =
-//       "https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Great+Vibes&family=Dancing+Script&family=Pacifico&family=Lobster&display=swap";
-//     link.rel = "stylesheet";
-//     document.head.appendChild(link);
-
-//     return () => document.head.removeChild(link);
-//   }, []);
-
-//   // Initialize Fabric Canvas
-//   useEffect(() => {
-//     if (!canvasRef.current) return;
-
-//     const canvas = new fabric.Canvas(canvasRef.current, {
-//       width: 700,
-//       height: 700,
-//       backgroundColor: "#f9fafb",
-//       preserveObjectStacking: true,
-//       selection: true,
-//     });
-
-//     fabricCanvasRef.current = canvas;
-
-//     // Load base product image as background
-//     const productImg = baseProduct?.imageUrl || "/placeholder-product.jpg";
-//     setIsProcessing(true);
-//     fabric.Image.fromURL(
-//       productImg,
-//       (img) => {
-//         setIsProcessing(false);
-//         if (!img) {
-//           setError("Failed to load product image. Please try again.");
-//           return;
-//         }
-//         const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-//         canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
-//           scaleX: scale,
-//           scaleY: scale,
-//           left: (canvas.width - img.width * scale) / 2,
-//           top: (canvas.height - img.height * scale) / 2,
-//           selectable: false,
-//           evented: false,
-//           crossOrigin: "anonymous",
-//         });
-//         saveState(); // Save initial state
-//       },
-//       { crossOrigin: "anonymous" }
-//     );
-
-//     // History & Sync listeners
-//     const syncState = () => {
-//       saveState();
-//       updateObjectList();
-//       updatePrice();
-//       autoSaveToLocal();
-//     };
-
-//     canvas.on("object:modified", syncState);
-//     canvas.on("object:added", syncState);
-//     canvas.on("object:removed", syncState);
-//     canvas.on("selection:created", updateObjectList);
-//     canvas.on("selection:updated", updateObjectList);
-//     canvas.on("selection:cleared", updateObjectList);
-
-//     // Initial Safe Zone
-//     addSafeZoneOverlay(canvas);
-
-//     // Check for Draft
-//     const draft = localStorage.getItem(`draft_${baseProduct._id}`);
-//     if (draft) setShowDraftPrompt(true);
-
-//     return () => {
-//       canvas.off();
-//       canvas.dispose();
-//       fabricCanvasRef.current = null;
-//     };
-//   }, [baseProduct]);
-
-//   // ─── SAFE ZONE OVERLAY ───
-//   const addSafeZoneOverlay = (canvas) => {
-//     const margin = 40;
-//     const rect = new fabric.Rect({
-//       left: margin,
-//       top: margin,
-//       width: canvas.width - margin * 2,
-//       height: canvas.height - margin * 2,
-//       fill: "transparent",
-//       stroke: "#9c51b6",
-//       strokeDashArray: [5, 5],
-//       selectable: false,
-//       evented: false,
-//       opacity: 0.5,
-//       name: "safe-zone-overlay",
-//     });
-//     canvas.add(rect);
-//     canvas.bringObjectToFront(rect);
-//   };
-
-//   const toggleSafeZone = () => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-//     const overlay = canvas.getObjects().find(o => o.name === "safe-zone-overlay");
-//     if (overlay) {
-//       overlay.set("opacity", hasSafeZone ? 0 : 0.5);
-//       setHasSafeZone(!hasSafeZone);
-//       canvas.renderAll();
-//     }
-//   };
-
-//   // ─── PRICE CALCULATION ───
-//   const updatePrice = useCallback(() => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-//     const objs = canvas.getObjects().filter(o => o.name !== "safe-zone-overlay");
-    
-//     // Dynamic Pricing Logic: Base + per text layer + per image layer
-//     const textLayers = objs.filter(o => o.type === "i-text").length;
-//     const imageLayers = objs.filter(o => o.type === "image").length;
-    
-//     const textCost = 30; // ₹30 per text layer
-//     const imageCost = 50; // ₹50 per image layer
-    
-//     const base = baseProduct?.price || baseProduct?.basePrice || 0;
-//     setTotalPrice(base + (textLayers * textCost) + (imageLayers * imageCost));
-//   }, [baseProduct]);
-
-//   // ─── OBJECT LIST (LAYERS) ───
-//   const updateObjectList = useCallback(() => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-//     const objs = [...canvas.getObjects()]
-//       .filter(o => o.name !== "safe-zone-overlay" && o !== canvas.backgroundImage)
-//       .reverse();
-//     setCanvasObjects(objs);
-//   }, []);
-
-//   // ─── AUTO-SAVE ───
-//   const autoSaveToLocal = useCallback(() => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-//     const json = canvas.toJSON(["name", "selectable", "evented"]);
-//     localStorage.setItem(`draft_${baseProduct?._id}`, JSON.stringify(json));
-//   }, [baseProduct]);
-
-//   const loadDraft = () => {
-//     const draft = localStorage.getItem(`draft_${baseProduct?._id}`);
-//     if (draft) {
-//       loadState(draft);
-//       setShowDraftPrompt(false);
-//     }
-//   };
-
-//   // ─── SIDE SWITCHING ───
-//   const switchSide = (side) => {
-//     if (side === currentSide) return;
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-
-//     const currentJson = canvas.toJSON(["name", "selectable", "evented"]);
-//     setSideData(prev => ({ ...prev, [currentSide]: JSON.stringify(currentJson) }));
-
-//     canvas.getObjects().forEach(obj => {
-//       if (obj !== canvas.backgroundImage) canvas.remove(obj);
-//     });
-
-//     const nextData = sideData[side];
-//     if (nextData) {
-//       canvas.loadFromJSON(nextData, () => {
-//         addSafeZoneOverlay(canvas);
-//         canvas.renderAll();
-//       });
-//     } else {
-//       addSafeZoneOverlay(canvas);
-//     }
-//     setCurrentSide(side);
-//   };
-
-//   // ─── ALIGNMENT ───
-//   const alignObject = (type) => {
-//     const canvas = fabricCanvasRef.current;
-//     const active = canvas?.getActiveObject();
-//     if (!active) return;
-//     if (type === "center") canvas.centerObject(active);
-//     else if (type === "horizontally") active.centerH();
-//     else if (type === "vertically") active.centerV();
-//     active.setCoords();
-//     canvas.requestRenderAll();
-//     saveState();
-//   };
-
-//   // ─── QR CODE ───
-//   const addQrCode = () => {
-//     if (!qrText.trim()) return;
-//     const url = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrText)}`;
-//     fabric.Image.fromURL(url, (img) => {
-//       img.set({ left: 250, top: 250, scaleX: 0.5, scaleY: 0.5 });
-//       fabricCanvasRef.current?.add(img);
-//       setShowQrInput(false);
-//       setQrText("");
-//     }, { crossOrigin: "anonymous" });
-//   };
-
-//   // ─── IMAGE FILTERS ───
-//   const applyFilter = (filterType) => {
-//     const canvas = fabricCanvasRef.current;
-//     const active = canvas?.getActiveObject();
-//     if (!active || active.type !== "image") return;
-//     let filter;
-//     if (filterType === "grayscale") filter = new fabric.Image.filters.Grayscale();
-//     else if (filterType === "sepia") filter = new fabric.Image.filters.Sepia();
-//     else if (filterType === "invert") filter = new fabric.Image.filters.Invert();
-//     if (filter) {
-//       active.filters.push(filter);
-//       active.applyFilters();
-//       canvas.renderAll();
-//       saveState();
-//     }
-//   };
-
-//   // ─── LAYER OPS ───
-//   const moveLayer = (direction) => {
-//     const canvas = fabricCanvasRef.current;
-//     const active = canvas?.getActiveObject();
-//     if (!active) return;
-//     if (direction === "forward") canvas.bringObjectForward(active);
-//     else if (direction === "backward") canvas.sendObjectBackwards(active);
-//     else if (direction === "top") canvas.bringObjectToFront(active);
-//     else if (direction === "bottom") canvas.sendObjectToBack(active);
-    
-//     // Ensure safe-zone-overlay is always on top
-//     const objects = canvas.getObjects();
-//     const overlay = objects.find(o => o.name === "safe-zone-overlay");
-//     if (overlay) canvas.bringObjectToFront(overlay);
-//     canvas.renderAll();
-//     updateObjectList();
-//   };
-
-//   // ─── TEXT EFFECTS (Shadow/Stroke) ───
-//   const applyTextEffect = (type, value) => {
-//     const canvas = fabricCanvasRef.current;
-//     const active = canvas?.getActiveObject();
-//     if (!active || active.type !== "i-text") return;
-//     if (type === "stroke") {
-//        active.set({ stroke: value, strokeWidth: value ? 2 : 0 });
-//     } else if (type === "shadow") {
-//        active.set("shadow", value ? new fabric.Shadow({ color: "rgba(0,0,0,0.5)", blur: 10, offsetX: 5, offsetY: 5 }) : null);
-//     }
-//     canvas.renderAll();
-//     saveState();
-//   };
-
-//   // ─── History Management ───
-//   const saveState = useCallback(() => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-
-//     try {
-//       const json = canvas.toJSON(["fontFamily", "fontWeight", "fontStyle", "underline"]);
-//       setHistory((prev) => {
-//         const newHistory = [...prev, JSON.stringify(json)];
-//         // Limit history to prevent memory issues
-//         if (newHistory.length > 30) newHistory.shift();
-//         return newHistory;
-//       });
-//       setRedoStack([]);
-//     } catch (err) {
-//       console.error("Failed to save canvas state:", err);
-//     }
-//   }, []);
-
-//   const undo = () => {
-//     if (history.length <= 1) return;
-//     const current = history[history.length - 1];
-//     const previous = history[history.length - 2];
-
-//     setHistory((prev) => prev.slice(0, -1));
-//     setRedoStack((prev) => [current, ...prev]);
-
-//     loadState(previous);
-//   };
-
-//   const redo = () => {
-//     if (!redoStack.length) return;
-//     const next = redoStack[0];
-//     setRedoStack((prev) => prev.slice(1));
-//     setHistory((prev) => [...prev, next]);
-//     loadState(next);
-//   };
-
-//   const loadState = (jsonString) => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-
-//     canvas.loadFromJSON(jsonString, () => {
-//       canvas.renderAll();
-//     });
-//   };
-
-//   // ─── Add Text ───
-//   const addText = () => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-
-//     const text = new fabric.IText("Edit me", {
-//       left: 180,
-//       top: 180,
-//       fontSize: textSize,
-//       fill: textColor,
-//       fontFamily: selectedFont,
-//       fontWeight: bold ? "bold" : "normal",
-//       fontStyle: italic ? "italic" : "normal",
-//       underline: underline,
-//       editable: true,
-//     });
-
-//     canvas.add(text);
-//     canvas.setActiveObject(text);
-//     canvas.requestRenderAll();
-//   };
-
-//   // ─── Image Upload ───
-//   const handleImageUpload = (e) => {
-//     const file = e.target.files?.[0];
-//     if (!file) return;
-
-//     const reader = new FileReader();
-//     reader.onload = (event) => {
-//       fabric.Image.fromURL(event.target.result, (img) => {
-//         img.scale(0.5);
-//         img.set({ left: 100, top: 100, selectable: true });
-//         fabricCanvasRef.current?.add(img);
-//         fabricCanvasRef.current?.setActiveObject(img);
-//       });
-//     };
-//     reader.readAsDataURL(file);
-//   };
-
-//   // ─── AI Background Removal (remove.bg) ───
-//   const removeBackground = async () => {
-//     const canvas = fabricCanvasRef.current;
-//     const active = canvas?.getActiveObject();
-
-//     if (!active || active.type !== "image") {
-//       setError("Please select an uploaded image first");
-//       return;
-//     }
-
-//     try {
-//       setError("");
-//       const dataUrl = active.toDataURL({ format: "png" });
-//       const blob = await (await fetch(dataUrl)).blob();
-
-//       const formData = new FormData();
-//       formData.append("image_file", blob, "uploaded.png");
-//       formData.append("size", "auto");
-
-//       const res = await fetch("https://api.remove.bg/v1.0/removebg", {
-//         method: "POST",
-//         headers: {
-//           "X-Api-Key": "YOUR_REMOVE_BG_API_KEY_HERE", // ← Replace with your actual key
-//         },
-//         body: formData,
-//       });
-
-//       if (!res.ok) {
-//         throw new Error(`Remove.bg error: ${res.statusText}`);
-//       }
-
-//       const newBlob = await res.blob();
-//       const newUrl = URL.createObjectURL(newBlob);
-
-//       fabric.Image.fromURL(newUrl, (img) => {
-//         img.scaleToWidth(active.getScaledWidth());
-//         img.set({
-//           left: active.left,
-//           top: active.top,
-//         });
-//         canvas.remove(active);
-//         canvas.add(img);
-//         canvas.setActiveObject(img);
-//         saveState();
-//       });
-//     } catch (err) {
-//       setError("Background removal failed: " + err.message);
-//       console.error(err);
-//     }
-//   };
-
-//   // ─── Load Template ───
-//   const loadTemplate = (key) => {
-//     const tpl = templates[key];
-//     if (!tpl) return;
-
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-
-//     // Clear only foreground objects (keep background)
-//     canvas.getObjects().forEach((obj) => {
-//       if (obj !== canvas.backgroundImage) canvas.remove(obj);
-//     });
-
-//     // Add template objects
-//     tpl.objects.forEach((obj) => {
-//       if (obj.type === "text") {
-//         const text = new fabric.IText(obj.text, {
-//           left: obj.left,
-//           top: obj.top,
-//           fontSize: obj.fontSize,
-//           fill: obj.fill,
-//           fontFamily: obj.fontFamily,
-//         });
-//         canvas.add(text);
-//       }
-//     });
-
-//     canvas.requestRenderAll();
-//     saveState();
-//   };
-
-//   // ─── Generate High-Res Preview ───
-//   const generatePrintPreview = () => {
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-
-//     const multiplier = 3; // for ~300 DPI
-
-//     const tempCanvas = new fabric.StaticCanvas(null, {
-//       width: canvas.width * multiplier,
-//       height: canvas.height * multiplier,
-//     });
-
-//     // Clone objects with scale
-//     canvas.getObjects().forEach((obj) => {
-//       if (obj === canvas.backgroundImage) return;
-//       const clone = obj.toObject();
-//       tempCanvas.add(
-//         fabric.util.object.enlivenObjects([clone])[0].set({
-//           scaleX: (obj.scaleX || 1) * multiplier,
-//           scaleY: (obj.scaleY || 1) * multiplier,
-//           left: (obj.left || 0) * multiplier,
-//           top: (obj.top || 0) * multiplier,
-//         })
-//       );
-//     });
-
-//     // Background image
-//     if (canvas.backgroundImage) {
-//       const bg = canvas.backgroundImage;
-//       tempCanvas.setBackgroundImage(
-//         new fabric.Image(bg.getElement(), {
-//           scaleX: multiplier,
-//           scaleY: multiplier,
-//         }),
-//         tempCanvas.renderAll.bind(tempCanvas)
-//       );
-//     }
-
-//     const url = tempCanvas.toDataURL({ format: "png", multiplier: 1 });
-//     setPreviewUrl(url);
-//     setShowPreview(true);
-//     tempCanvas.dispose();
-//   };
-
-//   // ─── Save Design & Add to Cart ───
-//   const saveAndProceed = () => {
-//     const token = localStorage.getItem("token");
-//     if (!token) {
-//       setError("⚠️ Please login to add items to cart. Your design is saved locally!");
-//       setTimeout(() => navigate("/login", { state: { redirectTo: `/customize`, baseProduct } }), 1500);
-//       return;
-//     }
-//     const canvas = fabricCanvasRef.current;
-//     if (!canvas) return;
-
-//     const designDataUrl = canvas.toDataURL({
-//       format: "png",
-//       quality: 0.92,
-//       multiplier: 2,
-//     });
-
-//     const cartItem = {
-//       productId: baseProduct._id,
-//       name: baseProduct.name,
-//       price: totalPrice,
-//       customDesignUrl: designDataUrl,
-//       canvasData: canvas.toJSON(),
-//       quantity: 1,
-//     };
-
-//     dispatch(addToCart(cartItem));
-//     alert("Added to cart!");
 //     navigate("/shop");
 //   };
 
