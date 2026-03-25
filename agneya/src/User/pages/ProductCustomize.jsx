@@ -1,411 +1,145 @@
-// src/user/pages/ProductCustomize.jsx
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/cartSlice";
-import * as fabric from "fabric"; // Fabric.js v6 support
+import * as fabric from "fabric"; 
 import { Helmet } from "react-helmet-async";
 import { getImageUrl } from "../../shared/utils/api";
 import "../style/ProductCustomize.css";
-
-// ─── 🖼️ കസ്റ്റമൈസേഷൻ മാസ്കുകൾ (Masks for Clipping) 🖼️ ───
-// ഈ മാസ്കുകൾ നിങ്ങളുടെ /public ഫോൾഡറിൽ ഉണ്ടായിരിക്കണം.
-// കറുത്ത നിറത്തിലുള്ള മാസ്ക് ചിത്രങ്ങളാണ് ഏറ്റവും നല്ലത്.
-const productMasks = {
-  // ടി-ഷർട്ടിന്റെ ആകൃതിയിലുള്ള കറുത്ത മാസ്ക് PNG/SVG
-  tshirt: "/masks/tshirt_mask.png", 
-  // കപ്പിന്റെ ആകൃതിയിലുള്ള മാസ്ക്
-  mug: "/masks/mug_mask.png", 
-  // ...മറ്റുള്ളവ
-};
 
 function ProductCustomize() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  // Redirect only if no base product selected
   const baseProduct = state?.baseProduct;
-  useEffect(() => {
-    if (!baseProduct?._id) {
-      navigate("/shop");
-    }
-  }, [navigate, baseProduct]);
 
   const canvasRef = useRef(null);
   const fabricCanvasRef = useRef(null);
-
-  const [textSize, setTextSize] = useState(40);
-  const [textColor, setTextColor] = useState("#000000");
-  const [selectedFont, setSelectedFont] = useState("Arial");
-  const [history, setHistory] = useState([]);
-  const [redoStack, setRedoStack] = useState([]);
-  const [error, setError] = useState("");
   const [totalPrice, setTotalPrice] = useState(baseProduct?.price || baseProduct?.basePrice || 0);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [activeTab, setActiveTab] = useState("text"); 
   const [canvasObjects, setCanvasObjects] = useState([]);
-  const [activeImage, setActiveImage] = useState(null); 
 
-  // Initialize Fabric Canvas
+  useEffect(() => {
+    if (!baseProduct?._id) navigate("/shop");
+  }, [navigate, baseProduct]);
+
   useEffect(() => {
     if (!canvasRef.current) return;
 
     // Initialize Fabric Canvas
     const canvas = new fabric.Canvas(canvasRef.current, {
-      width: 700,
-      height: 700,
+      width: 500, 
+      height: 500,
       backgroundColor: "#ffffff",
       preserveObjectStacking: true,
-      selection: true,
     });
 
     fabricCanvasRef.current = canvas;
 
-    // Load Product Background & Clipping Mask
-    const loadStudio = () => {
-      // 1. Load Background Image
-      const bgImgElement = new Image();
-      bgImgElement.crossOrigin = "anonymous";
-      bgImgElement.src = baseProduct?.imageUrl ? getImageUrl(baseProduct.imageUrl) : "/placeholder-product.jpg";
-
-      bgImgElement.onload = () => {
-        const fabricBgImg = new fabric.Image(bgImgElement);
-        const scale = Math.min(canvas.width / fabricBgImg.width, canvas.height / fabricBgImg.height);
-
-        canvas.backgroundImage = fabricBgImg;
-        fabricBgImg.set({
-          scaleX: scale,
-          scaleY: scale,
-          left: (canvas.width - fabricBgImg.width * scale) / 2,
-          top: (canvas.height - fabricBgImg.height * scale) / 2,
-          selectable: false,
-          crossOrigin: "anonymous",
-        });
-        canvas.renderAll();
-
-        // 2. 🛡️ Load Clipping Mask 🛡️
-        // പ്രോജക്റ്റിന്റെ മാസ്ക് ലോഡ് ചെയ്യുന്നു (ടി-ഷർട്ട് അല്ലെങ്കിൽ കപ്പ്)
-        const projectType = baseProduct?.category?.toLowerCase() || "tshirt";
-        const maskUrl = productMasks[projectType] || productMasks.tshirt; // Default to tshirt mask
-
-        if (maskUrl) {
-          const maskImgElement = new Image();
-          maskImgElement.crossOrigin = "anonymous";
-          maskImgElement.src = maskUrl;
-
-          maskImgElement.onload = () => {
-            const fabricMask = new fabric.Image(maskImgElement);
-            fabricMask.set({
-              // ബാക്ക്ഗ്രൗണ്ടിന്റെ അതേ സ്കെയിലും അലൈൻമെന്റും നൽകുക
-              scaleX: scale,
-              scaleY: scale,
-              left: (canvas.width - fabricBgImg.width * scale) / 2,
-              top: (canvas.height - fabricBgImg.height * scale) / 2,
-              selectable: false,
-              evented: false, // മാസ്കിൽ ക്ലിക്ക് ചെയ്യാൻ പറ്റില്ല
-              opacity: 0, // മാസ്ക് അദൃശ്യമാക്കുക
-              name: "clipping-mask",
-            });
-            canvas.add(fabricMask);
-            canvas.sendToBack(fabricMask); // മാസ്ക് ബാക്ക്ഗ്രൗണ്ടിന്റെ മുകളിലും ചിത്രങ്ങൾക്ക് താഴെയും നിൽക്കണം
-            canvas.renderAll();
-          };
-        }
-        
-        saveState(); // Save initial state
-      };
-    };
-
-    loadStudio();
-
-    // History & Sync listeners
-    const syncState = () => {
-      saveState();
-      updateObjectList();
-      updatePrice();
-    };
-
-    canvas.on("object:modified", syncState);
-    canvas.on("object:added", syncState);
-    canvas.on("object:removed", syncState);
-    canvas.on("selection:created", handleObjectSelection);
-    canvas.on("selection:updated", handleObjectSelection);
-    canvas.on("selection:cleared", () => setActiveImage(null));
-
-    return () => {
-      canvas.dispose();
-      fabricCanvasRef.current = null;
-    };
-  }, [baseProduct]);
-
-  // Object Selection Handler
-  const handleObjectSelection = (e) => {
-    updateObjectList();
-    const selected = e.selected[0];
-    if (selected && selected.type === "image") {
-      setActiveImage(selected);
-      setActiveTab("image");
-    } else {
-      setActiveImage(null);
-    }
-  };
-
-  // PRICE CALCULATION
-  const updatePrice = useCallback(() => {
-    const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
-    const objs = canvas.getObjects().filter(o => o.name !== "clipping-mask");
-
-    const textLayers = objs.filter((o) => o.type === "i-text").length;
-    const imageLayers = objs.filter((o) => o.type === "image").length;
-
-    const textCost = 30; // ₹30 per text layer
-    const imageCost = 50; // ₹50 per image layer
-
-    const base = baseProduct?.price || baseProduct?.basePrice || 0;
-    setTotalPrice(base + textLayers * textCost + imageLayers * imageCost);
-  }, [baseProduct]);
-
-  // OBJECT LIST (LAYERS)
-  const updateObjectList = useCallback(() => {
-    const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
-    const objs = [...canvas.getObjects()].filter(o => o.name !== "clipping-mask").reverse();
-    setCanvasObjects(objs);
-  }, []);
-
-  // History Management
-  const saveState = useCallback(() => {
-    const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
-    try {
-      const json = canvas.toJSON(["name", "selectable", "evented", "crossOrigin", "filters"]);
-      setHistory((prev) => {
-        const newHistory = [...prev, JSON.stringify(json)];
-        if (newHistory.length > 30) newHistory.shift();
-        return newHistory;
+    // Load Product Image as Background
+    const imgUrl = baseProduct?.imageUrl ? getImageUrl(baseProduct.imageUrl) : "/placeholder-product.jpg";
+    
+    fabric.Image.fromURL(imgUrl, (img) => {
+      const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+      canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+        scaleX: scale,
+        scaleY: scale,
+        left: canvas.width / 2,
+        top: canvas.height / 2,
+        originX: "center",
+        originY: "center",
+        crossOrigin: "anonymous",
       });
-      setRedoStack([]);
-    } catch (err) {
-      console.error("Failed to save canvas state:", err);
-    }
-  }, []);
+    }, { crossOrigin: "anonymous" });
 
-  const undo = () => {
-    if (history.length <= 1) return;
-    const current = history[history.length - 1];
-    const previous = history[history.length - 2];
-    setHistory((prev) => prev.slice(0, -1));
-    setRedoStack((prev) => [current, ...prev]);
-    loadState(previous);
-  };
-
-  const redo = () => {
-    if (!redoStack.length) return;
-    const next = redoStack[0];
-    setRedoStack((prev) => prev.slice(1));
-    setHistory((prev) => [...prev, next]);
-    loadState(next);
-  };
-
-  const loadState = (jsonString) => {
-    const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
-    canvas.loadFromJSON(jsonString, () => {
-      canvas.renderAll();
+    // Update object list for UI
+    canvas.on("after:render", () => {
+      setCanvasObjects([...canvas.getObjects()].reverse());
     });
-  };
 
-  // Add Text
+    return () => canvas.dispose();
+  }, [baseProduct]);
+
   const addText = () => {
-    const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
-    const text = new fabric.IText("Double click to edit", {
-      left: 180,
-      top: 180,
-      fontSize: textSize,
-      fill: textColor,
-      fontFamily: selectedFont,
-      cornerColor: "#b388ff",
-      cornerSize: 10,
+    const text = new fabric.IText("Double tap to edit", {
+      left: 100,
+      top: 100,
+      fontFamily: "Arial",
+      fontSize: 30,
+      fill: "#b388ff",
     });
-    canvas.add(text);
-    canvas.setActiveObject(text);
-    canvas.requestRenderAll();
+    fabricCanvasRef.current.add(text);
+    fabricCanvasRef.current.setActiveObject(text);
   };
 
-  // ─── 🛡️ IMAGE UPLOAD WITH CLIPPING 🛡️ ───
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
-
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const imgElement = new Image();
-      imgElement.src = event.target.result;
-      imgElement.onload = () => {
-        const img = new fabric.Image(imgElement);
-        img.scale(0.5);
-        img.set({ left: 100, top: 100, selectable: true, crossOrigin: "anonymous" });
-        
-        // 🛡️ ഈ ചിത്രം മാസ്കിനുള്ളിൽ മാത്രം കാണാൻ സെറ്റ് ചെയ്യുന്നു (Clipping Logic)
-        img.set("globalCompositeOperation", "source-atop");
-
-        canvas.add(img);
-        canvas.centerObject(img);
-        canvas.setActiveObject(img);
-        setActiveImage(img);
-        setActiveTab("image");
-        canvas.renderAll();
-      };
+    reader.onload = (f) => {
+      fabric.Image.fromURL(f.target.result, (img) => {
+        img.scaleToWidth(150);
+        fabricCanvasRef.current.add(img);
+        fabricCanvasRef.current.centerObject(img);
+        fabricCanvasRef.current.setActiveObject(img);
+      });
     };
     reader.readAsDataURL(file);
   };
 
-  // Layer Management
-  const moveLayer = (direction) => {
-    const canvas = fabricCanvasRef.current;
-    const active = canvas?.getActiveObject();
-    if (!active) return;
-    if (direction === "forward") canvas.bringObjectForward(active);
-    else if (direction === "backward") canvas.sendObjectBackwards(active);
-    canvas.renderAll();
-    updateObjectList();
+  const deleteObject = (obj) => {
+    fabricCanvasRef.current.remove(obj);
+    fabricCanvasRef.current.renderAll();
   };
 
-  // Save Design & Add to Cart
-  const saveAndProceed = () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("⚠️ Please login to add items to cart. Your design is saved!");
-      setTimeout(() => navigate("/login", { state: { redirectTo: `/customize`, baseProduct } }), 2000);
-      return;
-    }
-    const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
-
-    // Generate high-quality preview (clipping works here)
-    const designDataUrl = canvas.toDataURL({
-      format: "png",
-      quality: 1,
-      multiplier: 2,
-    });
-
-    const cartItem = {
-      productId: baseProduct._id,
-      name: baseProduct.name,
-      price: totalPrice,
-      customDesignUrl: designDataUrl,
-      quantity: 1,
-    };
-
-    dispatch(addToCart(cartItem));
-    alert("Added to cart!");
+  const handleSave = () => {
+    const finalDesign = fabricCanvasRef.current.toDataURL({ format: "png", multiplier: 2 });
+    dispatch(addToCart({ ...baseProduct, customDesignUrl: finalDesign, price: totalPrice, quantity: 1 }));
+    alert("Added to Cart!");
     navigate("/shop");
   };
 
   return (
     <div className="customize-page studio-theme">
-      <Helmet>
-        <title>{`Design Your ${baseProduct?.name || "Product"} | Agneya Studio`}</title>
-      </Helmet>
+      <Helmet><title>Design Studio | Agneya</title></Helmet>
 
-      {/* Header */}
       <div className="studio-header">
-        <button className="back-btn" onClick={() => navigate("/shop")}>
-          <i className="bi bi-arrow-left"></i> Back
-        </button>
-        <h1 className="studio-title">
-          Agneya <span>Design Studio</span>
-        </h1>
-        <div className="price-display">
-          Total: <span>₹{totalPrice.toFixed(2)}</span>
-        </div>
+        <button className="back-btn" onClick={() => navigate("/shop")}>← Back</button>
+        <h1 className="studio-title">Agneya <span>Design Studio</span></h1>
+        <div className="price-display">Total: <span>₹{totalPrice}</span></div>
       </div>
 
-      {error && <p className="error-banner">{error}</p>}
-
-      {/* Main Studio Layout */}
       <div className="studio-main-container">
-        {/* Left Panel: Layers and Templates */}
         <aside className="studio-side-panel left-panel">
-          <div className="panel-header">
-            <button className={activeTab === 'templates' ? 'active' : ''} onClick={() => setActiveTab('templates')}>Templates</button>
-            <button className={activeTab === 'layers' ? 'active' : ''} onClick={() => setActiveTab('layers')}>Layers</button>
-          </div>
-          
+          <div className="panel-header"><span>Layers</span></div>
           <div className="panel-content">
-            {activeTab === 'templates' && (
-              <div className="template-grid">
-                {Object.keys(templates).map(key => (
-                  <div key={key} className="template-item" onClick={() => loadTemplate(key)}>
-                    <div className="template-icon">{templates[key].name[0]}</div>
-                    <span>{templates[key].name}</span>
-                  </div>
-                ))}
+            {canvasObjects.map((obj, idx) => (
+              <div key={idx} className="layer-item">
+                <span>{obj.type === 'i-text' ? "Text" : "Image"}</span>
+                <button onClick={() => deleteObject(obj)} className="del-layer">Delete</button>
               </div>
-            )}
-            
-            {activeTab === 'layers' && (
-              <div className="layer-list">
-                {canvasObjects.map((obj, idx) => (
-                  <div key={idx} className="layer-item" onClick={() => {
-                    fabricCanvasRef.current.setActiveObject(obj);
-                    fabricCanvasRef.current.renderAll();
-                  }}>
-                    <i className={obj.type === 'i-text' ? 'bi bi-type' : 'bi bi-image'}></i>
-                    <span className="layer-name">{obj.type} {idx + 1}</span>
-                    <div className="layer-actions">
-                      <button onClick={(e) => { e.stopPropagation(); moveLayer("forward"); }}><i className="bi bi-arrow-up-short"></i></button>
-                      <button onClick={(e) => { e.stopPropagation(); fabricCanvasRef.current.remove(obj); }}><i className="bi bi-trash"></i></button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            ))}
           </div>
         </aside>
 
-        {/* Center Panel: Canvas */}
         <main className="studio-center-panel">
           <div className="canvas-wrapper">
             <canvas ref={canvasRef} />
           </div>
         </main>
 
-        {/* Right Panel: Tools (Text or Image) */}
         <aside className="studio-side-panel right-panel">
-          <div className="panel-header">
-            <span>Editor Tools</span>
-          </div>
-          
-          <div className="panel-content">
-            <div className="tool-section add-elements">
-              <label>Add to Design</label>
-              <div className="tool-grid">
-                <button onClick={addText}><i className="bi bi-plus-square"></i> Text</button>
-                <label className="upload-label">
-                  <i className="bi bi-upload"></i> Image
-                  <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
-                </label>
-              </div>
-            </div>
-
-            {/* History and Save actions */}
-            <div className="tool-section history-actions">
-              <div className="tool-grid">
-                <button onClick={undo} disabled={history.length <= 1}><i className="bi bi-arrow-counterclockwise"></i> Undo</button>
-                <button onClick={redo} disabled={!redoStack.length}><i className="bi bi-arrow-clockwise"></i> Redo</button>
-              </div>
-              <button onClick={saveAndProceed} className="primary-btn finish-btn">
-                Add to Cart
-              </button>
+          <div className="tool-section">
+            <label>Add Elements</label>
+            <div className="tool-grid">
+              <button onClick={addText} className="tool-btn">Add Text</button>
+              <label className="tool-btn upload-label">
+                Upload Image
+                <input type="file" onChange={handleImageUpload} hidden />
+              </label>
             </div>
           </div>
+          <button className="finish-btn" onClick={handleSave}>Add to Cart</button>
         </aside>
       </div>
     </div>
@@ -413,6 +147,427 @@ function ProductCustomize() {
 }
 
 export default ProductCustomize;
+
+
+
+
+
+
+// // src/user/pages/ProductCustomize.jsx
+// import React, { useEffect, useRef, useState, useCallback } from "react";
+// import { useLocation, useNavigate } from "react-router-dom";
+// import { useDispatch } from "react-redux";
+// import { addToCart } from "../../store/cartSlice";
+// import * as fabric from "fabric"; // Fabric.js v6 support
+// import { Helmet } from "react-helmet-async";
+// import { getImageUrl } from "../../shared/utils/api";
+// import "../style/ProductCustomize.css";
+
+// // ─── 🖼️ കസ്റ്റമൈസേഷൻ മാസ്കുകൾ (Masks for Clipping) 🖼️ ───
+// // ഈ മാസ്കുകൾ നിങ്ങളുടെ /public ഫോൾഡറിൽ ഉണ്ടായിരിക്കണം.
+// // കറുത്ത നിറത്തിലുള്ള മാസ്ക് ചിത്രങ്ങളാണ് ഏറ്റവും നല്ലത്.
+// const productMasks = {
+//   // ടി-ഷർട്ടിന്റെ ആകൃതിയിലുള്ള കറുത്ത മാസ്ക് PNG/SVG
+//   tshirt: "/masks/tshirt_mask.png", 
+//   // കപ്പിന്റെ ആകൃതിയിലുള്ള മാസ്ക്
+//   mug: "/masks/mug_mask.png", 
+//   // ...മറ്റുള്ളവ
+// };
+
+// function ProductCustomize() {
+//   const { state } = useLocation();
+//   const navigate = useNavigate();
+//   const dispatch = useDispatch();
+
+//   // Redirect only if no base product selected
+//   const baseProduct = state?.baseProduct;
+//   useEffect(() => {
+//     if (!baseProduct?._id) {
+//       navigate("/shop");
+//     }
+//   }, [navigate, baseProduct]);
+
+//   const canvasRef = useRef(null);
+//   const fabricCanvasRef = useRef(null);
+
+//   const [textSize, setTextSize] = useState(40);
+//   const [textColor, setTextColor] = useState("#000000");
+//   const [selectedFont, setSelectedFont] = useState("Arial");
+//   const [history, setHistory] = useState([]);
+//   const [redoStack, setRedoStack] = useState([]);
+//   const [error, setError] = useState("");
+//   const [totalPrice, setTotalPrice] = useState(baseProduct?.price || baseProduct?.basePrice || 0);
+//   const [isProcessing, setIsProcessing] = useState(false);
+//   const [activeTab, setActiveTab] = useState("text"); 
+//   const [canvasObjects, setCanvasObjects] = useState([]);
+//   const [activeImage, setActiveImage] = useState(null); 
+
+//   // Initialize Fabric Canvas
+//   useEffect(() => {
+//     if (!canvasRef.current) return;
+
+//     // Initialize Fabric Canvas
+//     const canvas = new fabric.Canvas(canvasRef.current, {
+//       width: 700,
+//       height: 700,
+//       backgroundColor: "#ffffff",
+//       preserveObjectStacking: true,
+//       selection: true,
+//     });
+
+//     fabricCanvasRef.current = canvas;
+
+//     // Load Product Background & Clipping Mask
+//     const loadStudio = () => {
+//       // 1. Load Background Image
+//       const bgImgElement = new Image();
+//       bgImgElement.crossOrigin = "anonymous";
+//       bgImgElement.src = baseProduct?.imageUrl ? getImageUrl(baseProduct.imageUrl) : "/placeholder-product.jpg";
+
+//       bgImgElement.onload = () => {
+//         const fabricBgImg = new fabric.Image(bgImgElement);
+//         const scale = Math.min(canvas.width / fabricBgImg.width, canvas.height / fabricBgImg.height);
+
+//         canvas.backgroundImage = fabricBgImg;
+//         fabricBgImg.set({
+//           scaleX: scale,
+//           scaleY: scale,
+//           left: (canvas.width - fabricBgImg.width * scale) / 2,
+//           top: (canvas.height - fabricBgImg.height * scale) / 2,
+//           selectable: false,
+//           crossOrigin: "anonymous",
+//         });
+//         canvas.renderAll();
+
+//         // 2. 🛡️ Load Clipping Mask 🛡️
+//         // പ്രോജക്റ്റിന്റെ മാസ്ക് ലോഡ് ചെയ്യുന്നു (ടി-ഷർട്ട് അല്ലെങ്കിൽ കപ്പ്)
+//         const projectType = baseProduct?.category?.toLowerCase() || "tshirt";
+//         const maskUrl = productMasks[projectType] || productMasks.tshirt; // Default to tshirt mask
+
+//         if (maskUrl) {
+//           const maskImgElement = new Image();
+//           maskImgElement.crossOrigin = "anonymous";
+//           maskImgElement.src = maskUrl;
+
+//           maskImgElement.onload = () => {
+//             const fabricMask = new fabric.Image(maskImgElement);
+//             fabricMask.set({
+//               // ബാക്ക്ഗ്രൗണ്ടിന്റെ അതേ സ്കെയിലും അലൈൻമെന്റും നൽകുക
+//               scaleX: scale,
+//               scaleY: scale,
+//               left: (canvas.width - fabricBgImg.width * scale) / 2,
+//               top: (canvas.height - fabricBgImg.height * scale) / 2,
+//               selectable: false,
+//               evented: false, // മാസ്കിൽ ക്ലിക്ക് ചെയ്യാൻ പറ്റില്ല
+//               opacity: 0, // മാസ്ക് അദൃശ്യമാക്കുക
+//               name: "clipping-mask",
+//             });
+//             canvas.add(fabricMask);
+//             canvas.sendToBack(fabricMask); // മാസ്ക് ബാക്ക്ഗ്രൗണ്ടിന്റെ മുകളിലും ചിത്രങ്ങൾക്ക് താഴെയും നിൽക്കണം
+//             canvas.renderAll();
+//           };
+//         }
+        
+//         saveState(); // Save initial state
+//       };
+//     };
+
+//     loadStudio();
+
+//     // History & Sync listeners
+//     const syncState = () => {
+//       saveState();
+//       updateObjectList();
+//       updatePrice();
+//     };
+
+//     canvas.on("object:modified", syncState);
+//     canvas.on("object:added", syncState);
+//     canvas.on("object:removed", syncState);
+//     canvas.on("selection:created", handleObjectSelection);
+//     canvas.on("selection:updated", handleObjectSelection);
+//     canvas.on("selection:cleared", () => setActiveImage(null));
+
+//     return () => {
+//       canvas.dispose();
+//       fabricCanvasRef.current = null;
+//     };
+//   }, [baseProduct]);
+
+//   // Object Selection Handler
+//   const handleObjectSelection = (e) => {
+//     updateObjectList();
+//     const selected = e.selected[0];
+//     if (selected && selected.type === "image") {
+//       setActiveImage(selected);
+//       setActiveTab("image");
+//     } else {
+//       setActiveImage(null);
+//     }
+//   };
+
+//   // PRICE CALCULATION
+//   const updatePrice = useCallback(() => {
+//     const canvas = fabricCanvasRef.current;
+//     if (!canvas) return;
+//     const objs = canvas.getObjects().filter(o => o.name !== "clipping-mask");
+
+//     const textLayers = objs.filter((o) => o.type === "i-text").length;
+//     const imageLayers = objs.filter((o) => o.type === "image").length;
+
+//     const textCost = 30; // ₹30 per text layer
+//     const imageCost = 50; // ₹50 per image layer
+
+//     const base = baseProduct?.price || baseProduct?.basePrice || 0;
+//     setTotalPrice(base + textLayers * textCost + imageLayers * imageCost);
+//   }, [baseProduct]);
+
+//   // OBJECT LIST (LAYERS)
+//   const updateObjectList = useCallback(() => {
+//     const canvas = fabricCanvasRef.current;
+//     if (!canvas) return;
+//     const objs = [...canvas.getObjects()].filter(o => o.name !== "clipping-mask").reverse();
+//     setCanvasObjects(objs);
+//   }, []);
+
+//   // History Management
+//   const saveState = useCallback(() => {
+//     const canvas = fabricCanvasRef.current;
+//     if (!canvas) return;
+//     try {
+//       const json = canvas.toJSON(["name", "selectable", "evented", "crossOrigin", "filters"]);
+//       setHistory((prev) => {
+//         const newHistory = [...prev, JSON.stringify(json)];
+//         if (newHistory.length > 30) newHistory.shift();
+//         return newHistory;
+//       });
+//       setRedoStack([]);
+//     } catch (err) {
+//       console.error("Failed to save canvas state:", err);
+//     }
+//   }, []);
+
+//   const undo = () => {
+//     if (history.length <= 1) return;
+//     const current = history[history.length - 1];
+//     const previous = history[history.length - 2];
+//     setHistory((prev) => prev.slice(0, -1));
+//     setRedoStack((prev) => [current, ...prev]);
+//     loadState(previous);
+//   };
+
+//   const redo = () => {
+//     if (!redoStack.length) return;
+//     const next = redoStack[0];
+//     setRedoStack((prev) => prev.slice(1));
+//     setHistory((prev) => [...prev, next]);
+//     loadState(next);
+//   };
+
+//   const loadState = (jsonString) => {
+//     const canvas = fabricCanvasRef.current;
+//     if (!canvas) return;
+//     canvas.loadFromJSON(jsonString, () => {
+//       canvas.renderAll();
+//     });
+//   };
+
+//   // Add Text
+//   const addText = () => {
+//     const canvas = fabricCanvasRef.current;
+//     if (!canvas) return;
+//     const text = new fabric.IText("Double click to edit", {
+//       left: 180,
+//       top: 180,
+//       fontSize: textSize,
+//       fill: textColor,
+//       fontFamily: selectedFont,
+//       cornerColor: "#b388ff",
+//       cornerSize: 10,
+//     });
+//     canvas.add(text);
+//     canvas.setActiveObject(text);
+//     canvas.requestRenderAll();
+//   };
+
+//   // ─── 🛡️ IMAGE UPLOAD WITH CLIPPING 🛡️ ───
+//   const handleImageUpload = (e) => {
+//     const file = e.target.files?.[0];
+//     if (!file) return;
+
+//     const canvas = fabricCanvasRef.current;
+//     if (!canvas) return;
+
+//     const reader = new FileReader();
+//     reader.onload = (event) => {
+//       const imgElement = new Image();
+//       imgElement.src = event.target.result;
+//       imgElement.onload = () => {
+//         const img = new fabric.Image(imgElement);
+//         img.scale(0.5);
+//         img.set({ left: 100, top: 100, selectable: true, crossOrigin: "anonymous" });
+        
+//         // 🛡️ ഈ ചിത്രം മാസ്കിനുള്ളിൽ മാത്രം കാണാൻ സെറ്റ് ചെയ്യുന്നു (Clipping Logic)
+//         img.set("globalCompositeOperation", "source-atop");
+
+//         canvas.add(img);
+//         canvas.centerObject(img);
+//         canvas.setActiveObject(img);
+//         setActiveImage(img);
+//         setActiveTab("image");
+//         canvas.renderAll();
+//       };
+//     };
+//     reader.readAsDataURL(file);
+//   };
+
+//   // Layer Management
+//   const moveLayer = (direction) => {
+//     const canvas = fabricCanvasRef.current;
+//     const active = canvas?.getActiveObject();
+//     if (!active) return;
+//     if (direction === "forward") canvas.bringObjectForward(active);
+//     else if (direction === "backward") canvas.sendObjectBackwards(active);
+//     canvas.renderAll();
+//     updateObjectList();
+//   };
+
+//   // Save Design & Add to Cart
+//   const saveAndProceed = () => {
+//     const token = localStorage.getItem("token");
+//     if (!token) {
+//       setError("⚠️ Please login to add items to cart. Your design is saved!");
+//       setTimeout(() => navigate("/login", { state: { redirectTo: `/customize`, baseProduct } }), 2000);
+//       return;
+//     }
+//     const canvas = fabricCanvasRef.current;
+//     if (!canvas) return;
+
+//     // Generate high-quality preview (clipping works here)
+//     const designDataUrl = canvas.toDataURL({
+//       format: "png",
+//       quality: 1,
+//       multiplier: 2,
+//     });
+
+//     const cartItem = {
+//       productId: baseProduct._id,
+//       name: baseProduct.name,
+//       price: totalPrice,
+//       customDesignUrl: designDataUrl,
+//       quantity: 1,
+//     };
+
+//     dispatch(addToCart(cartItem));
+//     alert("Added to cart!");
+//     navigate("/shop");
+//   };
+
+//   return (
+//     <div className="customize-page studio-theme">
+//       <Helmet>
+//         <title>{`Design Your ${baseProduct?.name || "Product"} | Agneya Studio`}</title>
+//       </Helmet>
+
+//       {/* Header */}
+//       <div className="studio-header">
+//         <button className="back-btn" onClick={() => navigate("/shop")}>
+//           <i className="bi bi-arrow-left"></i> Back
+//         </button>
+//         <h1 className="studio-title">
+//           Agneya <span>Design Studio</span>
+//         </h1>
+//         <div className="price-display">
+//           Total: <span>₹{totalPrice.toFixed(2)}</span>
+//         </div>
+//       </div>
+
+//       {error && <p className="error-banner">{error}</p>}
+
+//       {/* Main Studio Layout */}
+//       <div className="studio-main-container">
+//         {/* Left Panel: Layers and Templates */}
+//         <aside className="studio-side-panel left-panel">
+//           <div className="panel-header">
+//             <button className={activeTab === 'templates' ? 'active' : ''} onClick={() => setActiveTab('templates')}>Templates</button>
+//             <button className={activeTab === 'layers' ? 'active' : ''} onClick={() => setActiveTab('layers')}>Layers</button>
+//           </div>
+          
+//           <div className="panel-content">
+//             {activeTab === 'templates' && (
+//               <div className="template-grid">
+//                 {Object.keys(templates).map(key => (
+//                   <div key={key} className="template-item" onClick={() => loadTemplate(key)}>
+//                     <div className="template-icon">{templates[key].name[0]}</div>
+//                     <span>{templates[key].name}</span>
+//                   </div>
+//                 ))}
+//               </div>
+//             )}
+            
+//             {activeTab === 'layers' && (
+//               <div className="layer-list">
+//                 {canvasObjects.map((obj, idx) => (
+//                   <div key={idx} className="layer-item" onClick={() => {
+//                     fabricCanvasRef.current.setActiveObject(obj);
+//                     fabricCanvasRef.current.renderAll();
+//                   }}>
+//                     <i className={obj.type === 'i-text' ? 'bi bi-type' : 'bi bi-image'}></i>
+//                     <span className="layer-name">{obj.type} {idx + 1}</span>
+//                     <div className="layer-actions">
+//                       <button onClick={(e) => { e.stopPropagation(); moveLayer("forward"); }}><i className="bi bi-arrow-up-short"></i></button>
+//                       <button onClick={(e) => { e.stopPropagation(); fabricCanvasRef.current.remove(obj); }}><i className="bi bi-trash"></i></button>
+//                     </div>
+//                   </div>
+//                 ))}
+//               </div>
+//             )}
+//           </div>
+//         </aside>
+
+//         {/* Center Panel: Canvas */}
+//         <main className="studio-center-panel">
+//           <div className="canvas-wrapper">
+//             <canvas ref={canvasRef} />
+//           </div>
+//         </main>
+
+//         {/* Right Panel: Tools (Text or Image) */}
+//         <aside className="studio-side-panel right-panel">
+//           <div className="panel-header">
+//             <span>Editor Tools</span>
+//           </div>
+          
+//           <div className="panel-content">
+//             <div className="tool-section add-elements">
+//               <label>Add to Design</label>
+//               <div className="tool-grid">
+//                 <button onClick={addText}><i className="bi bi-plus-square"></i> Text</button>
+//                 <label className="upload-label">
+//                   <i className="bi bi-upload"></i> Image
+//                   <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
+//                 </label>
+//               </div>
+//             </div>
+
+//             {/* History and Save actions */}
+//             <div className="tool-section history-actions">
+//               <div className="tool-grid">
+//                 <button onClick={undo} disabled={history.length <= 1}><i className="bi bi-arrow-counterclockwise"></i> Undo</button>
+//                 <button onClick={redo} disabled={!redoStack.length}><i className="bi bi-arrow-clockwise"></i> Redo</button>
+//               </div>
+//               <button onClick={saveAndProceed} className="primary-btn finish-btn">
+//                 Add to Cart
+//               </button>
+//             </div>
+//           </div>
+//         </aside>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default ProductCustomize;
 
 
 
