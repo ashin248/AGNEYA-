@@ -338,6 +338,7 @@ const OrderManagement = () => {
                 <th>Customer</th>
                 <th>Product</th>
                 <th>Amount</th>
+                <th>Payment</th>
                 <th>Status</th>
                 <th>Download</th>
                 <th>Action</th>
@@ -363,6 +364,11 @@ const OrderManagement = () => {
                     </td>
                     <td>{o.productId?.name || "Ready Product"}</td>
                     <td className="price-cell">₹{(o.amount || 0).toLocaleString()}</td>
+                    <td>
+                      <span className={`status-badge ${o.paymentStatus?.toLowerCase() || "pending"}`}>
+                        {o.paymentStatus || "Pending"}
+                      </span>
+                    </td>
                     <td>
                       <span className={`status-badge ${o.status || "pending"}`}>
                         {o.status || "pending"}
@@ -442,6 +448,7 @@ const OrderManagement = () => {
                 <th>ID</th>
                 <th>Customer</th>
                 <th>Amount</th>
+                <th>Payment</th>
                 <th>Design Preview</th>
                 <th>Final Design</th>
                 <th>Invoice</th>
@@ -468,6 +475,11 @@ const OrderManagement = () => {
                       </div>
                     </td>
                     <td className="price-cell">₹{(o.amount || 0).toLocaleString()}</td>
+                    <td>
+                      <span className={`status-badge ${o.paymentStatus?.toLowerCase() || "pending"}`}>
+                        {o.paymentStatus || "Pending"}
+                      </span>
+                    </td>
                     <td>
                       {o.designImage ? (
                         <div className="preview-box">

@@ -144,9 +144,13 @@ exports.getMyOrders = async (req, res) => {
 // 4. Admin: Get All "Ready Product" Orders (Filter out custom)
 exports.getAllOrders = async (req, res) => {
   try {
-    // Orders where NO item has a custom design
+    // Orders where NO item has a valid custom design (null, "", or missing)
     const orders = await Order.find({
-      "items.customDesignUrl": { $exists: false }
+      $or: [
+        { "items.customDesignUrl": { $exists: false } },
+        { "items.customDesignUrl": null },
+        { "items.customDesignUrl": "" }
+      ]
     })
       .populate('userId', 'email fullName mobile')
       .populate('items.productId', 'name imageUrl')
@@ -161,12 +165,12 @@ exports.getAllOrders = async (req, res) => {
 // 6. Admin: Get All Custom Orders
 exports.getCustomOrders = async (req, res) => {
   try {
-    // Orders where at least one item HAS a custom design
+    // Orders where at least one item HAS a valid custom design string
     const customOrders = await Order.find({
-      "items.customDesignUrl": { $exists: true, $ne: null }
+      "items.customDesignUrl": { $exists: true, $ne: null, $gt: "" }
     })
       .populate('userId', 'email fullName mobile')
-      .populate('items.productId', 'name imageUrl') // this might be a CustomBase
+      .populate('items.productId', 'name imageUrl') 
       .sort({ createdAt: -1 });
 
     res.json({ success: true, customOrders });
