@@ -53,6 +53,10 @@ function ProductCustomize() {
   const [activeTab, setActiveTab] = useState("text");
   const [canvasObjects, setCanvasObjects] = useState([]);
   const [activeImage, setActiveImage] = useState(null);
+  const [activeSideIndex, setActiveSideIndex] = useState(0);
+  const [sidesData, setSidesData] = useState({});
+  const [showSafetyArea, setShowSafetyArea] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Redirect if no product
   useEffect(() => {
