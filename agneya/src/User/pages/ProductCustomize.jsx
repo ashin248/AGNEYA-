@@ -35,7 +35,11 @@ function ProductCustomize() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const baseProduct = state?.baseProduct;
+  const [baseProduct, setBaseProduct] = useState(() => {
+    if (state?.baseProduct) return state.baseProduct;
+    const saved = localStorage.getItem("current_product");
+    return saved ? JSON.parse(saved) : null;
+  });
 
   const canvasRef = useRef(null);
   const fabricCanvasRef = useRef(null);
@@ -60,7 +64,9 @@ function ProductCustomize() {
 
   // Redirect if no product
   useEffect(() => {
-    if (!baseProduct?._id) navigate("/shop");
+    if (baseProduct?._id) {
+      localStorage.setItem("current_product", JSON.stringify(baseProduct));
+    }
 
     // Load Google Fonts
     const link = document.createElement("link");
@@ -496,6 +502,19 @@ function ProductCustomize() {
       } 
     });
   };
+
+  if (!baseProduct) {
+    return (
+      <div className="customize-page studio-theme error-state">
+        <div className="error-content">
+          <i className="bi bi-exclamation-triangle"></i>
+          <h2>Product Not Found</h2>
+          <p>We couldn't find the product you were customizing. Please select a product from the shop.</p>
+          <button className="back-shop-btn" onClick={() => navigate("/shop")}>Back to Shop</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="customize-page studio-theme">
