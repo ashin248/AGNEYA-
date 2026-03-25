@@ -71,6 +71,7 @@ const menuItems = [
   { id: "orders", label: "Orders", path: "/admin/orders", icon: <i className="bi bi-box-seam"></i> },
   { id: "ready-upload", label: "Ready Products", path: "/admin/ready-upload", icon: <i className="bi bi-bag-plus"></i> },
   { id: "custom-base", label: "Custom Bases", path: "/admin/custom-base", icon: <i className="bi bi-pencil-square"></i> },
+  { id: "manage-products", label: "Manage Products", path: "/admin/manage-products", icon: <i className="bi bi-collection"></i> },
   { id: "analytics", label: "Analytics", path: "/admin/analytics", icon: <i className="bi bi-graph-up-arrow"></i> },
 ];
   const handleLogout = () => {
