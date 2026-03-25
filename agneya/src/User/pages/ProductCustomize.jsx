@@ -72,7 +72,7 @@ function ProductCustomize() {
 
   // Initialize Canvas
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || !baseProduct) return;
 
     const canvas = new fabric.Canvas(canvasRef.current, {
       width: 700,
@@ -109,7 +109,7 @@ function ProductCustomize() {
 
   const loadSide = (index) => {
     const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !baseProduct) return;
 
     setIsSaving(true);
     canvas.clear();
@@ -191,7 +191,7 @@ function ProductCustomize() {
 
   const switchSide = (newIndex) => {
     const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !baseProduct) return;
 
     // Save current side
     const json = canvas.toJSON(["name", "selectable", "evented", "filters", "crossOrigin"]);
@@ -429,8 +429,8 @@ function ProductCustomize() {
 
     dispatch(
       addToCart({
-        productId: baseProduct._id,
-        name: baseProduct.name,
+        productId: baseProduct?._id,
+        name: baseProduct?.name,
         price: totalPrice,
         customDesignUrl: designDataUrl,
         allSides: finalSides,
@@ -549,7 +549,7 @@ function ProductCustomize() {
             
             {/* Side Switcher Controls */}
             <div className="side-switcher">
-              {(baseProduct.images && baseProduct.images.length > 0 ? baseProduct.images : [baseProduct.imageUrl]).map((img, idx) => (
+              {(baseProduct?.images?.length > 0 ? baseProduct.images : (baseProduct?.imageUrl ? [baseProduct.imageUrl] : [])).map((img, idx) => (
                 <div 
                   key={idx} 
                   className={`side-thumb ${activeSideIndex === idx ? 'active' : ''}`}
