@@ -15,6 +15,7 @@ import ProductCustomize from "./User/pages/ProductCustomize";
 import Purchase from "./User/pages/Purchase";
 import OnlinePayment from "./User/pages/OnlinePayment";
 import MyOrders from "./User/pages/MyOrders";
+import Cart from "./User/pages/Cart";
 
 // Pages - User Components
 import About from "./User/components/About";
@@ -57,6 +58,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/cart" element={<Cart />} />
 
           <Route path="/customize" element={<ProductCustomize />} />
 

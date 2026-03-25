@@ -16,8 +16,9 @@
   font-weight: 800;
   margin-bottom: 30px;
   text-align: center;
-  background: linear-gradient(135deg, #fff 0%, #b388ff 100%);
+  background: linear-gradient(135deg, #b388ff 0%, #ff4081 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -53,7 +54,60 @@
   color: #b388ff;
 }
 
-/* --- Form Heading --- */
+/* Checkout Products List */
+.checkout-products-list {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.product-preview-mini {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.product-preview-mini:last-of-type {
+  border-bottom: none;
+}
+
+.product-preview-mini img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  background: white;
+  border-radius: 8px;
+}
+
+.mini-details h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.mini-details p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.checkout-total-row {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-top: 2px solid #ddd;
+}
+
+.total-price {
+  color: #9c51b6;
+}
+
+/* Shipping */
 .purchase-container h3 {
   font-size: 1.1rem;
   margin-bottom: 20px;

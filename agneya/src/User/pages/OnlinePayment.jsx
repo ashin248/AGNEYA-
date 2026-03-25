@@ -38,6 +38,7 @@ function OnlinePayment() {
     setOrder({
       _id: state.orderId,
       amount: Number(state.amount),
+      cartItems: state.cartItems || [],
       product: state.product || {},
       customDesignUrl: state.customDesignUrl || null,
     });
@@ -190,18 +191,34 @@ function OnlinePayment() {
           <>
             {/* Order Summary */}
             <div className="order-summary">
-              {(order.product?.imageUrl || order.customDesignUrl) && (
-                <img
-                  src={order.customDesignUrl || order.product?.imageUrl}
-                  alt={order.product?.name || "Custom Product"}
-                  className="product-preview"
-                  onError={(e) => (e.target.src = "/placeholder-product.jpg")}
-                />
+              {order.cartItems && order.cartItems.length > 0 ? (
+                <div className="payment-products-list">
+                  {order.cartItems.map((item, idx) => (
+                    <div key={idx} className="payment-product-item">
+                      <img src={item.customDesignUrl || item.imageUrl} alt={item.name} />
+                      <div className="item-txt">
+                        <span className="name">{item.name}</span>
+                        <span className="qty">x{item.quantity}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                (order.product?.imageUrl || order.customDesignUrl) && (
+                  <img
+                    src={order.customDesignUrl || order.product?.imageUrl}
+                    alt={order.product?.name || "Custom Product"}
+                    className="product-preview"
+                    onError={(e) => (e.target.src = "/placeholder-product.jpg")}
+                  />
+                )
               )}
               <div className="summary-details">
-                <h3>{order.product?.name || "Custom Product"}</h3>
+                {(!order.cartItems || order.cartItems.length === 0) && (
+                  <h3>{order.product?.name || "Custom Product"}</h3>
+                )}
                 <p className="amount">
-                  Total Amount: <strong>₹{order.amount?.toFixed(2)}</strong>
+                  Total Amount: <strong>₹{order.amount?.toLocaleString("en-IN")}</strong>
                 </p>
                 <p className="order-id">Order Reference #{order._id?.slice(-8)}</p>
               </div>

@@ -9,8 +9,17 @@ const Purchase = () => {
   const navigate = useNavigate();
 
   const product = state?.product || null;
-  const customDesignUrl = state?.customDesignUrl || "";
-  const isCustom = !!customDesignUrl;
+  const cartItems = state?.cartItems || (product ? [{
+    productId: product._id,
+    name: product.name,
+    price: product.price || product.basePrice || 0,
+    quantity: 1,
+    imageUrl: product.imageUrl,
+    customDesignUrl: state?.customDesignUrl || null
+  }] : []);
+  
+  const totalAmount = state?.total || cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const isCustom = cartItems.some(i => !!i.customDesignUrl);
 
   const [address, setAddress] = useState({
     fullName: "",
@@ -59,8 +68,12 @@ const Purchase = () => {
       pincode: user.address?.pincode || "",
       country: "India",
     });
-  }, [navigate, product]);
+  }, [navigate]); // Removed product dependency
 
+  if (cartItems.length === 0) {
+    navigate("/shop");
+    return null;
+  }
   // ✅ FIXED input handler
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -122,16 +135,14 @@ const Purchase = () => {
     setLoading(true);
     try {
       const payload = {
-        cartItems: [
-          {
-            productId: product._id,
-            name: product.name,
-            price: product.price || product.basePrice || 0,
-            quantity: 1,
-            customDesignUrl: customDesignUrl || null,
-          },
-        ],
-        amount: product.price || product.basePrice || 0,
+        cartItems: cartItems.map(item => ({
+          productId: item.productId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          customDesignUrl: item.customDesignUrl || null,
+        })),
+        amount: totalAmount,
         address,
       };
 
@@ -148,8 +159,8 @@ const Purchase = () => {
             razorpayOrderId: res.data.razorpayOrderId,
             amount: Number(res.data.order.amount),
             razorpayAmount: res.data.razorpayAmount,
-            product,
-            customDesignUrl: customDesignUrl || null,
+            cartItems,
+            totalAmount,
           },
         });
       } else {
@@ -171,17 +182,23 @@ const Purchase = () => {
     <div className="purchase-container">
       <h1>Checkout</h1>
 
-      {/* Product */}
-      <div className="product-preview">
-        <img
-          src={isCustom ? customDesignUrl : product.imageUrl}
-          alt={product.name}
-        />
-        <div>
-          <h2>{product.name}</h2>
-          <p className="price">
-            ₹{(product.price || product.basePrice || 0).toLocaleString("en-IN")}
-          </p>
+      {/* Products Preview */}
+      <div className="checkout-products-list">
+        {cartItems.map((item, idx) => (
+          <div key={idx} className="product-preview-mini">
+            <img
+              src={item.customDesignUrl || item.imageUrl}
+              alt={item.name}
+            />
+            <div className="mini-details">
+              <h4>{item.name}</h4>
+              <p>₹{item.price.toLocaleString("en-IN")} x {item.quantity}</p>
+            </div>
+          </div>
+        ))}
+        <div className="checkout-total-row">
+          <span>Total Payable:</span>
+          <span className="total-price">₹{totalAmount.toLocaleString("en-IN")}</span>
         </div>
       </div>
 

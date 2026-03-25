@@ -26,22 +26,46 @@
   font-size: 2rem;
   font-weight: 800;
   margin-bottom: 30px;
-  background: linear-gradient(135deg, #fff 0%, #b388ff 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #9c51b6 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 /* --- Order Summary Card --- */
 .order-summary {
   display: flex;
+  gap: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
   align-items: center;
-  gap: 20px;
-  background: rgba(255, 255, 255, 0.04);
-  padding: 20px;
-  border-radius: 20px;
-  margin-bottom: 30px;
-  text-align: left;
+  margin-bottom: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.payment-products-list {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.payment-product-item {
+  position: relative;
+  flex: 0 0 60px;
+}
+
+.payment-product-item img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: white;
+}
+
+.payment-product-item .item-txt {
+  display: none; /* simple icon view */
 }
 
 .product-preview {
