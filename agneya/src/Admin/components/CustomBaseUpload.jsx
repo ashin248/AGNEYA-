@@ -11,7 +11,7 @@ export default function CustomBaseUpload() {
     stock: "",
   });
 
-  const [imageFile, setImageFile] = useState(null);
+  const [baseImages, setBaseImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
@@ -20,14 +20,19 @@ export default function CustomBaseUpload() {
   };
 
   const handleFileChange = (e) => {
-    setImageFile(e.target.files[0]);
+    const files = Array.from(e.target.files);
+    if (files.length > 10) {
+      setMessage({ type: "error", text: "You can upload a maximum of 10 images" });
+      return;
+    }
+    setBaseImages(files);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!imageFile) {
-      setMessage({ type: "error", text: "Please select an image" });
+    if (baseImages.length === 0) {
+      setMessage({ type: "error", text: "Please select at least one image" });
       return;
     }
 
@@ -51,13 +56,16 @@ export default function CustomBaseUpload() {
     data.append("basePrice", formData.basePrice);
     data.append("description", formData.description.trim() || "");
     data.append("stock", formData.stock || 50);
-    data.append("image", imageFile);
+    
+    // Append multiple images to 'images' field
+    baseImages.forEach((file) => {
+      data.append("images", file);
+    });
 
     try {
       const res = await API.post("/api/products/custom-base", data, {
         headers: {
           Authorization: `Bearer ${adminToken}`,
-          // "Content-Type": "multipart/form-data"  → API instance handles this automatically for FormData
         },
       });
 
@@ -74,7 +82,7 @@ export default function CustomBaseUpload() {
           description: "",
           stock: "",
         });
-        setImageFile(null);
+        setBaseImages([]);
       } else {
         setMessage({
           type: "error",
@@ -130,14 +138,18 @@ export default function CustomBaseUpload() {
         </div>
 
         <div className="form-group">
-          <label>Product Image *</label>
+          <label>Product Images (Max 10) *</label>
           <input
             type="file"
             accept="image/*"
             onChange={handleFileChange}
+            multiple
             required
             disabled={loading}
           />
+          {baseImages.length > 0 && (
+            <p className="selected-count">{baseImages.length} images selected</p>
+          )}
         </div>
 
         <div className="form-group">

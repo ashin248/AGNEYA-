@@ -14,7 +14,7 @@ export default function ReadyProductUpload() {
     stock: "",
   });
 
-  const [singleImage, setSingleImage] = useState(null);
+  const [productImages, setProductImages] = useState([]);
   const [csvFile, setCsvFile] = useState(null);
   const [zipImages, setZipImages] = useState(null);
   const [uploadType, setUploadType] = useState("single"); // "single" or "bulk"
@@ -28,7 +28,14 @@ export default function ReadyProductUpload() {
     setSingleForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSingleImage = (e) => setSingleImage(e.target.files[0]);
+  const handleSingleImage = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 10) {
+      setMessage({ type: "error", text: "You can upload a maximum of 10 images" });
+      return;
+    }
+    setProductImages(files);
+  };
 
   const handleBulkCsv = (e) => setCsvFile(e.target.files[0]);
   const handleBulkZip = (e) => setZipImages(e.target.files[0]);
@@ -36,8 +43,8 @@ export default function ReadyProductUpload() {
   const uploadSingleProduct = async (e) => {
     e.preventDefault();
 
-    if (!singleImage) {
-      setMessage({ type: "error", text: "Please select a product image" });
+    if (productImages.length === 0) {
+      setMessage({ type: "error", text: "Please select at least one product image" });
       return;
     }
 
@@ -58,7 +65,11 @@ export default function ReadyProductUpload() {
     Object.keys(singleForm).forEach((key) => {
       if (singleForm[key]) formData.append(key, singleForm[key]);
     });
-    formData.append("image", singleImage);
+    
+    // Append multiple images to the 'images' field
+    productImages.forEach((file) => {
+      formData.append("images", file);
+    });
 
     try {
       const res = await API.post("/api/products/ready", formData, {
@@ -83,7 +94,7 @@ export default function ReadyProductUpload() {
           description: "",
           stock: "",
         });
-        setSingleImage(null);
+        setProductImages([]);
       } else {
         setMessage({
           type: "error",
@@ -271,14 +282,18 @@ export default function ReadyProductUpload() {
           </div>
 
           <div className="form-group">
-            <label>Product Image *</label>
+            <label>Product Images (Max 10) *</label>
             <input
               type="file"
               accept="image/*"
               onChange={handleSingleImage}
+              multiple
               required
               disabled={loading}
             />
+            {productImages.length > 0 && (
+              <p className="selected-count">{productImages.length} images selected</p>
+            )}
           </div>
 
           <button type="submit" disabled={loading} className="upload-btn">

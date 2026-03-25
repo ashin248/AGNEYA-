@@ -288,6 +288,32 @@ function ProductCustomize() {
     navigate("/shop");
   };
 
+  const handleBuyNow = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Please login to proceed with Buy Now!");
+      // Save redirect state so user returns to customize page after login or goes to purchase?
+      // Better to go to login and then naturally we can't easily resume the canvas state without complexity.
+      // But we can store the design in localStorage momentarily.
+      setTimeout(() => navigate("/login"), 1500);
+      return;
+    }
+
+    const canvas = fabricCanvasRef.current;
+    const designDataUrl = canvas.toDataURL({ format: "png", multiplier: 2 });
+
+    // Navigate directly to purchase page
+    navigate("/purchase", { 
+      state: { 
+        product: {
+          ...baseProduct,
+          price: totalPrice // Use the calculated total price with customization
+        },
+        customDesignUrl: designDataUrl 
+      } 
+    });
+  };
+
   return (
     <div className="customize-page studio-theme">
       <Helmet>
@@ -373,7 +399,14 @@ function ProductCustomize() {
             <button onClick={redo} disabled={!redoStack.length}>Redo</button>
           </div>
 
-          <button className="finish-btn" onClick={handleAddToCart}>Add to Cart</button>
+          <div className="action-buttons">
+            <button className="finish-btn add-cart" onClick={handleAddToCart}>
+              <i className="bi bi-cart-plus"></i> Add to Cart
+            </button>
+            <button className="finish-btn buy-now" onClick={handleBuyNow}>
+              <i className="bi bi-lightning-fill"></i> Buy Now
+            </button>
+          </div>
         </aside>
       </div>
     </div>

@@ -8,6 +8,61 @@ import ProductReviews from "../components/ProductReviews";
 import API, { getImageUrl } from "../../shared/utils/api";
 import "../style/OnlineShopping.css";
 
+const ProductImageGallery = ({ images, name, getImageUrl }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  if (!images || images.length === 0) {
+    return <img className="product-img" src="/placeholder-product.jpg" alt={name} />;
+  }
+
+  return (
+    <div className="product-card-gallery">
+      <img
+        className="product-img"
+        src={getImageUrl(images[currentIndex])}
+        alt={`${name} - View ${currentIndex + 1}`}
+        onError={(e) => (e.target.src = "/placeholder-product.jpg")}
+      />
+      {images.length > 1 && (
+        <div className="gallery-dots">
+          {images.map((_, idx) => (
+            <span
+              key={idx}
+              className={`gallery-dot ${idx === currentIndex ? "active" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentIndex(idx);
+              }}
+            ></span>
+          ))}
+        </div>
+      )}
+      {images.length > 1 && (
+        <div className="gallery-nav">
+          <button 
+            className="nav-btn prev" 
+            onClick={(e) => {
+              e.stopPropagation();
+              setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+            }}
+          >
+            <i className="bi bi-chevron-left"></i>
+          </button>
+          <button 
+            className="nav-btn next" 
+            onClick={(e) => {
+              e.stopPropagation();
+              setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+            }}
+          >
+            <i className="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 function OnlineShopping() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -318,11 +373,10 @@ function OnlineShopping() {
                 filteredReadyProducts.map(p => (
                   <motion.div key={p._id} className="product-card" variants={gravityScrollVariant}>
                     <div className="product-img-wrapper">
-                      <img
-                        className="product-img"
-                        src={getImageUrl(p.imageUrl)}
-                        alt={p.name}
-                        onError={e => e.target.src = "/placeholder-product.jpg"}
+                      <ProductImageGallery 
+                        images={p.imageUrls && p.imageUrls.length > 0 ? p.imageUrls : [p.imageUrl]} 
+                        name={p.name} 
+                        getImageUrl={getImageUrl} 
                       />
                     </div>
                     <div className="product-info">
@@ -358,11 +412,10 @@ function OnlineShopping() {
                 filteredCustomBases.map(p => (
                   <motion.div key={p._id} className="product-card" variants={gravityScrollVariant}>
                     <div className="product-img-wrapper">
-                      <img
-                        className="product-img"
-                        src={getImageUrl(p.imageUrl)}
-                        alt={p.name}
-                        onError={e => e.target.src = "/placeholder-product.jpg"}
+                      <ProductImageGallery 
+                        images={p.imageUrls && p.imageUrls.length > 0 ? p.imageUrls : [p.imageUrl]} 
+                        name={p.name} 
+                        getImageUrl={getImageUrl} 
                       />
                     </div>
                     <div className="product-info">

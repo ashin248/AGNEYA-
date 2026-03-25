@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({
+const uploadArray = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB safe
   fileFilter: (req, file, cb) => {
@@ -27,37 +27,38 @@ const upload = multer({
     if (extname && mimetype) return cb(null, true);
     cb(new Error('Only images allowed'));
   },
-}).single('image');
+}).array('images', 10);
 
 exports.uploadCustomBase = (req, res) => {
-  upload(req, res, async (err) => {
+  uploadArray(req, res, async (err) => {
     if (err) {
       console.error('Upload error:', err);
       return res.status(400).json({ success: false, message: err.message });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: 'Image required' });
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, message: 'Images required' });
     }
 
     try {
       const { name, basePrice, description, stock } = req.body;
 
       if (!name || !basePrice) {
-        fs.unlinkSync(req.file.path);
+        req.files.forEach(file => fs.unlinkSync(file.path));
         return res.status(400).json({ success: false, message: 'Name and basePrice required' });
       }
 
-      // Build absolute URL so Vercel frontend can load from Render backend
+      // Build absolute URLs
       const backendUrl = process.env.BACKEND_URL || `http://localhost:6060`;
-      const imageUrl = `${backendUrl}/uploads/custom-bases/${req.file.filename}`;
+      const imageUrls = req.files.map(file => `${backendUrl}/uploads/custom-bases/${file.filename}`);
 
       const customBase = new CustomBase({
         name: name.trim(),
         basePrice: Number(basePrice),
         description: description?.trim() || '',
         stock: stock ? Number(stock) : 50,
-        imageUrl,
+        imageUrl: imageUrls[0], // Main thumbnail
+        imageUrls: imageUrls,
       });
 
       await customBase.save();
@@ -69,7 +70,7 @@ exports.uploadCustomBase = (req, res) => {
       });
     } catch (error) {
       console.error('Save error:', error.message);
-      if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
       res.status(500).json({ success: false, message: error.message });
     }
   });
@@ -83,14 +84,20 @@ exports.deleteCustomBase = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Custom base not found' });
     }
 
-    // Delete image file if it exists
-    if (customBase.imageUrl) {
-      const filename = customBase.imageUrl.split('/').pop();
-      const filePath = path.join(__dirname, '../uploads/custom-bases/', filename);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+    // Delete image files
+    const imagesToDelete = customBase.imageUrls && customBase.imageUrls.length > 0 
+      ? customBase.imageUrls 
+      : [customBase.imageUrl];
+
+    imagesToDelete.forEach(url => {
+      if (url) {
+        const filename = url.split('/').pop();
+        const filePath = path.join(__dirname, '../uploads/custom-bases/', filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
       }
-    }
+    });
 
     await CustomBase.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'Custom base deleted successfully' });

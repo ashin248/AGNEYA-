@@ -19,7 +19,7 @@ const singleStorage = multer.diskStorage({
   },
 });
 
-const uploadSingle = multer({
+const uploadArray = multer({
   storage: singleStorage,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
@@ -29,32 +29,32 @@ const uploadSingle = multer({
     if (extname && mimetype) return cb(null, true);
     cb(new Error('Only images (jpg, jpeg, png, webp) allowed'));
   },
-}).single('image');
+}).array('images', 10);
 
-// Single Ready Product
+// Single Ready Product (Supports Multiple Images)
 exports.uploadReadyProduct = (req, res) => {
-  uploadSingle(req, res, async (err) => {
+  uploadArray(req, res, async (err) => {
     if (err instanceof multer.MulterError) {
       return res.status(400).json({ success: false, message: err.message });
     } else if (err) {
       return res.status(400).json({ success: false, message: err.message });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: 'Image required' });
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, message: 'At least one image is required' });
     }
 
     try {
       const { name, price, originalPrice, discount, category, description, stock } = req.body;
 
       if (!name || !price) {
-        fs.unlinkSync(req.file.path);
+        req.files.forEach(file => fs.unlinkSync(file.path));
         return res.status(400).json({ success: false, message: 'Name and price required' });
       }
 
-      // Build absolute URL so Vercel frontend can load from Render backend
+      // Build absolute URLs
       const backendUrl = process.env.BACKEND_URL || `http://localhost:6060`;
-      const imageUrl = `${backendUrl}/uploads/products/${req.file.filename}`;
+      const imageUrls = req.files.map(file => `${backendUrl}/uploads/products/${file.filename}`);
 
       const product = new Product({
         name: name.trim(),
@@ -65,7 +65,8 @@ exports.uploadReadyProduct = (req, res) => {
         category,
         description: description?.trim(),
         stock: stock ? Number(stock) : 50,
-        imageUrl,
+        imageUrl: imageUrls[0], // Main thumbnail
+        imageUrls: imageUrls,
       });
 
       await product.save();
@@ -76,7 +77,7 @@ exports.uploadReadyProduct = (req, res) => {
         product,
       });
     } catch (error) {
-      if (req.file) fs.unlinkSync(req.file.path);
+      if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
       res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
   });
@@ -174,14 +175,20 @@ exports.deleteReadyProduct = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    // Delete image file if it exists
-    if (product.imageUrl) {
-      const filename = product.imageUrl.split('/').pop();
-      const filePath = path.join(__dirname, '../uploads/products/', filename);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+    // Delete image files
+    const imagesToDelete = product.imageUrls && product.imageUrls.length > 0 
+      ? product.imageUrls 
+      : [product.imageUrl];
+
+    imagesToDelete.forEach(url => {
+      if (url) {
+        const filename = url.split('/').pop();
+        const filePath = path.join(__dirname, '../uploads/products/', filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
       }
-    }
+    });
 
     await Product.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'Product deleted successfully' });

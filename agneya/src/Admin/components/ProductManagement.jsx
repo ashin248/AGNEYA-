@@ -137,17 +137,36 @@ const ProductManagement = () => {
                   overflow: "hidden"
                 }}
               >
-                <img 
-                  src={product.imageUrl} 
-                  alt={product.name} 
-                  style={{ 
-                    width: "100%", 
-                    height: "180px", 
-                    objectFit: "cover", 
-                    borderRadius: "10px",
-                    marginBottom: "12px"
-                  }} 
-                />
+                <div className="product-mgmt-img-container" style={{ position: "relative" }}>
+                  <img 
+                    src={product.imageUrl} 
+                    alt={product.name} 
+                    style={{ 
+                      width: "100%", 
+                      height: "180px", 
+                      objectFit: "cover", 
+                      borderRadius: "10px",
+                      marginBottom: "12px"
+                    }} 
+                  />
+                  {product.imageUrls && product.imageUrls.length > 1 && (
+                    <div style={{
+                      position: "absolute",
+                      top: "10px",
+                      right: "10px",
+                      background: "rgba(0,0,0,0.7)",
+                      color: "#fff",
+                      padding: "2px 8px",
+                      borderRadius: "6px",
+                      fontSize: "0.75rem",
+                      fontWeight: "bold",
+                      backdropFilter: "blur(4px)",
+                      border: "1px solid rgba(255,255,255,0.1)"
+                    }}>
+                      {product.imageUrls.length} Views
+                    </div>
+                  )}
+                </div>
                 <h4 style={{ color: "#fff", marginBottom: "5px" }}>{product.name}</h4>
                 <p style={{ color: "var(--primary-color)", fontWeight: "bold", fontSize: "1.1rem" }}>
                    ₹{activeTab === "ready" ? product.price : product.basePrice}
