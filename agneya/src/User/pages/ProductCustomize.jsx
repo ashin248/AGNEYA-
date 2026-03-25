@@ -1,74 +1,213 @@
-import React, { useEffect, useRef, useState } from "react";
+// src/user/pages/ProductCustomize.jsx
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/cartSlice";
-import * as fabric from "fabric"; 
+import * as fabric from "fabric";
 import { Helmet } from "react-helmet-async";
 import { getImageUrl } from "../../shared/utils/api";
 import "../style/ProductCustomize.css";
+
+const productMasks = {
+  tshirt: "/masks/tshirt_mask.png",
+  mug: "/masks/mug_mask.png",
+};
 
 function ProductCustomize() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const baseProduct = state?.baseProduct;
 
   const canvasRef = useRef(null);
   const fabricCanvasRef = useRef(null);
-  const [totalPrice, setTotalPrice] = useState(baseProduct?.price || baseProduct?.basePrice || 0);
-  const [canvasObjects, setCanvasObjects] = useState([]);
 
+  const [textSize, setTextSize] = useState(40);
+  const [textColor, setTextColor] = useState("#000000");
+  const [selectedFont, setSelectedFont] = useState("Arial");
+  const [history, setHistory] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
+  const [error, setError] = useState("");
+  const [totalPrice, setTotalPrice] = useState(baseProduct?.price || baseProduct?.basePrice || 0);
+  const [activeTab, setActiveTab] = useState("text");
+  const [canvasObjects, setCanvasObjects] = useState([]);
+  const [activeImage, setActiveImage] = useState(null);
+
+  // Redirect if no product
   useEffect(() => {
     if (!baseProduct?._id) navigate("/shop");
   }, [navigate, baseProduct]);
 
+  // Initialize Canvas
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    // Initialize Fabric Canvas
     const canvas = new fabric.Canvas(canvasRef.current, {
-      width: 500, 
-      height: 500,
+      width: 700,
+      height: 700,
       backgroundColor: "#ffffff",
       preserveObjectStacking: true,
     });
 
     fabricCanvasRef.current = canvas;
 
-    // Load Product Image as Background
-    const imgUrl = baseProduct?.imageUrl ? getImageUrl(baseProduct.imageUrl) : "/placeholder-product.jpg";
-    
-    fabric.Image.fromURL(imgUrl, (img) => {
-      const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-      canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
-        scaleX: scale,
-        scaleY: scale,
-        left: canvas.width / 2,
-        top: canvas.height / 2,
-        originX: "center",
-        originY: "center",
-        crossOrigin: "anonymous",
-      });
-    }, { crossOrigin: "anonymous" });
+    const loadStudio = () => {
+      const bgImgElement = new Image();
+      bgImgElement.crossOrigin = "anonymous";
+      bgImgElement.src = baseProduct?.imageUrl ? getImageUrl(baseProduct.imageUrl) : "/placeholder-product.jpg";
 
-    // Update object list for UI
-    canvas.on("after:render", () => {
-      setCanvasObjects([...canvas.getObjects()].reverse());
+      bgImgElement.onload = () => {
+        const fabricBgImg = new fabric.Image(bgImgElement);
+        const scale = Math.min(canvas.width / fabricBgImg.width, canvas.height / fabricBgImg.height);
+
+        // Background image (centered)
+        canvas.backgroundImage = fabricBgImg;
+        fabricBgImg.set({
+          scaleX: scale,
+          scaleY: scale,
+          left: (canvas.width - fabricBgImg.width * scale) / 2,
+          top: (canvas.height - fabricBgImg.height * scale) / 2,
+          selectable: false,
+        });
+        canvas.renderAll();
+
+        // Clipping Mask
+        const projectType = baseProduct?.category?.toLowerCase() || "tshirt";
+        const maskUrl = productMasks[projectType] || productMasks.tshirt;
+
+        if (maskUrl) {
+          const maskImgElement = new Image();
+          maskImgElement.crossOrigin = "anonymous";
+          maskImgElement.src = maskUrl;
+
+          maskImgElement.onload = () => {
+            const fabricMask = new fabric.Image(maskImgElement);
+            fabricMask.set({
+              scaleX: scale,
+              scaleY: scale,
+              left: (canvas.width - fabricBgImg.width * scale) / 2,
+              top: (canvas.height - fabricBgImg.height * scale) / 2,
+              selectable: false,
+              evented: false,
+              opacity: 0,
+              name: "clipping-mask",
+            });
+            canvas.add(fabricMask);
+            canvas.sendToBack(fabricMask);
+
+            // Set this mask as clipPath for all future added objects
+            canvas.clipPath = fabricMask;
+            canvas.renderAll();
+          };
+        }
+
+        saveState();
+      };
+    };
+
+    loadStudio();
+
+    const syncState = () => {
+      saveState();
+      updateObjectList();
+      updatePrice();
+    };
+
+    canvas.on("object:modified", syncState);
+    canvas.on("object:added", syncState);
+    canvas.on("object:removed", syncState);
+    canvas.on("selection:created", (e) => handleObjectSelection(e));
+    canvas.on("selection:updated", (e) => handleObjectSelection(e));
+    canvas.on("selection:cleared", () => {
+      setActiveImage(null);
+      updateObjectList();
     });
 
-    return () => canvas.dispose();
+    return () => {
+      canvas.dispose();
+      fabricCanvasRef.current = null;
+    };
   }, [baseProduct]);
 
-  const addText = () => {
-    const text = new fabric.IText("Double tap to edit", {
-      left: 100,
-      top: 100,
-      fontFamily: "Arial",
-      fontSize: 30,
-      fill: "#b388ff",
+  const handleObjectSelection = (e) => {
+    updateObjectList();
+    const selected = e.selected ? e.selected[0] : null;
+    if (selected && selected.type === "image" && selected.name !== "clipping-mask") {
+      setActiveImage(selected);
+      setActiveTab("image");
+    } else {
+      setActiveImage(null);
+    }
+  };
+
+  const updatePrice = useCallback(() => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+    const objs = canvas.getObjects().filter((o) => o.name !== "clipping-mask");
+    const textLayers = objs.filter((o) => o.type === "i-text").length;
+    const imageLayers = objs.filter((o) => o.type === "image").length;
+
+    const base = baseProduct?.price || baseProduct?.basePrice || 0;
+    setTotalPrice(base + textLayers * 30 + imageLayers * 50);
+  }, [baseProduct]);
+
+  const updateObjectList = useCallback(() => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+    setCanvasObjects([...canvas.getObjects()].filter((o) => o.name !== "clipping-mask").reverse());
+  }, []);
+
+  const saveState = useCallback(() => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+    try {
+      const json = canvas.toJSON(["name", "selectable", "evented", "filters", "crossOrigin"]);
+      setHistory((prev) => [...prev.slice(-29), JSON.stringify(json)]);
+      setRedoStack([]);
+    } catch (err) {
+      console.error("Save state error:", err);
+    }
+  }, []);
+
+  const undo = () => {
+    if (history.length <= 1) return;
+    const current = history.pop();
+    setRedoStack((prev) => [current, ...prev]);
+    const previous = history[history.length - 1];
+    fabricCanvasRef.current.loadFromJSON(previous, () => {
+      fabricCanvasRef.current.renderAll();
+      updateObjectList();
+      updatePrice();
     });
-    fabricCanvasRef.current.add(text);
-    fabricCanvasRef.current.setActiveObject(text);
+  };
+
+  const redo = () => {
+    if (!redoStack.length) return;
+    const next = redoStack.shift();
+    setHistory((prev) => [...prev, next]);
+    fabricCanvasRef.current.loadFromJSON(next, () => {
+      fabricCanvasRef.current.renderAll();
+      updateObjectList();
+      updatePrice();
+    });
+  };
+
+  const addText = () => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+    const text = new fabric.IText("Double click to edit", {
+      left: 180,
+      top: 180,
+      fontSize: textSize,
+      fill: textColor,
+      fontFamily: selectedFont,
+      cornerColor: "#b388ff",
+      cornerSize: 10,
+    });
+    canvas.add(text);
+    canvas.setActiveObject(text);
+    canvas.requestRenderAll();
   };
 
   const handleImageUpload = (e) => {
@@ -76,70 +215,165 @@ function ProductCustomize() {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (f) => {
-      fabric.Image.fromURL(f.target.result, (img) => {
-        img.scaleToWidth(150);
-        fabricCanvasRef.current.add(img);
-        fabricCanvasRef.current.centerObject(img);
-        fabricCanvasRef.current.setActiveObject(img);
-      });
+    reader.onload = (event) => {
+      const imgElement = new Image();
+      imgElement.src = event.target.result;
+      imgElement.onload = () => {
+        const img = new fabric.Image(imgElement);
+        img.scaleToWidth(200);
+        img.set({
+          left: 100,
+          top: 100,
+          crossOrigin: "anonymous",
+        });
+
+        const canvas = fabricCanvasRef.current;
+        canvas.add(img);
+        canvas.centerObject(img);
+        canvas.setActiveObject(img);
+        setActiveImage(img);
+        setActiveTab("image");
+        canvas.renderAll();
+      };
     };
     reader.readAsDataURL(file);
   };
 
-  const deleteObject = (obj) => {
-    fabricCanvasRef.current.remove(obj);
-    fabricCanvasRef.current.renderAll();
+  const applyFilter = (filterType) => {
+    if (!activeImage) return;
+    let filter;
+    if (filterType === "grayscale") filter = new fabric.Image.filters.Grayscale();
+    if (filterType === "sepia") filter = new fabric.Image.filters.Sepia();
+
+    if (filter) {
+      activeImage.filters = [filter]; // replace previous filters
+      activeImage.applyFilters();
+      fabricCanvasRef.current.renderAll();
+      saveState();
+    }
   };
 
-  const handleSave = () => {
-    const finalDesign = fabricCanvasRef.current.toDataURL({ format: "png", multiplier: 2 });
-    dispatch(addToCart({ ...baseProduct, customDesignUrl: finalDesign, price: totalPrice, quantity: 1 }));
-    alert("Added to Cart!");
+  const moveLayer = (direction) => {
+    const canvas = fabricCanvasRef.current;
+    const active = canvas?.getActiveObject();
+    if (!active) return;
+    if (direction === "up") canvas.bringObjectForward(active);
+    if (direction === "down") canvas.sendObjectBackwards(active);
+    canvas.renderAll();
+    updateObjectList();
+  };
+
+  const handleAddToCart = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Please login to add to cart!");
+      setTimeout(() => navigate("/login"), 1500);
+      return;
+    }
+
+    const canvas = fabricCanvasRef.current;
+    const designDataUrl = canvas.toDataURL({ format: "png", multiplier: 2 });
+
+    dispatch(
+      addToCart({
+        productId: baseProduct._id,
+        name: baseProduct.name,
+        price: totalPrice,
+        customDesignUrl: designDataUrl,
+        quantity: 1,
+      })
+    );
+
+    alert("Added to cart successfully!");
     navigate("/shop");
   };
 
   return (
     <div className="customize-page studio-theme">
-      <Helmet><title>Design Studio | Agneya</title></Helmet>
+      <Helmet>
+        <title>Design Your {baseProduct?.name} | Agneya Studio</title>
+      </Helmet>
 
       <div className="studio-header">
         <button className="back-btn" onClick={() => navigate("/shop")}>← Back</button>
-        <h1 className="studio-title">Agneya <span>Design Studio</span></h1>
+        <h1 className="studio-title">Agneya <span>Studio</span></h1>
         <div className="price-display">Total: <span>₹{totalPrice}</span></div>
       </div>
 
+      {error && <p className="error-banner">{error}</p>}
+
       <div className="studio-main-container">
+        {/* Left Panel - Layers */}
         <aside className="studio-side-panel left-panel">
-          <div className="panel-header"><span>Layers</span></div>
+          <div className="panel-header">
+            <button className={activeTab === "layers" ? "active" : ""} onClick={() => setActiveTab("layers")}>Layers</button>
+          </div>
           <div className="panel-content">
             {canvasObjects.map((obj, idx) => (
-              <div key={idx} className="layer-item">
-                <span>{obj.type === 'i-text' ? "Text" : "Image"}</span>
-                <button onClick={() => deleteObject(obj)} className="del-layer">Delete</button>
+              <div key={idx} className="layer-item" onClick={() => fabricCanvasRef.current.setActiveObject(obj)}>
+                <i className={obj.type === "i-text" ? "bi bi-type" : "bi bi-image"}></i>
+                <span className="layer-name">{obj.type} {idx + 1}</span>
+                <div className="layer-actions">
+                  <button onClick={(e) => { e.stopPropagation(); moveLayer("up"); }}><i className="bi bi-arrow-up-short"></i></button>
+                  <button onClick={(e) => { e.stopPropagation(); fabricCanvasRef.current.remove(obj); }}><i className="bi bi-trash"></i></button>
+                </div>
               </div>
             ))}
           </div>
         </aside>
 
+        {/* Center - Canvas */}
         <main className="studio-center-panel">
           <div className="canvas-wrapper">
             <canvas ref={canvasRef} />
           </div>
         </main>
 
+        {/* Right Panel - Tools */}
         <aside className="studio-side-panel right-panel">
           <div className="tool-section">
             <label>Add Elements</label>
             <div className="tool-grid">
-              <button onClick={addText} className="tool-btn">Add Text</button>
+              <button onClick={addText}>Add Text</button>
               <label className="tool-btn upload-label">
-                Upload Image
-                <input type="file" onChange={handleImageUpload} hidden />
+                Upload Image <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
               </label>
             </div>
           </div>
-          <button className="finish-btn" onClick={handleSave}>Add to Cart</button>
+
+          {/* Text Controls */}
+          <div className="tool-section">
+            <label>Text Properties</label>
+            <div>
+              <input type="range" min="10" max="100" value={textSize} onChange={(e) => setTextSize(+e.target.value)} />
+              <span>Size: {textSize}</span>
+            </div>
+            <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} />
+            <select value={selectedFont} onChange={(e) => setSelectedFont(e.target.value)}>
+              <option value="Arial">Arial</option>
+              <option value="Helvetica">Helvetica</option>
+              <option value="Times New Roman">Times New Roman</option>
+            </select>
+          </div>
+
+          {/* Image Filters */}
+          {activeImage && (
+            <div className="tool-section">
+              <label>Filters</label>
+              <div className="tool-grid">
+                <button onClick={() => applyFilter("grayscale")}>B&W</button>
+                <button onClick={() => applyFilter("sepia")}>Sepia</button>
+              </div>
+            </div>
+          )}
+
+          {/* History */}
+          <div className="history-section">
+            <button onClick={undo} disabled={history.length <= 1}>Undo</button>
+            <button onClick={redo} disabled={!redoStack.length}>Redo</button>
+          </div>
+
+          <button className="finish-btn" onClick={handleAddToCart}>Add to Cart</button>
         </aside>
       </div>
     </div>
@@ -147,8 +381,6 @@ function ProductCustomize() {
 }
 
 export default ProductCustomize;
-
-
 
 
 
