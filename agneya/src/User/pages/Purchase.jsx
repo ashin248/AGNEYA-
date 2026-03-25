@@ -19,6 +19,7 @@ const Purchase = () => {
     city: "",
     state: "",
     pincode: "",
+    postOffice: "",
     country: "India",
   });
 
@@ -79,10 +80,12 @@ const Purchase = () => {
           setAddress(prev => ({
             ...prev,
             city: postOffice.District,
-            state: postOffice.State
+            state: postOffice.State,
+            postOffice: postOffice.Name
           }));
         } else {
           setPincodeError("Invalid Pincode. Please check your entry.");
+          setAddress(prev => ({ ...prev, postOffice: "" }));
         }
       } catch (error) {
         console.error("Error fetching pincode:", error);
@@ -93,6 +96,9 @@ const Purchase = () => {
 
     if (address.pincode?.length === 6) {
       fetchPincodeDetails(address.pincode);
+    } else {
+      setAddress(prev => ({ ...prev, postOffice: "" }));
+      setPincodeError("");
     }
   }, [address.pincode]);
 
@@ -222,6 +228,11 @@ const Purchase = () => {
             placeholder="6-digit PIN"
             style={{marginBottom: "0"}}
           />
+          {address.postOffice && (
+            <p style={{fontSize: "0.85rem", color: "#9c51b6", fontWeight: "600", marginTop: "4px"}}>
+              📍 Post Office: {address.postOffice}
+            </p>
+          )}
           {pincodeError && <span style={{color: "red", fontSize: "0.8rem"}}>{pincodeError}</span>}
         </div>
       </div>
