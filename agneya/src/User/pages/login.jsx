@@ -116,7 +116,22 @@ const Login = () => {
           // Existing user → login success
           localStorage.setItem("token", res.data.token);
           localStorage.setItem("user", JSON.stringify(res.data.user));
-          navigate(location.state?.from || "/");
+          
+          // Smart redirect
+          const redirectData = localStorage.getItem("redirectAfterLogin");
+          let destination = "/";
+          let navState = null;
+
+          if (location.state?.from) {
+            destination = location.state.from;
+          } else if (redirectData) {
+            const parsed = JSON.parse(redirectData);
+            destination = parsed.path;
+            navState = parsed.state;
+            localStorage.removeItem("redirectAfterLogin");
+          }
+
+          navigate(destination, { state: navState, replace: true });
         }
       } else {
         setErrorMsg(res.data.message || "Invalid OTP");
@@ -161,7 +176,22 @@ const Login = () => {
       if (res.data.success) {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("user", JSON.stringify(res.data.user));
-        navigate(location.state?.from || "/");
+        
+        // Smart redirect
+        const redirectData = localStorage.getItem("redirectAfterLogin");
+        let destination = "/";
+        let navState = null;
+
+        if (location.state?.from) {
+          destination = location.state.from;
+        } else if (redirectData) {
+          const parsed = JSON.parse(redirectData);
+          destination = parsed.path;
+          navState = parsed.state;
+          localStorage.removeItem("redirectAfterLogin");
+        }
+
+        navigate(destination, { state: navState, replace: true });
       } else {
         setErrorMsg(res.data.message || "Profile completion failed");
       }
@@ -788,22 +818,6 @@ export default Login;
 //         const from = location.state?.from || "/shop";
 //         navigate(from, { replace: true });
 //       }
-//       // if (res.data.success) {
-//       //   localStorage.setItem("user", JSON.stringify(res.data.user));
-
-//       //   // Redirect to the page user originally tried to access (or default to shop)
-//       //   const from = location.state?.from || "/shop";
-//       //   navigate(from, { replace: true });
-//       // }
-//     } catch (err) {
-//       setErrorMsg(
-//         err.response?.data?.message || "Registration failed. Please try again."
-//       );
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
 //   return (
 //     <div className="login-page">
 //       <div className="login-card">

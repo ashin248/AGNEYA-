@@ -27,7 +27,13 @@ const Purchase = () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     if (!user) {
-      navigate("/login");
+      if (product) {
+        localStorage.setItem("redirectAfterLogin", JSON.stringify({ 
+          path: "/purchase", 
+          state: { product, customDesignUrl } 
+        }));
+      }
+      navigate("/login", { state: { from: "/purchase" } });
       return;
     }
 
