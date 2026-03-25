@@ -25,7 +25,7 @@ const uploadArray = multer({
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = filetypes.test(file.mimetype);
     if (extname && mimetype) return cb(null, true);
-    cb(new Error('Only images allowed'));
+    cb(new Error('Only images (jpg, jpeg, png, webp) allowed'));
   },
 }).array('images', 10);
 
