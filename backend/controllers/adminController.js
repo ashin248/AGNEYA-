@@ -21,7 +21,7 @@ const adminLogin = (req, res) => {
     // Also generate a JWT token (for JWT-based routes like product upload)
     const secret = process.env.JWT_SECRET || process.env.SESSION_SECRET || 'fallback_secret';
     const token = jwt.sign(
-      { isAdmin: true, role: 'admin', id: 'admin' },
+      { isAdmin: true, role: 'admin', id: '000000000000000000000000' },
       secret,
       { expiresIn: '7d' }
     );
