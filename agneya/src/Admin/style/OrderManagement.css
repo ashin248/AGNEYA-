@@ -1,7 +1,7 @@
 /* --- Global Admin Orders Layout --- */
 .admin-orders {
   padding: 40px;
-  background-color: #050505;
+  background: transparent;
   color: #fff;
   min-height: 100vh;
 }
@@ -12,6 +12,7 @@
   margin-bottom: 40px;
   background: linear-gradient(135deg, #fff 0%, #b388ff 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

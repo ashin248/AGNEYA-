@@ -5,6 +5,13 @@
   max-width: 1400px;
   margin: 0 auto;
   min-height: 100vh;
+  /* Dark background from Admin Login */
+  background-color: #050505;
+  background-image: 
+    linear-gradient(rgba(179, 136, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(179, 136, 255, 0.02) 1px, transparent 1px);
+  background-size: 30px 30px;
+  color: #fff;
 }
 
 .admin-header-info {
@@ -13,21 +20,26 @@
 
 .admin-header-info h1 {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 0.25rem;
+  color: #fff;
+  letter-spacing: 1px;
 }
 
 .admin-header-info p {
   font-size: 1rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* Tab Navigation */
 .admin-tabs {
   display: flex;
   gap: 1rem;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.05); /* Dark theme border */
   margin-bottom: 2rem;
-  overflow-x: auto; /* Allows scrolling on smaller screens */
+  overflow-x: auto;
   padding-bottom: 2px;
 }
 
@@ -35,35 +47,49 @@
   padding: 0.75rem 1.25rem;
   font-size: 1rem;
   font-weight: 500;
-  color: var(--text-dim);
+  color: rgba(255, 255, 255, 0.4);
   background: transparent;
   border: none;
   border-bottom: 3px solid transparent;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
-  margin-bottom: -2px; /* Pull down to overlap the container's border */
+  margin-bottom: -2px;
 }
 
 .tab-button:hover {
-  color: var(--primary-color);
-  background-color: rgba(106, 27, 154, 0.05); /* Very light grape */
+  color: #b388ff;
+  background-color: rgba(179, 136, 255, 0.05); 
   border-radius: 6px 6px 0 0;
 }
 
 .tab-button.active {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
+  color: #b388ff;
+  border-bottom-color: #b388ff;
   font-weight: 600;
 }
 
 /* Content Area */
 .admin-main-view {
-  background-color: var(--bg-white);
+  background: #0d0d0f; /* Dark theme card bg */
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 20px; /* Matching border radius */
+  border: 1px solid rgba(255, 255, 255, 0.05); /* Matching border */
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
   min-height: 400px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Neon glow line at top like AdminLogin */
+.admin-main-view::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #b388ff, transparent);
 }
 
 /* Responsive adjustments */

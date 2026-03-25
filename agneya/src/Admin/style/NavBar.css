@@ -8,12 +8,29 @@
   left: 0;
   height: 100vh;
   width: 280px;
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-  border-right: 1px solid rgba(124, 58, 237, 0.15);
+  background-color: #050505;
+  background-image: 
+    linear-gradient(rgba(179, 136, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(179, 136, 255, 0.02) 1px, transparent 1px);
+  background-size: 30px 30px;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 4px 0 25px rgba(0, 0, 0, 0.5);
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   overflow: hidden;
+  position: relative;
+}
+
+/* Neon glow line at top */
+.admin-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #b388ff, transparent);
+  z-index: 1001;
 }
 
 /* Collapsed state - only icons visible */
