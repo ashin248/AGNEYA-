@@ -42,11 +42,13 @@ const ProtectedRoute = ({ children }) => {
 
 import { HelmetProvider } from "react-helmet-async";
 import Profile from "./User/pages/Profile";
+import { AuthProvider } from "./shared/context/AuthContext";
 
 function App() {
   return (
     <HelmetProvider>
-      <Routes>
+      <AuthProvider>
+        <Routes>
         {/* USER ROUTES */}
         <Route element={<UserLayout />}>
           <Route path="/" element={<HomePage />} />
@@ -117,6 +119,7 @@ function App() {
           }
         />
       </Routes>
+      </AuthProvider>
     </HelmetProvider>
   );
 }

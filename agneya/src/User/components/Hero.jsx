@@ -2,11 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { gravityScrollVariant, staggeredGravityContainer } from "../../shared/animations/framerVariants";
+import { useAuth } from "../../shared/context/AuthContext";
 import "../style/Hero.css";
 
 function Hero() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     setIsLoaded(true);
@@ -86,15 +87,17 @@ function Hero() {
             </motion.button>
           </Link>
 
-          <Link to="/login">
-            <motion.button
-              className="primary-btn"
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Login
-            </motion.button>
-          </Link>
+          {!isAuthenticated && (
+            <Link to="/login">
+              <motion.button
+                className="primary-btn"
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Login
+              </motion.button>
+            </Link>
+          )}
 
           <motion.button
             className="secondary-btn"

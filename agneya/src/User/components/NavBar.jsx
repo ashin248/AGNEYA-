@@ -4,44 +4,14 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import { staggeredGravityContainer, gravityScrollVariant } from "../../shared/animations/framerVariants";
-import API from "../../shared/utils/api"; // your axios instance
+import { useAuth } from "../../shared/context/AuthContext";
 import "../style/NavBar.css";
 
 function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [loadingUser, setLoadingUser] = useState(true);
-
-  // Load user from backend session (express-session)
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const res = await API.get("/api/auth/me"); // gets current session user from backend
-        if (res.data.success && res.data.user) {
-          setUser(res.data.user);
-          // Optional: save to localStorage (for faster initial load)
-          localStorage.setItem("user", JSON.stringify(res.data.user));
-        } else {
-          setUser(null);
-          localStorage.removeItem("user");
-        }
-      } catch (err) {
-        console.error("Failed to fetch current user:", err);
-        setUser(null);
-        localStorage.removeItem("user");
-      } finally {
-        setLoadingUser(false);
-      }
-    };
-
-    fetchCurrentUser();
-
-    // Re-check when storage changes (multi-tab support)
-    window.addEventListener("storage", fetchCurrentUser);
-    return () => window.removeEventListener("storage", fetchCurrentUser);
-  }, []);
+  const { user, logout, loading } = useAuth();
 
   // Scroll effect
   useEffect(() => {
@@ -54,20 +24,8 @@ function NavBar() {
 
   const handleLogout = async () => {
     if (!window.confirm("Do you really want to logout?")) return;
-
-    try {
-      await API.post("/api/auth/logout"); // destroy backend session
-      setUser(null);
-      localStorage.removeItem("user");
-      navigate("/login");
-      setMenuOpen(false);
-    } catch (err) {
-      console.error("Logout failed:", err);
-      // Fallback: clear in frontend
-      setUser(null);
-      localStorage.removeItem("user");
-      navigate("/login");
-    }
+    await logout();
+    setMenuOpen(false);
   };
 
   const navLinks = [
@@ -77,7 +35,7 @@ function NavBar() {
   ];
 
   // Loading state (optional spinner or skeleton)
-  if (loadingUser) {
+  if (loading) {
     return (
       <nav className="user-navbar">
         <div className="user-nav-container">

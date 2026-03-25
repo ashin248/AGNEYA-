@@ -1,15 +1,21 @@
-
-// src/User/pages/login.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import API from "../../shared/utils/api";
+import { useAuth } from "../../shared/context/AuthContext";
 import "../style/login.css";
-
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, login: contextLogin } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !location.state?.from) {
+      navigate("/", { replace: true });
+    }
+  }, [user, navigate, location.state]);
 
   const [step, setStep] = useState(1); // 1: email → 2: OTP → 3: profile completion
   const [loading, setLoading] = useState(false);
@@ -114,8 +120,7 @@ const Login = () => {
           setStep(3);
         } else {
           // Existing user → login success
-          localStorage.setItem("token", res.data.token);
-          localStorage.setItem("user", JSON.stringify(res.data.user));
+          contextLogin(res.data.user, res.data.token);
           
           // Smart redirect
           const redirectData = localStorage.getItem("redirectAfterLogin");
@@ -174,8 +179,7 @@ const Login = () => {
       });
 
       if (res.data.success) {
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("user", JSON.stringify(res.data.user));
+        contextLogin(res.data.user, res.data.token);
         
         // Smart redirect
         const redirectData = localStorage.getItem("redirectAfterLogin");
