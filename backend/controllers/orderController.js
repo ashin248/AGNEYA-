@@ -141,10 +141,13 @@ exports.getMyOrders = async (req, res) => {
   }
 };
 
-// 4. Admin: Get All Orders
+// 4. Admin: Get All "Ready Product" Orders (Filter out custom)
 exports.getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find()
+    // Orders where NO item has a custom design
+    const orders = await Order.find({
+      "items.customDesignUrl": { $exists: false }
+    })
       .populate('userId', 'email fullName mobile')
       .populate('items.productId', 'name imageUrl')
       .sort({ createdAt: -1 });
@@ -155,17 +158,40 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
+// 6. Admin: Get All Custom Orders
+exports.getCustomOrders = async (req, res) => {
+  try {
+    // Orders where at least one item HAS a custom design
+    const customOrders = await Order.find({
+      "items.customDesignUrl": { $exists: true, $ne: null }
+    })
+      .populate('userId', 'email fullName mobile')
+      .populate('items.productId', 'name imageUrl') // this might be a CustomBase
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, customOrders });
+  } catch (err) {
+    console.error("Fetch Custom Orders Error:", err);
+    res.status(500).json({ success: false, message: 'Failed to fetch custom orders' });
+  }
+};
+
 // 5. Admin: Update Order Status
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const { orderStatus, paymentStatus } = req.body;
+    const { status, orderStatus, paymentStatus } = req.body;
 
     const updateData = { updatedAt: Date.now() };
-    if (orderStatus) {
-      updateData.orderStatus = orderStatus;
-      updateData.status = orderStatus; // sync legacy status
+    
+    // Support both 'status' and 'orderStatus' fields for consistency
+    const newStatus = status || orderStatus;
+    
+    if (newStatus) {
+      updateData.orderStatus = newStatus;
+      updateData.status = newStatus;
     }
+    
     if (paymentStatus) {
        updateData.paymentStatus = paymentStatus;
     }

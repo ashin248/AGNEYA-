@@ -18,5 +18,6 @@ router.get('/my-orders', protect, getMyOrders);
 // Admin only routes
 router.get('/all', protect, admin, getAllOrders);
 router.put('/update-status/:orderId', protect, admin, updateOrderStatus);
+router.put('/:orderId/status', protect, admin, updateOrderStatus); // Matches OrderManagement.jsx call
 
 module.exports = router;

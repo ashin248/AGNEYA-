@@ -8,7 +8,8 @@ const API = axios.create({
 
 // Automatically attach the JWT token from localStorage to every request
 API.interceptors.request.use((req) => {
-  const token = localStorage.getItem("token");
+  // Check for adminToken first, then regular token
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
   if (token) {
     req.headers.Authorization = `Bearer ${token}`;
   }

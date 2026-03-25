@@ -12,7 +12,7 @@ const CustomerInsights = () => {
     const fetchCustomers = async () => {
       setLoading(true);
       try {
-        const response = await API.get("/api/admin/customers/stats");
+        const response = await API.get("/api/admin/analytics/customer-stats");
         setCustomers(response.data?.data || []);
       } catch (err) {
         console.error("Customer Stats Error:", err);
