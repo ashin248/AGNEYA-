@@ -23,17 +23,10 @@ const {
 
 // routes/authRoutes.js
 router.get('/me', protect, (req, res) => {
-  if (req.user) {
-    res.json({
-      success: true,
-      user: req.user,
-    });
-  } else {
-    res.status(401).json({
-      success: false,
-      message: 'Not authenticated',
-    });
-  }
+  res.json({
+    success: true,
+    user: req.user,
+  });
 });
 
 

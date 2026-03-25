@@ -17,8 +17,15 @@ exports.protect = async (req, res, next) => {
       const secret = process.env.JWT_SECRET || process.env.SESSION_SECRET || 'fallback_secret';
       const decoded = jwt.verify(token, secret);
       
-      // Attach user object to the request
-      req.user = decoded;
+      // Attach full user object from DB (not just skinny token payload)
+      const User = require('../models/User');
+      const user = await User.findById(decoded.id || decoded._id).select('-otp');
+      
+      if (!user) {
+        return res.status(401).json({ success: false, message: 'User no longer exists' });
+      }
+
+      req.user = user;
       next();
     } catch (error) {
       console.error("Auth Middleware Error:", error);

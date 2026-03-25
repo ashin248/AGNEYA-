@@ -69,21 +69,15 @@ exports.verifyOTP = async (req, res) => {
     user.otp = undefined;
     await user.save();
 
-    // Store in session
-    req.session.user = {
-      _id: user._id.toString(),
-      email: user.email,
-      fullName: user.fullName,
-      mobile: user.mobile,
-      address: user.address,
-      profileComplete: user.profileComplete,
-    };
+    // Store in session (full user object)
+    req.session.user = user.toObject();
+    delete req.session.user.otp; // remove sensitive data
 
     res.status(200).json({
       success: true,
       message: 'OTP verified & session created',
       token: jwt.sign(
-        { _id: user._id, email: user.email },
+        { id: user._id, email: user.email }, // use 'id' consistently 
         process.env.JWT_SECRET || process.env.SESSION_SECRET || 'fallback_secret',
         { expiresIn: '7d' }
       ),
@@ -132,20 +126,14 @@ exports.completeRegistration = async (req, res) => {
     await user.save();
 
     // Update session
-    req.session.user = {
-      _id: user._id.toString(),
-      email: user.email,
-      fullName: user.fullName,
-      mobile: user.mobile,
-      address: user.address,
-      profileComplete: true,
-    };
+    req.session.user = user.toObject();
+    delete req.session.user.otp;
 
     res.status(200).json({
       success: true,
       message: 'Profile completed',
       token: jwt.sign(
-        { _id: user._id, email: user.email },
+        { id: user._id, email: user.email },
         process.env.JWT_SECRET || process.env.SESSION_SECRET || 'fallback_secret',
         { expiresIn: '7d' }
       ),
