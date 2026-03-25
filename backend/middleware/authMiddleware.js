@@ -35,7 +35,44 @@ exports.protect = async (req, res, next) => {
   }
 };
 
-// Admin only middleware
+// Admin-only protection (supports both JWT adminToken and Express Session)
+exports.adminProtect = (req, res, next) => {
+  let token;
+
+  // 1. Check for JWT token in headers
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer') &&
+    req.headers.authorization !== 'Bearer null' &&
+    req.headers.authorization !== 'Bearer undefined'
+  ) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const secret = process.env.JWT_SECRET || process.env.SESSION_SECRET || 'fallback_secret';
+      const decoded = jwt.verify(token, secret);
+      
+      if (decoded.isAdmin || decoded.role === 'admin') {
+        req.user = decoded;
+        return next();
+      }
+    } catch (error) {
+      console.error("Admin Token Verify Error:", error);
+      // Fall through to session check
+    }
+  }
+
+  // 2. Fallback to Express Session
+  if (req.session && req.session.isAdmin) {
+    return next();
+  }
+
+  return res.status(401).json({ 
+    success: false, 
+    message: 'Unauthorized - Admin access required' 
+  });
+};
+
+// Admin only middleware (Legacy/Compatibility)
 exports.admin = (req, res, next) => {
   if (
     (req.user && req.user.isAdmin) || 
