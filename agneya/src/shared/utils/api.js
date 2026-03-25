@@ -11,7 +11,8 @@ API.interceptors.request.use((req) => {
   const isAdminRoute = 
     req.url.includes("/api/admin") || 
     req.url.includes("/api/custom-orders") ||
-    req.url.includes("/api/products");
+    req.url.includes("/api/products") ||
+    req.url.includes("/api/orders");
   
   // Use adminToken only for admin routes, otherwise use regular user token
   const token = isAdminRoute 

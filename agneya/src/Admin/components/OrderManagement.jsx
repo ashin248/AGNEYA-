@@ -26,7 +26,7 @@ const OrderManagement = () => {
 
     try {
       const [resNormal, resCustom] = await Promise.all([
-        API.get("/api/orders/admin/all"),
+        API.get("/api/orders/all"),
         API.get("/api/custom-orders/admin"),
       ]);
 
