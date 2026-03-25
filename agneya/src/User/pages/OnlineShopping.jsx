@@ -610,7 +610,7 @@ function OnlineShopping() {
                       <button
                         className="buy-now-btn-main"
                         style={{ background: "linear-gradient(135deg, #ff4081, #f50057)", color: "#fff" }}
-                        onClick={() => handleProtectedAction("/customize", { product: p })}
+                        onClick={() => handleProtectedAction("/customize", { baseProduct: p })}
                       >
                         <i className="bi bi-palette-fill" style={{ marginRight: '8px' }}></i>
                         Customize Now
@@ -701,7 +701,7 @@ function OnlineShopping() {
                           </button>
                         </>
                       ) : (
-                        <button className="qv-buy" onClick={() => handleProtectedAction("/customize", { product: quickViewProduct })}>
+                        <button className="qv-buy" onClick={() => handleProtectedAction("/customize", { baseProduct: quickViewProduct })}>
                           Customize Now
                         </button>
                       )}

@@ -190,6 +190,11 @@ function ProductCustomize() {
         } else {
           canvas.renderAll();
           setIsSaving(false);
+          // Auto-load draft if exists for this product
+          const draft = localStorage.getItem(`agneya_draft_${baseProduct._id}`);
+          if (draft && !sidesData[index]) {
+            handleLoadDraft();
+          }
         }
       };
     };
@@ -414,7 +419,8 @@ function ProductCustomize() {
   const handleAddToCart = () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      setError("Please login to add to cart!");
+      handleSaveDraft();
+      setError("Please login to add to cart. Your design has been saved as a draft!");
       setTimeout(() => navigate("/login"), 1500);
       return;
     }
@@ -480,10 +486,8 @@ function ProductCustomize() {
   const handleBuyNow = () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      setError("Please login to proceed with Buy Now!");
-      // Save redirect state so user returns to customize page after login or goes to purchase?
-      // Better to go to login and then naturally we can't easily resume the canvas state without complexity.
-      // But we can store the design in localStorage momentarily.
+      handleSaveDraft();
+      setError("Please login to proceed with Buy Now. Your design has been saved as a draft!");
       setTimeout(() => navigate("/login"), 1500);
       return;
     }
