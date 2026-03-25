@@ -35,13 +35,13 @@ const OrderManagement = () => {
   }, []);
 
   const calculateStats = (normal, custom) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString();
     
-    const todayNormal = normal.filter(o => o.createdAt?.startsWith(today));
-    const todayCustom = custom.filter(o => o.createdAt?.startsWith(today));
+    const todayNormal = normal.filter(o => o.createdAt && new Date(o.createdAt).toLocaleDateString() === today);
+    const todayCustom = custom.filter(o => o.createdAt && new Date(o.createdAt).toLocaleDateString() === today);
     
     const revenue = todayNormal.reduce((sum, o) => sum + (o.amount || 0), 0) + 
-                    todayCustom.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+                    todayCustom.reduce((sum, o) => sum + (o.amount || 0), 0);
 
     const pending = custom.filter(o => o.status === "pending").length;
 
@@ -441,6 +441,7 @@ const OrderManagement = () => {
                 </th>
                 <th>ID</th>
                 <th>Customer</th>
+                <th>Amount</th>
                 <th>Design Preview</th>
                 <th>Final Design</th>
                 <th>Invoice</th>
@@ -466,6 +467,7 @@ const OrderManagement = () => {
                         <span className="email">{o.userId?.email || "—"}</span>
                       </div>
                     </td>
+                    <td className="price-cell">₹{(o.amount || 0).toLocaleString()}</td>
                     <td>
                       {o.designImage ? (
                         <div className="preview-box">
