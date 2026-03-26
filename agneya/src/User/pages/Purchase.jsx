@@ -135,8 +135,42 @@ const Purchase = () => {
 
     setLoading(true);
     try {
+      // Step 1: Upload custom designs directly to Cloudinary if they are base64
+      // This bypasses the Vercel/Render 1mb payload limit
+      const updatedCartItems = await Promise.all(
+        cartItems.map(async (item) => {
+          if (item.customDesignUrl && item.customDesignUrl.startsWith("data:image")) {
+            try {
+              const formData = new FormData();
+              formData.append("file", item.customDesignUrl);
+              formData.append("upload_preset", "agneya_unsigned"); // Uses the same preset from Studio
+              formData.append("folder", "agneya_custom_designs");
+
+              const cloudRes = await fetch(
+                `https://api.cloudinary.com/v1_1/dx6dfus5x/image/upload`, // Assuming default cloud name dx6dfus5x
+                { method: "POST", body: formData }
+              );
+
+              const cloudData = await cloudRes.json();
+              
+              if (cloudData.secure_url) {
+                return { ...item, customDesignUrl: cloudData.secure_url };
+              } else {
+                console.error("Cloudinary error on purchase:", cloudData);
+                return item; // Fallback to base64, might trigger 413 still
+              }
+            } catch (uploadErr) {
+              console.error("Direct upload failed:", uploadErr);
+              return item;
+            }
+          }
+          return item;
+        })
+      );
+
+      // Step 2: Create Order with the secure cloud URLs
       const payload = {
-        cartItems: cartItems.map(item => ({
+        cartItems: updatedCartItems.map(item => ({
           productId: item.productId,
           name: item.name,
           price: item.price,
