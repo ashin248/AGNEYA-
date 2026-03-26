@@ -177,143 +177,74 @@ function ProductCustomize() {
     };
   }, [baseProduct]);
 
-  const loadSide = (index) => {
+  // Background Image സെറ്റ് ചെയ്യാനുള്ള പ്രത്യേക ഫങ്ക്ഷൻ
+  const setupBackgroundImage = (canvas, imageUrl) => {
+    return new Promise((resolve) => {
+      fabric.Image.fromURL(imageUrl, (img) => {
+        // ക്യാൻവാസ് സൈസ് 700x700 ആയതുകൊണ്ട് അതിനനുസരിച്ച് സ്കെയിൽ ചെയ്യുന്നു
+        const scaleX = canvas.width / img.width;
+        const scaleY = canvas.height / img.height;
+        const scale = Math.max(scaleX, scaleY); // ഫുൾ കവർ ചെയ്യാൻ
+
+        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+          scaleX: scale,
+          scaleY: scale,
+          left: canvas.width / 2,
+          top: canvas.height / 2,
+          originX: 'center',
+          originY: 'center',
+          crossOrigin: 'anonymous'
+        });
+        resolve();
+      }, { crossOrigin: 'anonymous' });
+    });
+  };
+
+  const loadSide = async (index) => {
     const canvas = fabricCanvasRef.current;
     if (!canvas || !baseProduct) return;
 
     setIsSaving(true);
     canvas.clear();
 
-    const imageUrl = baseProduct.images?.[index] || baseProduct.imageUrl;
-    const finalUrl = getImageUrl(imageUrl) || "/placeholder-product.jpg";
+    // 1. ഷോപ്പിൽ നിന്നുള്ള മെയിൻ ഇമേജ് ബാക്ക്ഗ്രൗണ്ട് ആയി സെറ്റ് ചെയ്യുന്നു
+    const imageUrl = getImageUrl(baseProduct.images?.[index] || baseProduct.imageUrl);
+    await setupBackgroundImage(canvas, imageUrl);
 
-    // Re-usable function to forcefully set background image to ensure it's not wiped by JSON load
-    const setupBackgroundImage = (callback) => {
-      fabric.Image.fromURL(finalUrl, (img) => {
-        if (!img) {
-          console.error("Failed to load background image:", finalUrl);
-          if (callback) callback(null, 1);
-          return;
-        }
-        
-        const scale = Math.min(
-          canvas.width / img.width,
-          canvas.height / img.height
-        );
-        img.set({
-          scaleX: scale,
-          scaleY: scale,
-          originX: 'center',
-          originY: 'center',
-          left: canvas.width / 2,
-          top: canvas.height / 2,
-          crossOrigin: 'anonymous'
-        });
-        canvas.setBackgroundImage(img, () => {
-          canvas.renderAll();
-          if (callback) callback(img, scale);
-        });
-      }, { crossOrigin: 'anonymous' });
-    };
+    // 2. സേഫ്റ്റി ഏരിയ (Print Guide) സെറ്റ് ചെയ്യുന്നു
+    const safetyWidth = 350; // ആവശ്യാനുസരണം മാറ്റാം
+    const safetyHeight = 450;
+    
+    const safetyRect = new fabric.Rect({
+      left: canvas.width / 2 - safetyWidth / 2,
+      top: canvas.height / 2 - safetyHeight / 2,
+      width: safetyWidth,
+      height: safetyHeight,
+      fill: "transparent",
+      stroke: "#ff4081",
+      strokeDashArray: [5, 5],
+      selectable: false,
+      evented: false,
+      name: "safety-area",
+      visible: showSafetyArea,
+      opacity: 0.6,
+    });
+    
+    canvas.add(safetyRect);
 
-    setupBackgroundImage((fabricBgImg, scale) => {
-      // Load Clipping Mask
-      const projectType = baseProduct?.category?.toLowerCase() || "";
-      const maskUrl = productMasks[projectType];
-
-      const finishLoading = (maskObject, safetyWidth, safetyHeight) => {
-        if (maskObject) {
-          canvas.customClipPath = maskObject;
-        }
-
-        // Safety Area
-        const safetyRect = new fabric.Rect({
-          left: canvas.width / 2 - safetyWidth / 2,
-          top: canvas.height / 2 - safetyHeight / 2,
-          width: safetyWidth,
-          height: safetyHeight,
-          fill: "transparent",
-          stroke: "#ff4081",
-          strokeDashArray: [5, 5],
-          selectable: false,
-          evented: false,
-          name: "safety-area",
-          visible: showSafetyArea,
-          opacity: 0.6,
-        });
-        canvas.add(safetyRect);
-        canvas.bringToFront(safetyRect);
-
-        const loadContent = (jsonData) => {
-           canvas.loadFromJSON(jsonData, () => {
-             // Re-force the background and clip paths
-             setupBackgroundImage(() => {
-               reApplyClipPath();
-               canvas.renderAll();
-               setIsSaving(false);
-             });
-           });
-        };
-
-        // Load saved data for this side
-        if (sidesData[index]) {
-          loadContent(sidesData[index]);
-        } else {
-          // Check for draft recovery if this is the first load
-          const draft = localStorage.getItem(`agneya_draft_${baseProduct._id}`);
-          if (draft && Object.keys(sidesData).length === 0) {
-            try {
-              const parsed = JSON.parse(draft);
-              setSidesData(parsed);
-              if (parsed[index]) {
-                loadContent(parsed[index]);
-                return;
-              }
-            } catch (err) {
-              console.error("Failed to parse draft", err);
-            }
-          }
+    // 3. പഴയ ഡിസൈൻ (Draft) ഉണ്ടെങ്കിൽ അത് ലോഡ് ചെയ്യുന്നു
+    if (sidesData[index]) {
+      canvas.loadFromJSON(sidesData[index], () => {
+        // ഡിസൈൻ ലോഡ് ചെയ്താലും ബാക്ക്ഗ്രൗണ്ട് ഉറപ്പുവരുത്തുന്നു
+        setupBackgroundImage(canvas, imageUrl).then(() => {
           canvas.renderAll();
           setIsSaving(false);
-        }
-      };
-
-      if (maskUrl) {
-        fabric.Image.fromURL(maskUrl, (fabricMask) => {
-          if (fabricMask) {
-            fabricMask.set({
-              scaleX: scale,
-              scaleY: scale,
-              originX: 'center',
-              originY: 'center',
-              left: canvas.width / 2,
-              top: canvas.height / 2,
-              absolutePositioned: true,
-            });
-            finishLoading(fabricMask, 300, 400); // Default tshirt safety area
-          } else {
-            console.error("Mask failed to load");
-            finishLoading(null, 300, 400);
-          }
-        }, { crossOrigin: 'anonymous' });
-      } else {
-        // Generic Rectangular mask for other products (like mobile covers)
-        // Covers the full background area to allow editing the entire image
-        const bgW = fabricBgImg ? fabricBgImg.width : canvas.width;
-        const bgH = fabricBgImg ? fabricBgImg.height : canvas.height;
-        const printW = bgW * scale; // 100% of background width
-        const printH = bgH * scale; // 100% of background height
-        const fabricMask = new fabric.Rect({
-          width: printW,
-          height: printH,
-          left: (canvas.width - printW) / 2,
-          top: (canvas.height - printH) / 2,
-          absolutePositioned: true,
         });
-
-        finishLoading(fabricMask, printW, printH);
-      }
-    });
+      });
+    } else {
+      canvas.renderAll();
+      setIsSaving(false);
+    }
   };
 
   const handleZoom = (scaleDelta) => {
