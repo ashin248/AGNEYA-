@@ -415,7 +415,7 @@ function ProductCustomize() {
         const canvas = fabricCanvasRef.current;
         const img = new fabric.Image(imgElement, { crossOrigin: "anonymous" });
         img.scaleToHeight(600); // Auto-scale as requested
-        img.setName("uploaded-image");
+        img.set({ name: "uploaded-image" });
 
         canvas.add(img);
         canvas.centerObject(img);
