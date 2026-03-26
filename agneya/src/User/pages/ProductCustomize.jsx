@@ -185,29 +185,32 @@ function ProductCustomize() {
     canvas.clear();
 
     const imageUrl = baseProduct.images?.[index] || baseProduct.imageUrl;
-    const bgImgElement = new Image();
-    bgImgElement.crossOrigin = "anonymous";
-    bgImgElement.src = getImageUrl(imageUrl) || "/placeholder-product.jpg";
+    const finalUrl = getImageUrl(imageUrl) || "/placeholder-product.jpg";
 
-    bgImgElement.onload = () => {
-      const fabricBgImg = new fabric.Image(bgImgElement);
-      const scale = Math.min(
-        canvas.width / fabricBgImg.width,
-        canvas.height / fabricBgImg.height,
-      );
+    // Re-usable function to forcefully set background image to ensure it's not wiped by JSON load
+    const setupBackgroundImage = (callback) => {
+      fabric.Image.fromURL(finalUrl, (img) => {
+        const scale = Math.min(
+          canvas.width / img.width,
+          canvas.height / img.height
+        );
+        img.set({
+          scaleX: scale,
+          scaleY: scale,
+          originX: 'center',
+          originY: 'center',
+          left: canvas.width / 2,
+          top: canvas.height / 2,
+          crossOrigin: 'anonymous'
+        });
+        canvas.setBackgroundImage(img, () => {
+          canvas.renderAll();
+          if (callback) callback(img, scale);
+        });
+      }, { crossOrigin: 'anonymous' });
+    };
 
-      fabricBgImg.set({
-        scaleX: scale,
-        scaleY: scale,
-        left: (canvas.width - fabricBgImg.width * scale) / 2,
-        top: (canvas.height - fabricBgImg.height * scale) / 2,
-        selectable: false,
-        name: "product-bg",
-      });
-
-      canvas.add(fabricBgImg);
-      canvas.sendToBack(fabricBgImg);
-
+    setupBackgroundImage((fabricBgImg, scale) => {
       // Load Clipping Mask
       const projectType = baseProduct?.category?.toLowerCase() || "";
       const maskUrl = productMasks[projectType];
@@ -233,13 +236,20 @@ function ProductCustomize() {
         canvas.add(safetyRect);
         canvas.bringToFront(safetyRect);
 
+        const loadContent = (jsonData) => {
+           canvas.loadFromJSON(jsonData, () => {
+             // Re-force the background and clip paths
+             setupBackgroundImage(() => {
+               reApplyClipPath();
+               canvas.renderAll();
+               setIsSaving(false);
+             });
+           });
+        };
+
         // Load saved data for this side
         if (sidesData[index]) {
-          canvas.loadFromJSON(sidesData[index], () => {
-            reApplyClipPath();
-            canvas.renderAll();
-            setIsSaving(false);
-          });
+          loadContent(sidesData[index]);
         } else {
           // Check for draft recovery if this is the first load
           const draft = localStorage.getItem(`agneya_draft_${baseProduct._id}`);
@@ -247,11 +257,7 @@ function ProductCustomize() {
             const parsed = JSON.parse(draft);
             setSidesData(parsed);
             if (parsed[index]) {
-              canvas.loadFromJSON(parsed[index], () => {
-                reApplyClipPath();
-                canvas.renderAll();
-                setIsSaving(false);
-              });
+              loadContent(parsed[index]);
               return;
             }
           }
@@ -261,22 +267,19 @@ function ProductCustomize() {
       };
 
       if (maskUrl) {
-        const maskImgElement = new Image();
-        maskImgElement.crossOrigin = "anonymous";
-        maskImgElement.src = maskUrl;
-
-        maskImgElement.onload = () => {
-          const fabricMask = new fabric.Image(maskImgElement);
+        fabric.Image.fromURL(maskUrl, (fabricMask) => {
           fabricMask.set({
             scaleX: scale,
             scaleY: scale,
-            left: (canvas.width - fabricBgImg.width * scale) / 2,
-            top: (canvas.height - fabricBgImg.height * scale) / 2,
+            originX: 'center',
+            originY: 'center',
+            left: canvas.width / 2,
+            top: canvas.height / 2,
             absolutePositioned: true,
           });
 
           finishLoading(fabricMask, 300, 400); // Default tshirt safety area
-        };
+        }, { crossOrigin: 'anonymous' });
       } else {
         // Generic Rectangular mask for other products (like mobile covers)
         // Covers the full background area to allow editing the entire image
@@ -292,7 +295,7 @@ function ProductCustomize() {
 
         finishLoading(fabricMask, printW, printH);
       }
-    };
+    });
   };
 
   const handleZoom = (scaleDelta) => {
