@@ -18,13 +18,13 @@ function Hero() {
     <section className="hero-section" id="home">
       <div className="hero-bg-glow" />
 
-      {/* --- നിങ്ങൾ ആവശ്യപ്പെട്ട ഇടിവെട്ടും തീപ്പൊരിയും --- */}
+     
       <div className="hero-lightning">
-        {/* ഇടിവെട്ട് (Jagged lightning bolt) */}
+       
         <div className="lightning-bolt"></div>
-        {/* മിന്നൽ പിണർ (Lightning flash) */}
+        
         <div className="lightning-flash"></div>
-        {/* ഇടിവെട്ടിന്റെ അറ്റത്തെ തീപ്പൊരി (Spark at the strike point) */}
+        
         <div className="lightning-spark"></div>
       </div>
       {/* ------------------------------------- */}
@@ -58,7 +58,7 @@ function Hero() {
         <div className="hero-heading">
           <motion.h1 variants={gravityScrollVariant}>
             Elevate Your Brand with <br />
-            <span className="brand-highlight">AGNEYA</span> <br />
+            <span className="brand-highlight">Agneya</span> <br />
             <span className="sub-heading">Precision in Every Print</span>
           </motion.h1>
         </div>
