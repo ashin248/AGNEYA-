@@ -1,25 +1,24 @@
-
 // src/User/components/NavBar.jsx
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { staggeredGravityContainer, gravityScrollVariant } from "../../shared/animations/framerVariants";
 import { useAuth } from "../../shared/context/AuthContext";
 import "../style/NavBar.css";
 
-// Import your logo image
-import Logo from '../../../public/Agneya_Creations.png';
+// Import Logo Image
+import Logo from "../../../public/Agneya_Creations.png";
 
 function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const navigate = useNavigate();
+
   const { user, logout, loading } = useAuth();
   const cartItems = useSelector((state) => state.cart.items);
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
-  // Scroll effect to change background
+  // Scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -45,33 +44,29 @@ function NavBar() {
       <nav className="user-navbar">
         <div className="user-nav-container">
           <div className="user-logo">
-            <img src={Logo} alt="Agneya" className="agneyaLogo" />
+            <img src={Logo} alt="Agneya Creations" className="agneyaLogo" />
           </div>
-          <div style={{color: '#fff'}}>Loading...</div>
+          <div style={{ color: "#fff" }}>Loading...</div>
         </div>
       </nav>
     );
   }
 
   return (
-    <motion.nav 
+    <motion.nav
       className={`user-navbar ${scrolled ? "scrolled" : ""} ${menuOpen ? "menu-active" : ""}`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
     >
       <div className="user-nav-container">
-        
-        {/* Logo Section with Image and Text
+        {/* Logo - Image Only */}
         <Link to="/" className="user-logo" onClick={() => setMenuOpen(false)}>
-          <img src={Logo} alt="Agneya Logo" className="agneyaLogo" />
-          <span className="logo-text">
-            AGNEYA<span className="accent-dot">.</span>
-          </span>
-        </Link> */}
+          <img src={Logo} alt="Agneya Creations" className="agneyaLogo" />
+        </Link>
 
         {/* Navigation Links */}
-        <motion.ul 
+        <motion.ul
           className={`user-nav-links ${menuOpen ? "active" : ""}`}
           variants={staggeredGravityContainer}
           initial="hidden"
@@ -92,15 +87,19 @@ function NavBar() {
           {/* Mobile Login/Logout */}
           <motion.li className="user-nav-item mobile-only" variants={gravityScrollVariant}>
             {user ? (
-              <button className="logout-btn-mob" onClick={handleLogout}>Logout</button>
+              <button className="logout-btn-mob" onClick={handleLogout}>
+                Logout
+              </button>
             ) : (
-              <Link to="/login" className="login-btn-mob" onClick={() => setMenuOpen(false)}>Login</Link>
+              <Link to="/login" className="login-btn-mob" onClick={() => setMenuOpen(false)}>
+                Login
+              </Link>
             )}
           </motion.li>
         </motion.ul>
 
         {/* Desktop Actions */}
-        <motion.div 
+        <motion.div
           className="user-nav-actions"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -113,19 +112,22 @@ function NavBar() {
 
           {user ? (
             <div className="user-profile-nav desktop-only">
-              <span className="user-name-text">Hi, {user.fullName?.split(" ")[0]}</span>
+              <span className="user-name-text">Hi, {user.fullName?.split(" ")[0] || "User"}</span>
               <button className="logout-icon-btn" onClick={handleLogout} title="Logout">
                 <i className="bi bi-box-arrow-right"></i>
               </button>
             </div>
           ) : (
-            <Link to="/login" className="login-link-desktop desktop-only">Login / Register</Link>
+            <Link to="/login" className="login-link-desktop desktop-only">
+              Login / Register
+            </Link>
           )}
 
           {/* Hamburger Menu */}
           <button
             className={`hamburger ${menuOpen ? "active" : ""}`}
             onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle navigation"
           >
             <span className="line"></span>
             <span className="line"></span>

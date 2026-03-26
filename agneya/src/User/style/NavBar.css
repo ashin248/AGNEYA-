@@ -1,6 +1,3 @@
-
-
-
 @import url('../../index.css');
 
 .user-navbar {
@@ -14,7 +11,7 @@
 }
 
 .user-navbar.scrolled {
-  background: rgba(15, 12, 41, 0.85); /* Deep grape/purple shade */
+  background: rgba(15, 12, 41, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -31,25 +28,30 @@
   justify-content: space-between;
 }
 
-/* Logo */
+/* Logo - Image Only */
 .user-logo {
-  font-family: var(--font-heading, "Poppins", sans-serif);
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: -1px;
-  background: linear-gradient(90deg, #ff7e5f, #feb47b); /* Orange/Red */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   text-decoration: none;
 }
 
-.user-logo .accent-dot {
-  color: #ff7e5f;
-  font-weight: 900;
+/* Logo Image Styling */
+.agneyaLogo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  transition: all 0.4s ease;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+}
+
+.user-logo:hover .agneyaLogo {
+  transform: scale(1.06);
+  filter: drop-shadow(0 4px 12px rgba(255, 126, 95, 0.5));
+}
+
+/* Shrink logo when scrolled */
+.user-navbar.scrolled .agneyaLogo {
+  height: 40px;
 }
 
 /* Navigation Links */
@@ -67,7 +69,7 @@
 }
 
 .user-nav-link {
-  color: #e2e8f0; /* Soft light gray */
+  color: #e2e8f0;
   font-weight: 500;
   font-size: 1.05rem;
   text-decoration: none;
@@ -90,7 +92,6 @@
   left: 0;
   background: linear-gradient(90deg, #ff7e5f, #feb47b);
   transition: width 0.3s ease;
-  border-radius: 2px;
 }
 
 .user-nav-link:hover::after,
@@ -98,7 +99,7 @@
   width: 100%;
 }
 
-/* Auth / User Actions (Desktop) */
+/* Actions */
 .user-nav-actions {
   display: flex;
   align-items: center;
@@ -110,11 +111,10 @@
   align-items: center;
   gap: 1rem;
   color: #e2e8f0;
-  font-weight: 500;
 }
 
 .user-name-text {
-  color: #ff7e5f; /* Orange accent */
+  color: #ff7e5f;
   font-weight: 600;
 }
 
@@ -128,22 +128,21 @@
   align-items: center;
   justify-content: center;
   color: #fca5a5;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .logout-icon-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.15);
   color: #ef4444;
-  transform: scale(1.05);
-  border-color: rgba(239, 68, 68, 0.3);
+  transform: scale(1.08);
 }
 
-/* Cart Button & Badge */
+/* Cart Button */
 .user-nav-cart-btn {
   position: relative;
-  font-size: 1.5rem;
+  font-size: 1.55rem;
   color: #fff;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -158,7 +157,7 @@
 }
 
 .user-nav-cart-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   border-color: #ff7e5f;
   color: #ff7e5f;
   transform: translateY(-2px);
@@ -170,7 +169,7 @@
   right: -8px;
   background: linear-gradient(135deg, #ff512f, #dd2476);
   color: #fff;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 800;
   width: 20px;
   height: 20px;
@@ -185,21 +184,20 @@
 .login-link-desktop {
   color: #ffffff;
   font-weight: 600;
-  padding: 0.7rem 1.8rem;
+  padding: 0.75rem 1.9rem;
   background: linear-gradient(90deg, #ff512f, #dd2476);
   border-radius: 50px;
-  transition: all 0.3s ease;
   text-decoration: none;
   box-shadow: 0 4px 15px rgba(221, 36, 118, 0.3);
+  transition: all 0.3s ease;
 }
 
 .login-link-desktop:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(221, 36, 118, 0.5);
-  opacity: 0.95;
 }
 
-/* Hamburger Menu */
+/* Hamburger */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -208,7 +206,6 @@
   border: none;
   cursor: pointer;
   padding: 0.5rem;
-  z-index: 1001; /* Above mobile menu */
 }
 
 .hamburger span {
@@ -222,27 +219,23 @@
 .hamburger.active span:nth-child(1) {
   transform: rotate(45deg) translate(6px, 6px);
 }
-
 .hamburger.active span:nth-child(2) {
   opacity: 0;
 }
-
 .hamburger.active span:nth-child(3) {
   transform: rotate(-45deg) translate(6px, -7px);
 }
 
-/* Mobile-only elements */
+/* Mobile */
 .mobile-only {
   display: none;
 }
 
-/* Responsive Design */
 @media (max-width: 992px) {
   .user-nav-container {
-    padding: 1.2rem 2rem;
+    padding: 1.1rem 2rem;
   }
 
-  /* Hamburger logic maps perfectly now */
   .hamburger {
     display: flex;
   }
@@ -257,9 +250,8 @@
     right: -100%;
     width: 100%;
     height: 100vh;
-    background: rgba(15, 12, 41, 0.98); /* Matching background shade */
+    background: rgba(15, 12, 41, 0.98);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -272,261 +264,42 @@
     right: 0;
   }
 
-  .user-nav-item {
-    font-size: 1.5rem;
-  }
-
   .user-nav-link {
-    font-size: 1.8rem;
+    font-size: 1.85rem;
     font-weight: 600;
   }
 
   .mobile-only {
     display: block;
-    margin-top: 1rem;
   }
 
   .logout-btn-mob,
   .login-btn-mob {
-    display: inline-block;
-    padding: 1rem 3rem;
-    font-size: 1.3rem;
+    padding: 1rem 3.5rem;
+    font-size: 1.35rem;
     border-radius: 50px;
     font-weight: 600;
-    text-align: center;
-    text-decoration: none;
     border: none;
     cursor: pointer;
   }
 
   .logout-btn-mob {
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(239, 68, 68, 0.12);
     color: #fca5a5;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    border: 1px solid rgba(239, 68, 68, 0.4);
   }
 
   .login-btn-mob {
     background: linear-gradient(90deg, #ff512f, #dd2476);
     color: white;
-    box-shadow: 0 4px 15px rgba(221, 36, 118, 0.3);
   }
 }
 
 @media (max-width: 576px) {
-  .user-logo {
-    font-size: 1.7rem;
+  .agneyaLogo {
+    height: 38px;
   }
-
   .user-nav-container {
     padding: 1rem 1.5rem;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-/* --- Agneya Logo Image Styling --- */
-.agneyaLogo {
-  height: 45px;            /* Fixed height for desktop */
-  width: auto;             /* Keep aspect ratio */
-  object-fit: contain;     /* Ensure image isn't cropped */
-  transition: all 0.4s ease;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)); /* Give it some depth */
-}
-
-/* Hover effect for the logo */
-.user-logo:hover .agneyaLogo {
-  transform: scale(1.05);
-  filter: drop-shadow(0 4px 8px rgba(255, 126, 95, 0.4)); /* Glow effect on hover */
-}
-
-/* Shrink logo slightly when navbar is scrolled for a cleaner look */
-.user-navbar.scrolled .agneyaLogo {
-  height: 38px;
-}
-
-/* Container for the logo inside the Link component */
-.user-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  /* Keeping your existing gradient text styles for the fallback text... */
-}
-
-/* --- Responsive Adjustments --- */
-@media (max-width: 992px) {
-  .agneyaLogo {
-    height: 40px; /* Slightly smaller on tablets/mobile */
-  }
-}
-
-@media (max-width: 576px) {
-  .agneyaLogo {
-    height: 35px; /* Even smaller for small mobile screens */
-  }
-}
-
-
-
-/* src/style/NavBar.css */
-@import url('../../index.css');
-
-.user-navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  transition: all 0.4s ease;
-  background: transparent;
-}
-
-.user-navbar.scrolled {
-  background: rgba(15, 12, 41, 0.85); 
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.user-nav-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1rem 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* --- New agneyaLogo Styling --- */
-.agneyaLogo {
-  height: 45px;
-  width: auto;
-  object-fit: contain;
-  transition: all 0.3s ease;
-  filter: drop-shadow(0 0 5px rgba(255, 126, 95, 0.3));
-}
-
-.user-logo {
-  display: flex;
-  align-items: center;
-  gap: 12px; 
-  text-decoration: none;
-}
-
-.user-logo:hover .agneyaLogo {
-  transform: scale(1.08) rotate(-2deg);
-  filter: drop-shadow(0 0 8px rgba(255, 126, 95, 0.6));
-}
-
-.logo-text {
-  font-family: var(--font-heading, "Poppins", sans-serif);
-  font-size: 1.8rem;
-  font-weight: 800;
-  background: linear-gradient(90deg, #ff7e5f, #feb47b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.accent-dot {
-  -webkit-text-fill-color: #ff7e5f;
-}
-
-/* Navigation Links */
-.user-nav-links {
-  display: flex;
-  align-items: center;
-  gap: 2.5rem;
-  list-style: none;
-}
-
-.user-nav-link {
-  color: #e2e8f0;
-  font-weight: 500;
-  text-decoration: none;
-  transition: 0.3s;
-}
-
-.user-nav-link:hover, .user-nav-link.active {
-  color: #ff7e5f;
-}
-
-/* Actions & Cart */
-.user-nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.user-nav-cart-btn {
-  position: relative;
-  font-size: 1.5rem;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-}
-
-.cart-count-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: linear-gradient(135deg, #ff512f, #dd2476);
-  color: #fff;
-  font-size: 0.7rem;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #0f0c29;
-}
-
-.login-link-desktop {
-  color: #fff;
-  padding: 0.7rem 1.8rem;
-  background: linear-gradient(90deg, #ff512f, #dd2476);
-  border-radius: 50px;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-/* Mobile Responsive */
-@media (max-width: 992px) {
-  .hamburger { display: flex; flex-direction: column; gap: 6px; background: none; border: none; cursor: pointer; }
-  .hamburger span { width: 28px; height: 3px; background: #fff; border-radius: 3px; }
-  .desktop-only { display: none; }
-  .user-nav-links {
-    position: fixed; top: 0; right: -100%; width: 100%; height: 100vh;
-    background: rgba(15, 12, 41, 0.98); flex-direction: column; 
-    justify-content: center; align-items: center; gap: 3rem; transition: 0.5s;
-  }
-  .user-nav-links.active { right: 0; }
-}
-
-@media (max-width: 576px) {
-  .agneyaLogo { height: 35px; }
-  .logo-text { font-size: 1.5rem; }
-  .user-nav-container { padding: 1rem 1.5rem; }
-}
-
-
-
-
-
-
-
-
-
