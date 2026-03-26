@@ -5,13 +5,42 @@ import { gravityScrollVariant, staggeredGravityContainer } from "../../shared/an
 import "../style/Service.css";
 
 const services = [
-  { name: "Digital Printing", icon: "bi-printer" },
-  { name: "Offset Printing", icon: "bi-layers" },
-  { name: "Brochures & Catalog Printing", icon: "bi-book" },
-  { name: "Business Cards & Letterheads", icon: "bi-person-vcard" },
-  { name: "Label Printing", icon: "bi-tags" },
-  { name: "Custom T-Shirt Printing", icon: "bi-palette" },
+  { 
+    name: "MUG PRINTING", 
+    icon: "bi-cup-hot" 
+  },
+  { 
+    name: "ACRYLIC PHOTOFRAMES", 
+    icon: "bi-image" 
+  },
+  { 
+    name: "Brochures & Catalog Printing", 
+    icon: "bi-journal-text" 
+  },
+  { 
+    name: "Business Cards & Letterheads", 
+    icon: "bi-card-heading" 
+  },
+  { 
+    name: "Label Printing", 
+    icon: "bi-sticky" 
+  },
+  { 
+    name: "Custom T-Shirt Printing", 
+    icon: "bi-person-badge" 
+  },
 ];
+
+
+
+// const services = [
+//   { name: "MUG PRINTING", icon: "bi-printer" },
+//   { name: "ACRYLIC PHOTOFRAMES", icon: "bi-layers" },
+//   { name: "Brochures & Catalog Printing", icon: "bi-book" },
+//   { name: "Business Cards & Letterheads", icon: "bi-person-vcard" },
+//   { name: "Label Printing", icon: "bi-tags" },
+//   { name: "Custom T-Shirt Printing", icon: "bi-palette" },
+// ];
 
 function Service() {
   return (
@@ -62,7 +91,7 @@ function Service() {
                   <h5 className="service-title">{service.name}</h5>
                   <Link to="/shop" className="service-link">
                     <button className="service-btn">
-                      View Details
+                      shop new
                       <span className="arrow">
                         <i className="bi bi-arrow-right-short"></i>
                       </span>
