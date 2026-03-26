@@ -108,7 +108,13 @@ function ProductCustomize() {
     fabricCanvasRef.current = canvas;
     loadSide(activeSideIndex);
 
+    const bringSafetyToFront = () => {
+      const sArea = canvas.getObjects().find((o) => o.name === "safety-area");
+      if (sArea) canvas.bringToFront(sArea);
+    };
+
     const syncState = () => {
+      bringSafetyToFront();
       saveState();
       updateObjectList();
       updatePrice();
@@ -190,20 +196,25 @@ function ProductCustomize() {
         canvas.height / fabricBgImg.height,
       );
 
-      canvas.backgroundImage = fabricBgImg;
       fabricBgImg.set({
         scaleX: scale,
         scaleY: scale,
         left: (canvas.width - fabricBgImg.width * scale) / 2,
         top: (canvas.height - fabricBgImg.height * scale) / 2,
         selectable: false,
+        name: "product-bg",
       });
+
+      canvas.add(fabricBgImg);
+      canvas.sendToBack(fabricBgImg);
 
       // Load Clipping Mask
       const projectType = baseProduct?.category?.toLowerCase() || "";
       const maskUrl = productMasks[projectType];
 
       const finishLoading = (maskObject, safetyWidth, safetyHeight) => {
+        canvas.customClipPath = maskObject;
+
         // Safety Area
         const safetyRect = new fabric.Rect({
           left: canvas.width / 2 - safetyWidth / 2,
@@ -261,16 +272,8 @@ function ProductCustomize() {
             scaleY: scale,
             left: (canvas.width - fabricBgImg.width * scale) / 2,
             top: (canvas.height - fabricBgImg.height * scale) / 2,
-            selectable: false,
-            evented: false,
-            opacity: 0,
-            name: "clipping-mask",
             absolutePositioned: true,
           });
-
-          canvas.add(fabricMask);
-          canvas.sendToBack(fabricMask);
-          canvas.clipPath = fabricMask;
 
           finishLoading(fabricMask, 300, 400); // Default tshirt safety area
         };
@@ -284,16 +287,8 @@ function ProductCustomize() {
           height: printH,
           left: (canvas.width - printW) / 2,
           top: (canvas.height - printH) / 2,
-          selectable: false,
-          evented: false,
-          opacity: 0,
-          name: "clipping-mask",
           absolutePositioned: true,
         });
-
-        canvas.add(fabricMask);
-        canvas.sendToBack(fabricMask);
-        canvas.clipPath = fabricMask;
 
         finishLoading(fabricMask, printW, printH);
       }
@@ -311,11 +306,12 @@ function ProductCustomize() {
 
   const reApplyClipPath = () => {
     const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
-    const mask = canvas.getObjects().find((o) => o.name === "clipping-mask");
-    if (mask) {
-      canvas.clipPath = mask;
-    }
+    if (!canvas || !canvas.customClipPath) return;
+    canvas.getObjects().forEach((o) => {
+      if (o.type === 'i-text' || o.name === 'clipart') {
+        o.clipPath = canvas.customClipPath;
+      }
+    });
   };
 
   const switchSide = (newIndex) => {
@@ -383,7 +379,7 @@ function ProductCustomize() {
     if (!canvas) return;
     setCanvasObjects(
       [...canvas.getObjects()]
-        .filter((o) => o.name !== "clipping-mask")
+        .filter((o) => o.name !== "safety-area")
         .reverse(),
     );
   }, []);
@@ -442,6 +438,7 @@ function ProductCustomize() {
       fontFamily: selectedFont,
       cornerColor: "#b388ff",
       cornerSize: 10,
+      clipPath: canvas.customClipPath,
     });
     canvas.add(text);
     canvas.setActiveObject(text);
@@ -460,7 +457,8 @@ function ProductCustomize() {
       imgElement.onload = () => {
         const canvas = fabricCanvasRef.current;
         const img = new fabric.Image(imgElement, { crossOrigin: "anonymous" });
-        img.scaleToWidth(220);
+        img.scaleToHeight(600); // Auto-scale as requested
+        img.setName("uploaded-image");
 
         canvas.add(img);
         canvas.centerObject(img);
@@ -482,7 +480,11 @@ function ProductCustomize() {
       url,
       (img) => {
         img.scaleToWidth(150);
-        img.set({ crossOrigin: "anonymous" });
+        img.set({ 
+          crossOrigin: "anonymous", 
+          name: "clipart",
+          clipPath: canvas.customClipPath
+        });
 
         canvas.add(img);
         canvas.centerObject(img);
@@ -715,7 +717,7 @@ function ProductCustomize() {
                     }
                   ></i>
                   <span className="layer-name">
-                    {obj.type} {idx + 1}
+                    {obj.name === "product-bg" ? "T-Shirt / Base" : obj.type} {idx + 1}
                   </span>
                   <div className="layer-actions">
                     <button
@@ -723,17 +725,30 @@ function ProductCustomize() {
                         e.stopPropagation();
                         moveLayer("up");
                       }}
+                      title="Bring Forward"
                     >
                       <i className="bi bi-arrow-up-short"></i>
                     </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        moveLayer("down");
+                      }}
+                      title="Send Backward"
+                    >
+                      <i className="bi bi-arrow-down-short"></i>
+                    </button>
+                    {obj.name !== "product-bg" && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
                         fabricCanvasRef.current.remove(obj);
                       }}
+                      title="Delete Layer"
                     >
                       <i className="bi bi-trash"></i>
                     </button>
+                    )}
                   </div>
                 </div>
               ))}
