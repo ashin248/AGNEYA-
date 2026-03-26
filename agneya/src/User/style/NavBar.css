@@ -1,3 +1,8 @@
+
+
+
+
+/* src/style/NavBar.css */
 @import url('../../index.css');
 
 .user-navbar {
@@ -11,42 +16,52 @@
 }
 
 .user-navbar.scrolled {
-  background: rgba(15, 12, 41, 0.85); /* Deep grape/purple shade */
+  background: rgba(15, 12, 41, 0.85); 
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* Main container */
 .user-nav-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 1.2rem 2.5rem;
+  padding: 1rem 2.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-/* Logo */
+/* --- New agneyaLogo Styling --- */
+.agneyaLogo {
+  height: 45px;
+  width: auto;
+  object-fit: contain;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 5px rgba(255, 126, 95, 0.3));
+}
+
 .user-logo {
-  font-family: var(--font-heading, "Poppins", sans-serif);
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: -1px;
-  background: linear-gradient(90deg, #ff7e5f, #feb47b); /* Orange/Red */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 12px; 
   text-decoration: none;
 }
 
-.user-logo .accent-dot {
-  color: #ff7e5f;
-  font-weight: 900;
+.user-logo:hover .agneyaLogo {
+  transform: scale(1.08) rotate(-2deg);
+  filter: drop-shadow(0 0 8px rgba(255, 126, 95, 0.6));
+}
+
+.logo-text {
+  font-family: var(--font-heading, "Poppins", sans-serif);
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #ff7e5f, #feb47b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.accent-dot {
+  -webkit-text-fill-color: #ff7e5f;
 }
 
 /* Navigation Links */
@@ -55,110 +70,38 @@
   align-items: center;
   gap: 2.5rem;
   list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.user-nav-item {
-  position: relative;
 }
 
 .user-nav-link {
-  color: #e2e8f0; /* Soft light gray */
+  color: #e2e8f0;
   font-weight: 500;
-  font-size: 1.05rem;
   text-decoration: none;
-  transition: all 0.3s ease;
-  padding: 0.5rem 0;
-  font-family: var(--font-body, 'Inter', sans-serif);
+  transition: 0.3s;
 }
 
-.user-nav-link:hover,
-.user-nav-link.active {
+.user-nav-link:hover, .user-nav-link.active {
   color: #ff7e5f;
 }
 
-.user-nav-link::after {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 2px;
-  bottom: -2px;
-  left: 0;
-  background: linear-gradient(90deg, #ff7e5f, #feb47b);
-  transition: width 0.3s ease;
-  border-radius: 2px;
-}
-
-.user-nav-link:hover::after,
-.user-nav-link.active::after {
-  width: 100%;
-}
-
-/* Auth / User Actions (Desktop) */
+/* Actions & Cart */
 .user-nav-actions {
   display: flex;
   align-items: center;
   gap: 1.5rem;
 }
 
-.user-profile-nav {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  color: #e2e8f0;
-  font-weight: 500;
-}
-
-.user-name-text {
-  color: #ff7e5f; /* Orange accent */
-  font-weight: 600;
-}
-
-.logout-icon-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fca5a5;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.logout-icon-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  transform: scale(1.05);
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
-/* Cart Button & Badge */
 .user-nav-cart-btn {
   position: relative;
   font-size: 1.5rem;
   color: #fff;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
   width: 44px;
   height: 44px;
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
   text-decoration: none;
-}
-
-.user-nav-cart-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #ff7e5f;
-  color: #ff7e5f;
-  transform: translateY(-2px);
 }
 
 .cart-count-badge {
@@ -168,155 +111,41 @@
   background: linear-gradient(135deg, #ff512f, #dd2476);
   color: #fff;
   font-size: 0.7rem;
-  font-weight: 800;
   width: 20px;
   height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   border: 2px solid #0f0c29;
 }
 
 .login-link-desktop {
-  color: #ffffff;
-  font-weight: 600;
+  color: #fff;
   padding: 0.7rem 1.8rem;
   background: linear-gradient(90deg, #ff512f, #dd2476);
   border-radius: 50px;
-  transition: all 0.3s ease;
   text-decoration: none;
-  box-shadow: 0 4px 15px rgba(221, 36, 118, 0.3);
+  font-weight: 600;
 }
 
-.login-link-desktop:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(221, 36, 118, 0.5);
-  opacity: 0.95;
-}
-
-/* Hamburger Menu */
-.hamburger {
-  display: none;
-  flex-direction: column;
-  gap: 6px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  z-index: 1001; /* Above mobile menu */
-}
-
-.hamburger span {
-  width: 28px;
-  height: 3px;
-  background: #ffffff;
-  border-radius: 3px;
-  transition: all 0.4s ease;
-}
-
-.hamburger.active span:nth-child(1) {
-  transform: rotate(45deg) translate(6px, 6px);
-}
-
-.hamburger.active span:nth-child(2) {
-  opacity: 0;
-}
-
-.hamburger.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(6px, -7px);
-}
-
-/* Mobile-only elements */
-.mobile-only {
-  display: none;
-}
-
-/* Responsive Design */
+/* Mobile Responsive */
 @media (max-width: 992px) {
-  .user-nav-container {
-    padding: 1.2rem 2rem;
-  }
-
-  /* Hamburger logic maps perfectly now */
-  .hamburger {
-    display: flex;
-  }
-
-  .user-nav-actions .desktop-only {
-    display: none;
-  }
-
+  .hamburger { display: flex; flex-direction: column; gap: 6px; background: none; border: none; cursor: pointer; }
+  .hamburger span { width: 28px; height: 3px; background: #fff; border-radius: 3px; }
+  .desktop-only { display: none; }
   .user-nav-links {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 100%;
-    height: 100vh;
-    background: rgba(15, 12, 41, 0.98); /* Matching background shade */
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 3rem;
-    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    z-index: 1000;
+    position: fixed; top: 0; right: -100%; width: 100%; height: 100vh;
+    background: rgba(15, 12, 41, 0.98); flex-direction: column; 
+    justify-content: center; align-items: center; gap: 3rem; transition: 0.5s;
   }
-
-  .user-nav-links.active {
-    right: 0;
-  }
-
-  .user-nav-item {
-    font-size: 1.5rem;
-  }
-
-  .user-nav-link {
-    font-size: 1.8rem;
-    font-weight: 600;
-  }
-
-  .mobile-only {
-    display: block;
-    margin-top: 1rem;
-  }
-
-  .logout-btn-mob,
-  .login-btn-mob {
-    display: inline-block;
-    padding: 1rem 3rem;
-    font-size: 1.3rem;
-    border-radius: 50px;
-    font-weight: 600;
-    text-align: center;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .logout-btn-mob {
-    background: rgba(239, 68, 68, 0.1);
-    color: #fca5a5;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-  }
-
-  .login-btn-mob {
-    background: linear-gradient(90deg, #ff512f, #dd2476);
-    color: white;
-    box-shadow: 0 4px 15px rgba(221, 36, 118, 0.3);
-  }
+  .user-nav-links.active { right: 0; }
 }
 
 @media (max-width: 576px) {
-  .user-logo {
-    font-size: 1.7rem;
-  }
-
-  .user-nav-container {
-    padding: 1rem 1.5rem;
-  }
+  .agneyaLogo { height: 35px; }
+  .logo-text { font-size: 1.5rem; }
+  .user-nav-container { padding: 1rem 1.5rem; }
 }
 
 
@@ -327,46 +156,3 @@
 
 
 
-
-
-
-/* --- Agneya Logo Image Styling --- */
-.agneyaLogo {
-  height: 45px;            /* Fixed height for desktop */
-  width: auto;             /* Keep aspect ratio */
-  object-fit: contain;     /* Ensure image isn't cropped */
-  transition: all 0.4s ease;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)); /* Give it some depth */
-}
-
-/* Hover effect for the logo */
-.user-logo:hover .agneyaLogo {
-  transform: scale(1.05);
-  filter: drop-shadow(0 4px 8px rgba(255, 126, 95, 0.4)); /* Glow effect on hover */
-}
-
-/* Shrink logo slightly when navbar is scrolled for a cleaner look */
-.user-navbar.scrolled .agneyaLogo {
-  height: 38px;
-}
-
-/* Container for the logo inside the Link component */
-.user-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  /* Keeping your existing gradient text styles for the fallback text... */
-}
-
-/* --- Responsive Adjustments --- */
-@media (max-width: 992px) {
-  .agneyaLogo {
-    height: 40px; /* Slightly smaller on tablets/mobile */
-  }
-}
-
-@media (max-width: 576px) {
-  .agneyaLogo {
-    height: 35px; /* Even smaller for small mobile screens */
-  }
-}
