@@ -266,21 +266,24 @@ function OnlineShopping() {
     }
   };
 
-  const handleCustomizeAndDownload = async (product) => {
+  const handleCustomizeAndDownload = (product) => {
     try {
-      // 1. Auto-download the selected image
+      // 1. Auto-download the selected image using native download approach
       const imageUrl = getImageUrl(product.imageUrls?.[0] || product.images?.[0] || product.imageUrl);
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
       
       const link = document.createElement("a");
-      link.href = blobUrl;
+      link.href = imageUrl;
+      // Provide a clean filename
       link.download = `${product.name?.replace(/\s+/g, "_") || "custom_base"}.jpg`;
+      link.target = "_blank"; // Fallback to opening in a new tab if download is blocked
+      
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(link);
+      }, 100);
     } catch (error) {
       console.error("Failed to download image automatically:", error);
     }
