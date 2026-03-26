@@ -270,23 +270,34 @@ function OnlineShopping() {
     try {
       const imageUrl = getImageUrl(product.imageUrls?.[0] || product.images?.[0] || product.imageUrl);
       
-      // Navigate to customize page FIRST to avoid browser blocking download due to navigation
-      handleProtectedAction("/customize", { baseProduct: product });
-
-      // Trigger download immediately after navigation state is set
-      setTimeout(() => {
+      // Force internal browser download using invisible canvas
+      // This bypasses Cloudinary/CORS fetching issues while avoiding visual new tabs
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = imageUrl;
+      
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        
+        const dataUrl = canvas.toDataURL("image/jpeg", 1.0);
         const link = document.createElement("a");
-        link.href = imageUrl;
-        link.download = `${product.name?.replace(/\s+/g, "_") || "custom_base"}.jpg`;
-        link.target = "_blank"; // Opens in new tab/triggers download without blocking
+        link.href = dataUrl;
+        link.download = `${product.name?.replace(/\s+/g, "_") || "agneya_base"}.jpg`;
         document.body.appendChild(link);
         link.click();
-        
-        setTimeout(() => {
-          document.body.removeChild(link);
-        }, 100);
-      }, 500); // Small delay allows navigate() to process
+        document.body.removeChild(link);
+      };
+      
+      img.onerror = () => {
+        console.error("Failed to load image for auto-download");
+      };
 
+      // Proceed to Customization page as intended while download happens quietly
+      handleProtectedAction("/customize", { baseProduct: product });
     } catch (error) {
       console.error("Failed to download image automatically:", error);
     }
