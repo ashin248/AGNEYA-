@@ -8,6 +8,8 @@ import { staggeredGravityContainer, gravityScrollVariant } from "../../shared/an
 import { useAuth } from "../../shared/context/AuthContext";
 import "../style/NavBar.css";
 
+import Logo from '../../../public/Agneya_Creations.png'
+
 function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -42,7 +44,7 @@ function NavBar() {
     return (
       <nav className="user-navbar">
         <div className="user-nav-container">
-          <div className="user-logo">AGNEYA<span className="accent-dot">.</span></div>
+          <div className="user-logo"><img src={Logo} alt="" className="agneyaLogo" /> </div>
           <div>Loading...</div>
         </div>
       </nav>
@@ -138,117 +140,3 @@ function NavBar() {
 }
 
 export default NavBar;
-
-
-
-
-
-
-// import React, { useState, useEffect } from "react";
-// import { Link, useNavigate, NavLink } from "react-router-dom";
-// import "../style/NavBar.css";
-
-// function NavBar() {
-//   const [menuOpen, setMenuOpen] = useState(false);
-//   const [scrolled, setScrolled] = useState(false);
-//   const navigate = useNavigate();
-//   const [user, setUser] = useState(null);
-
-//   useEffect(() => {
-//     const storedUser = localStorage.getItem("user");
-//     if (storedUser) {
-//       try {
-//         setUser(JSON.parse(storedUser));
-//       } catch (e) {
-//         localStorage.removeItem("user");
-//       }
-//     }
-
-//     const handleScroll = () => {
-//       setScrolled(window.scrollY > 50);
-//     };
-//     window.addEventListener("scroll", handleScroll);
-//     return () => window.removeEventListener("scroll", handleScroll);
-//   }, []);
-
-//   const handleLogout = () => {
-//     if (window.confirm("Logout")) {
-//       localStorage.removeItem("token");
-//       localStorage.removeItem("user");
-//       setUser(null);
-//       navigate("/login");
-//       setMenuOpen(false);
-//     }
-//   };
-
-//   const navLinks = [
-//     { name: "Home", href: "/" },
-//     { name: "Shop", href: "/shop" },
-//     { name: "Orders", href: "/my-orders" },
-//   ];
-
-//   return (
-//     <nav className={`navbar ${scrolled ? "scrolled" : ""} ${menuOpen ? "menu-active" : ""}`}>
-//       <div className="navbar-container">
-        
-//         {/* Logo Section */}
-//         <Link to="/" className="logo" onClick={() => setMenuOpen(false)}>
-//           AGNEYA<span className="gold-dot">.</span>
-//         </Link>
-
-//         {/* Navigation Links */}
-//         <ul className={`nav-links ${menuOpen ? "active" : ""}`}>
-//           {navLinks.map((item) => (
-//             <li key={item.name} className="nav-item">
-//               <NavLink 
-//                 to={item.href} 
-//                 className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
-//                 onClick={() => setMenuOpen(false)}
-//               >
-//                 {item.name}
-//               </NavLink>
-//             </li>
-//           ))}
-          
-//           {/* Mobile Only Login/Logout */}
-//           <li className="nav-item mobile-only">
-//             {user ? (
-//               <button className="logout-btn-mob" onClick={handleLogout}>Logout</button>
-//             ) : (
-//               <Link to="/login" className="login-btn-mob" onClick={() => setMenuOpen(false)}>
-//                 Login
-//               </Link>
-//             )}
-//           </li>
-//         </ul>
-
-//         {/* Desktop Actions */}
-//         <div className="nav-actions">
-//           {user ? (
-//             <div className="user-profile-nav desktop-only">
-//               <span className="user-name-text">Hi, {user.fullName?.split(" ")[0] || "User"}</span>
-//               <button className="logout-icon-btn" onClick={handleLogout} title="Logout">
-//                 <i className="bi bi-box-arrow-right"></i>
-//               </button>
-//             </div>
-//           ) : (
-//             <Link to="/login" className="login-link-desktop desktop-only">Login / Register</Link>
-//           )}
-
-//           {/* Hamburger Menu Icon */}
-//           <button 
-//             className={`hamburger ${menuOpen ? "active" : ""}`} 
-//             onClick={() => setMenuOpen(!menuOpen)}
-//             aria-label="Toggle navigation"
-//           >
-//             <span className="line"></span>
-//             <span className="line"></span>
-//             <span className="line"></span>
-//           </button>
-//         </div>
-//       </div>
-//     </nav>
-//   );
-// }
-
-// export default NavBar;

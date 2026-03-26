@@ -318,3 +318,55 @@
     padding: 1rem 1.5rem;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/* --- Agneya Logo Image Styling --- */
+.agneyaLogo {
+  height: 45px;            /* Fixed height for desktop */
+  width: auto;             /* Keep aspect ratio */
+  object-fit: contain;     /* Ensure image isn't cropped */
+  transition: all 0.4s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)); /* Give it some depth */
+}
+
+/* Hover effect for the logo */
+.user-logo:hover .agneyaLogo {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 8px rgba(255, 126, 95, 0.4)); /* Glow effect on hover */
+}
+
+/* Shrink logo slightly when navbar is scrolled for a cleaner look */
+.user-navbar.scrolled .agneyaLogo {
+  height: 38px;
+}
+
+/* Container for the logo inside the Link component */
+.user-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  /* Keeping your existing gradient text styles for the fallback text... */
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+  .agneyaLogo {
+    height: 40px; /* Slightly smaller on tablets/mobile */
+  }
+}
+
+@media (max-width: 576px) {
+  .agneyaLogo {
+    height: 35px; /* Even smaller for small mobile screens */
+  }
+}
