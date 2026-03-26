@@ -218,7 +218,25 @@ const Purchase = () => {
           onChange={handleChange}
           placeholder="Mobile *"
         />
-
+         <div style={{display: "flex", flexDirection: "column", gap: "4px", width: "100%", marginBottom: "15px"}}>
+          <label style={{fontSize: "14px", fontWeight: "bold", color: "#333"}}>PIN Code {pincodeLoading && <span style={{fontSize: "0.8rem", color: "#999", fontWeight: "normal"}}>(Checking...)</span>}</label>
+          <input
+            name="pincode"
+            value={address.pincode}
+            maxLength={6}
+            onChange={(e) => {
+              if (/^\d{0,6}$/.test(e.target.value)) handleChange(e);
+            }}
+            placeholder="6-digit PIN"
+            style={{marginBottom: "0"}}
+          />
+          {address.postOffice && (
+            <p style={{fontSize: "0.85rem", color: "#9c51b6", fontWeight: "600", marginTop: "4px"}}>
+              📍 Post Office: {address.postOffice}
+            </p>
+          )}
+          {pincodeError && <span style={{color: "red", fontSize: "0.8rem"}}>{pincodeError}</span>}
+        </div>
         <input
           name="addressLine"
           value={address.addressLine}
@@ -239,26 +257,9 @@ const Purchase = () => {
           onChange={handleChange}
           placeholder="State"
         />
+        {/* ----------------------------------------------------------------- */}
 
-        <div style={{display: "flex", flexDirection: "column", gap: "4px", width: "100%", marginBottom: "15px"}}>
-          <label style={{fontSize: "14px", fontWeight: "bold", color: "#333"}}>PIN Code {pincodeLoading && <span style={{fontSize: "0.8rem", color: "#999", fontWeight: "normal"}}>(Checking...)</span>}</label>
-          <input
-            name="pincode"
-            value={address.pincode}
-            maxLength={6}
-            onChange={(e) => {
-              if (/^\d{0,6}$/.test(e.target.value)) handleChange(e);
-            }}
-            placeholder="6-digit PIN"
-            style={{marginBottom: "0"}}
-          />
-          {address.postOffice && (
-            <p style={{fontSize: "0.85rem", color: "#9c51b6", fontWeight: "600", marginTop: "4px"}}>
-              📍 Post Office: {address.postOffice}
-            </p>
-          )}
-          {pincodeError && <span style={{color: "red", fontSize: "0.8rem"}}>{pincodeError}</span>}
-        </div>
+
       </div>
 
       <button

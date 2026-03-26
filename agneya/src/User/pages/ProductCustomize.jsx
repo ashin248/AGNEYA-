@@ -383,15 +383,9 @@ function ProductCustomize() {
         const img = new fabric.Image(imgElement, { crossOrigin: "anonymous" });
         img.scaleToWidth(220);
 
-        const clippedGroup = new fabric.Group([img], {
-          clipPath: canvas.clipPath,
-          selectable: true,
-          subTargetCheck: true,
-        });
-
-        canvas.add(clippedGroup);
-        canvas.centerObject(clippedGroup);
-        canvas.setActiveObject(clippedGroup);
+        canvas.add(img);
+        canvas.centerObject(img);
+        canvas.setActiveObject(img);
         setActiveImage(img);
         setActiveTab("image");
         canvas.renderAll();
@@ -411,15 +405,9 @@ function ProductCustomize() {
         img.scaleToWidth(150);
         img.set({ crossOrigin: "anonymous" });
 
-        const clippedGroup = new fabric.Group([img], {
-          clipPath: canvas.clipPath,
-          selectable: true,
-          subTargetCheck: true,
-        });
-
-        canvas.add(clippedGroup);
-        canvas.centerObject(clippedGroup);
-        canvas.setActiveObject(clippedGroup);
+        canvas.add(img);
+        canvas.centerObject(img);
+        canvas.setActiveObject(img);
         canvas.renderAll();
         saveState();
       },

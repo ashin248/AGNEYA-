@@ -1,5 +1,5 @@
 
-
+.studio-main-container
 /* --- Global Studio Setup --- */
 .customize-page.studio-theme {
   min-height: 100vh;
@@ -40,6 +40,7 @@
   grid-template-columns: 280px 1fr 300px;
   height: calc(100vh - 145px);
   overflow: hidden;
+  height: 100vh;
 }
 
 /* 3. Side Panels (Left & Right) */
