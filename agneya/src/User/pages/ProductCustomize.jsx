@@ -276,8 +276,9 @@ function ProductCustomize() {
         };
       } else {
         // Generic Rectangular mask for other products (like mobile covers)
-        const printW = fabricBgImg.width * scale * 0.5; // ~50% of background width
-        const printH = fabricBgImg.height * scale * 0.8; // ~80% of background height
+        // Covers the full background area to allow editing the entire image
+        const printW = fabricBgImg.width * scale; // 100% of background width
+        const printH = fabricBgImg.height * scale; // 100% of background height
         const fabricMask = new fabric.Rect({
           width: printW,
           height: printH,
