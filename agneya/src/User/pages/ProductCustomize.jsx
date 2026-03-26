@@ -181,6 +181,11 @@ function ProductCustomize() {
   const setupBackgroundImage = (canvas, imageUrl) => {
     return new Promise((resolve) => {
       fabric.Image.fromURL(imageUrl, (img) => {
+        if (!img) {
+          console.error("Failed to load background image:", imageUrl);
+          resolve();
+          return;
+        }
         // ക്യാൻവാസ് സൈസ് 700x700 ആയതുകൊണ്ട് അതിനനുസരിച്ച് സ്കെയിൽ ചെയ്യുന്നു
         const scaleX = canvas.width / img.width;
         const scaleY = canvas.height / img.height;
