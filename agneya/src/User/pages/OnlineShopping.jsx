@@ -266,48 +266,30 @@ function OnlineShopping() {
     }
   };
 
-  const handleCustomizeAndDownload = async (product) => {
+  const handleCustomizeAndDownload = (product) => {
     try {
-      // 1. Fetch image as blob to force download instead of navigating
       const imageUrl = getImageUrl(product.imageUrls?.[0] || product.images?.[0] || product.imageUrl);
       
-      const response = await fetch(imageUrl, {
-        method: "GET",
-        headers: {
-          "Cache-Control": "no-cache",
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error("Network response failed");
-      }
-      
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      const fileName = `${product.name?.replace(/\s+/g, "_") || "custom_base"}.jpg`;
-      link.download = fileName;
-      
-      document.body.appendChild(link);
-      link.click();
-      
-      // Cleanup with delay to ensure download starts
+      // Navigate to customize page FIRST to avoid browser blocking download due to navigation
+      handleProtectedAction("/customize", { baseProduct: product });
+
+      // Trigger download immediately after navigation state is set
       setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(blobUrl);
-      }, 1000);
-      
+        const link = document.createElement("a");
+        link.href = imageUrl;
+        link.download = `${product.name?.replace(/\s+/g, "_") || "custom_base"}.jpg`;
+        link.target = "_blank"; // Opens in new tab/triggers download without blocking
+        document.body.appendChild(link);
+        link.click();
+        
+        setTimeout(() => {
+          document.body.removeChild(link);
+        }, 100);
+      }, 500); // Small delay allows navigate() to process
+
     } catch (error) {
       console.error("Failed to download image automatically:", error);
-      // Fallback: Just open in new tab if fetch fails due to strict CORS proxy issues
-      const imageUrl = getImageUrl(product.imageUrls?.[0] || product.images?.[0] || product.imageUrl);
-      window.open(imageUrl, "_blank");
     }
-    
-    // 2. Navigate to customize page
-    handleProtectedAction("/customize", { baseProduct: product });
   };
 
   if (loading) {
