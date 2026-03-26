@@ -1,5 +1,8 @@
 /* src/style/OnlineShopping.css */
 
+.quick-view-overlay{}
+
+
 .online-shopping-page {
   min-height: 100vh;
   background-color: #030305;
@@ -62,7 +65,7 @@
 
 .quick-view-overlay {
   position: absolute;
-  inset: 0;
+  /* inset: 0; */
   display: flex;
   align-items: center;
   justify-content: center;
