@@ -35,11 +35,12 @@ const Purchase = () => {
   // Load user + validation
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
+    const token = localStorage.getItem("token");
 
     // Verify user exists on backend to catch "User no longer exists" early
-    if (user) {
-      API.get("/api/users/profile").catch(() => {
-        // Interceptor will handle logout if 401
+    if (token) {
+      API.get("/api/user/profile").catch(() => {
+        // Silently fail if profile not readable, they will have to enter address manually
       });
     }
 
