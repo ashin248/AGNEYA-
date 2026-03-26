@@ -190,6 +190,12 @@ function ProductCustomize() {
     // Re-usable function to forcefully set background image to ensure it's not wiped by JSON load
     const setupBackgroundImage = (callback) => {
       fabric.Image.fromURL(finalUrl, (img) => {
+        if (!img) {
+          console.error("Failed to load background image:", finalUrl);
+          if (callback) callback(null, 1);
+          return;
+        }
+        
         const scale = Math.min(
           canvas.width / img.width,
           canvas.height / img.height
@@ -216,7 +222,9 @@ function ProductCustomize() {
       const maskUrl = productMasks[projectType];
 
       const finishLoading = (maskObject, safetyWidth, safetyHeight) => {
-        canvas.customClipPath = maskObject;
+        if (maskObject) {
+          canvas.customClipPath = maskObject;
+        }
 
         // Safety Area
         const safetyRect = new fabric.Rect({
@@ -254,11 +262,15 @@ function ProductCustomize() {
           // Check for draft recovery if this is the first load
           const draft = localStorage.getItem(`agneya_draft_${baseProduct._id}`);
           if (draft && Object.keys(sidesData).length === 0) {
-            const parsed = JSON.parse(draft);
-            setSidesData(parsed);
-            if (parsed[index]) {
-              loadContent(parsed[index]);
-              return;
+            try {
+              const parsed = JSON.parse(draft);
+              setSidesData(parsed);
+              if (parsed[index]) {
+                loadContent(parsed[index]);
+                return;
+              }
+            } catch (err) {
+              console.error("Failed to parse draft", err);
             }
           }
           canvas.renderAll();
@@ -268,23 +280,29 @@ function ProductCustomize() {
 
       if (maskUrl) {
         fabric.Image.fromURL(maskUrl, (fabricMask) => {
-          fabricMask.set({
-            scaleX: scale,
-            scaleY: scale,
-            originX: 'center',
-            originY: 'center',
-            left: canvas.width / 2,
-            top: canvas.height / 2,
-            absolutePositioned: true,
-          });
-
-          finishLoading(fabricMask, 300, 400); // Default tshirt safety area
+          if (fabricMask) {
+            fabricMask.set({
+              scaleX: scale,
+              scaleY: scale,
+              originX: 'center',
+              originY: 'center',
+              left: canvas.width / 2,
+              top: canvas.height / 2,
+              absolutePositioned: true,
+            });
+            finishLoading(fabricMask, 300, 400); // Default tshirt safety area
+          } else {
+            console.error("Mask failed to load");
+            finishLoading(null, 300, 400);
+          }
         }, { crossOrigin: 'anonymous' });
       } else {
         // Generic Rectangular mask for other products (like mobile covers)
         // Covers the full background area to allow editing the entire image
-        const printW = fabricBgImg.width * scale; // 100% of background width
-        const printH = fabricBgImg.height * scale; // 100% of background height
+        const bgW = fabricBgImg ? fabricBgImg.width : canvas.width;
+        const bgH = fabricBgImg ? fabricBgImg.height : canvas.height;
+        const printW = bgW * scale; // 100% of background width
+        const printH = bgH * scale; // 100% of background height
         const fabricMask = new fabric.Rect({
           width: printW,
           height: printH,
