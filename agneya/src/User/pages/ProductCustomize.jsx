@@ -124,6 +124,47 @@ function ProductCustomize() {
       updateObjectList();
     });
 
+    canvas.on("mouse:wheel", function(opt) {
+      if (opt.e.ctrlKey || opt.e.metaKey || opt.e.shiftKey || opt.e.altKey) {
+        let delta = opt.e.deltaY;
+        let zoom = canvas.getZoom();
+        zoom *= 0.999 ** delta;
+        if (zoom > 5) zoom = 5;
+        if (zoom < 0.2) zoom = 0.2;
+        canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+        opt.e.preventDefault();
+        opt.e.stopPropagation();
+      }
+    });
+
+    canvas.on('mouse:down', function(opt) {
+      let evt = opt.e;
+      if (evt.shiftKey === true || evt.altKey === true) {
+        this.isDragging = true;
+        this.selection = false;
+        this.lastPosX = evt.clientX;
+        this.lastPosY = evt.clientY;
+      }
+    });
+
+    canvas.on('mouse:move', function(opt) {
+      if (this.isDragging) {
+        let e = opt.e;
+        let vpt = this.viewportTransform;
+        vpt[4] += e.clientX - this.lastPosX;
+        vpt[5] += e.clientY - this.lastPosY;
+        this.requestRenderAll();
+        this.lastPosX = e.clientX;
+        this.lastPosY = e.clientY;
+      }
+    });
+
+    canvas.on('mouse:up', function(opt) {
+      this.setViewportTransform(this.viewportTransform);
+      this.isDragging = false;
+      this.selection = true;
+    });
+
     return () => {
       canvas.dispose();
       fabricCanvasRef.current = null;
@@ -159,36 +200,16 @@ function ProductCustomize() {
       });
 
       // Load Clipping Mask
-      const projectType = baseProduct?.category?.toLowerCase() || "tshirt";
-      const maskUrl = productMasks[projectType] || productMasks.tshirt;
+      const projectType = baseProduct?.category?.toLowerCase() || "";
+      const maskUrl = productMasks[projectType];
 
-      const maskImgElement = new Image();
-      maskImgElement.crossOrigin = "anonymous";
-      maskImgElement.src = maskUrl;
-
-      maskImgElement.onload = () => {
-        const fabricMask = new fabric.Image(maskImgElement);
-        fabricMask.set({
-          scaleX: scale,
-          scaleY: scale,
-          left: (canvas.width - fabricBgImg.width * scale) / 2,
-          top: (canvas.height - fabricBgImg.height * scale) / 2,
-          selectable: false,
-          evented: false,
-          opacity: 0,
-          name: "clipping-mask",
-        });
-
-        canvas.add(fabricMask);
-        canvas.sendToBack(fabricMask);
-        canvas.clipPath = fabricMask; // ← Important for clipping
-
+      const finishLoading = (maskObject, safetyWidth, safetyHeight) => {
         // Safety Area
         const safetyRect = new fabric.Rect({
-          left: canvas.width / 2 - 150,
-          top: canvas.height / 2 - 200,
-          width: 300,
-          height: 400,
+          left: canvas.width / 2 - safetyWidth / 2,
+          top: canvas.height / 2 - safetyHeight / 2,
+          width: safetyWidth,
+          height: safetyHeight,
           fill: "transparent",
           stroke: "#ff4081",
           strokeDashArray: [5, 5],
@@ -227,7 +248,64 @@ function ProductCustomize() {
           setIsSaving(false);
         }
       };
+
+      if (maskUrl) {
+        const maskImgElement = new Image();
+        maskImgElement.crossOrigin = "anonymous";
+        maskImgElement.src = maskUrl;
+
+        maskImgElement.onload = () => {
+          const fabricMask = new fabric.Image(maskImgElement);
+          fabricMask.set({
+            scaleX: scale,
+            scaleY: scale,
+            left: (canvas.width - fabricBgImg.width * scale) / 2,
+            top: (canvas.height - fabricBgImg.height * scale) / 2,
+            selectable: false,
+            evented: false,
+            opacity: 0,
+            name: "clipping-mask",
+            absolutePositioned: true,
+          });
+
+          canvas.add(fabricMask);
+          canvas.sendToBack(fabricMask);
+          canvas.clipPath = fabricMask;
+
+          finishLoading(fabricMask, 300, 400); // Default tshirt safety area
+        };
+      } else {
+        // Generic Rectangular mask for other products (like mobile covers)
+        const printW = fabricBgImg.width * scale * 0.5; // ~50% of background width
+        const printH = fabricBgImg.height * scale * 0.8; // ~80% of background height
+        const fabricMask = new fabric.Rect({
+          width: printW,
+          height: printH,
+          left: (canvas.width - printW) / 2,
+          top: (canvas.height - printH) / 2,
+          selectable: false,
+          evented: false,
+          opacity: 0,
+          name: "clipping-mask",
+          absolutePositioned: true,
+        });
+
+        canvas.add(fabricMask);
+        canvas.sendToBack(fabricMask);
+        canvas.clipPath = fabricMask;
+
+        finishLoading(fabricMask, printW, printH);
+      }
     };
+  };
+
+  const handleZoom = (scaleDelta) => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+    let zoom = canvas.getZoom() * scaleDelta;
+    if (zoom > 5) zoom = 5;
+    if (zoom < 0.2) zoom = 0.2;
+    canvas.zoomToPoint({ x: canvas.width / 2, y: canvas.height / 2 }, zoom);
   };
 
   const reApplyClipPath = () => {
@@ -708,6 +786,15 @@ function ProductCustomize() {
                 />
                 Show Print Guide
               </label>
+            </div>
+            <div className="zoom-controls">
+              <button onClick={() => handleZoom(0.8)} title="Zoom Out">
+                <i className="bi bi-zoom-out"></i> -
+              </button>
+              <button onClick={() => handleZoom(1.2)} title="Zoom In">
+                <i className="bi bi-zoom-in"></i> +
+              </button>
+              <span className="tooltip-hint">(Scroll + Ctrl to Zoom, Shift to Pan)</span>
             </div>
           </div>
         </main>
