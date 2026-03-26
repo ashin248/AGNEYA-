@@ -266,6 +266,29 @@ function OnlineShopping() {
     }
   };
 
+  const handleCustomizeAndDownload = async (product) => {
+    try {
+      // 1. Auto-download the selected image
+      const imageUrl = getImageUrl(product.imageUrls?.[0] || product.images?.[0] || product.imageUrl);
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `${product.name?.replace(/\s+/g, "_") || "custom_base"}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Failed to download image automatically:", error);
+    }
+    
+    // 2. Navigate to customize page
+    handleProtectedAction("/customize", { baseProduct: product });
+  };
+
   if (loading) {
     return (
       <div className="online-shopping-page">
@@ -610,7 +633,7 @@ function OnlineShopping() {
                       <button
                         className="buy-now-btn-main"
                         style={{ background: "linear-gradient(135deg, #ff4081, #f50057)", color: "#fff" }}
-                        onClick={() => handleProtectedAction("/customize", { baseProduct: p })}
+                        onClick={() => handleCustomizeAndDownload(p)}
                       >
                         <i className="bi bi-palette-fill" style={{ marginRight: '8px' }}></i>
                         Customize Now
@@ -701,7 +724,7 @@ function OnlineShopping() {
                           </button>
                         </>
                       ) : (
-                        <button className="qv-buy" onClick={() => handleProtectedAction("/customize", { baseProduct: quickViewProduct })}>
+                        <button className="qv-buy" onClick={() => handleCustomizeAndDownload(quickViewProduct)}>
                           Customize Now
                         </button>
                       )}
