@@ -62,13 +62,13 @@ function NavBar() {
     >
       <div className="user-nav-container">
         
-        {/* Logo Section with Image and Text */}
+        {/* Logo Section with Image and Text
         <Link to="/" className="user-logo" onClick={() => setMenuOpen(false)}>
           <img src={Logo} alt="Agneya Logo" className="agneyaLogo" />
           <span className="logo-text">
             AGNEYA<span className="accent-dot">.</span>
           </span>
-        </Link>
+        </Link> */}
 
         {/* Navigation Links */}
         <motion.ul 
